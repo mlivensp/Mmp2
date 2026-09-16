@@ -7,6 +7,7 @@
 
 import Foundation
 
+typealias AppSetting = SchemaV1.AppSetting
 typealias Backup = SchemaV1.Backup
 typealias Clip = SchemaV1.Clip
 //typealias CurrentSelection = SchemaV1.CurrentSelection
@@ -18,7 +19,7 @@ typealias PlaybackConstant = SchemaV1.PlaybackConstant
 typealias PlaybackStepwise = SchemaV1.PlaybackStepwise
 typealias Playlist = SchemaV1.Playlist
 typealias PlaylistMember = SchemaV1.PlaylistItem
-typealias SettingsSetting = SchemaV1.Setting
+typealias PlayOrder = SchemaV1.PlayOrder
 typealias Source = SchemaV1.Source
 typealias SourceGroup = SchemaV1.SourceGroup
 typealias Version = SchemaV1.Version

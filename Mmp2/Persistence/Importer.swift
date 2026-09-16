@@ -101,38 +101,22 @@ struct JSON: RandomAccessCollection {
 }
 
 struct Importer {
-    //
-    //    fileprivate func importClips(_ clips: [JSON], _ context: NSManagedObjectContext) -> [Clip] {
-    //        var result: [Clip] = []
-    //        for clipJson in clips {
-    //            let clip = Clip(context: context)
-    //            clip.name = clipJson.name.string
-    //            let startTimeString = clipJson.startTime.string
-    //            if let startTimeComponents = parseISO8601Duration(startTimeString) {
-    //                clip.startTimeValue = format(dateComponents: startTimeComponents)
-    //            } else {
-    //                clip.startTimeValue = "00:00:00"
-    //            }
-    //
-    //            let endTimeString = clipJson.endTime.string
-    //            if let endTimeComponents = parseISO8601Duration(endTimeString) {
-    //                clip.endTimeValue = format(dateComponents: endTimeComponents)
-    //            } else {
-    //                clip.endTimeValue = "00:00:00"
-    //            }
-    //
-    //            clip.isFavorite = clipJson.isFavorite.bool
-    //            clip.notes = clipJson.notes.string
-    //            clip.media = importMedia(clipJson.media, context)
-    //            clip.media.path = nil
-    //            clip.playback = importPlayback(clipJson.playback, context)
-    //            clip.clipCreationInProgress = false
-    //            result.append(clip)
-    //        }
-    //
-    //        return result
-    //    }
-    //
+    fileprivate func importPlayOrders(in modelContext: ModelContext, _ playOrders: JSON) -> [Int:PlayOrder] {
+        var result: [Int:PlayOrder] = [:]
+        for playOrderData in playOrders.array {
+            let id = playOrderData.playOrderId.int
+            let name = playOrderData.name.string
+            let slowOrder = playOrderData.slowOrder.int
+            let midOrder = playOrderData.midOrder.int
+            let fastOrder = playOrderData.fastOrder.int
+            let sortOrder = playOrderData.sortOrder.int
+            let playOrder = PlayOrder(name: name, slowOrder: slowOrder, midOrder: midOrder, fastOrder: fastOrder, sortOrder: sortOrder)
+            modelContext.insert(playOrder)
+            result[id] = playOrder
+        }
+        
+        return result
+    }
     
     fileprivate func importCollections(in modelContext: ModelContext, _ collections: JSON) -> [MediaCollection] {
         var result: [MediaCollection] = []
@@ -189,7 +173,7 @@ struct Importer {
             modelContext.insert(source)
             source.mediaCollection = mediaCollection
 
-//            let clips = importClips(sourceJson.clips.array, context)
+            let clips = importClips(modelContext: modelContext, sourceAggregate.clips.array, source: source)
 //            _ = clips.map { source.addToClips($0) }
             result[id] = source
         }
@@ -197,6 +181,30 @@ struct Importer {
         return result
     }
     
+    fileprivate func importClips(modelContext: ModelContext, _ clips: [JSON], source: Source) -> [Int:Clip] {
+        var result: [Int:Clip] = [:]
+        for clipAggregate in clips {
+            let media = importMedia(modelContext: modelContext, clipAggregate.media)
+            let playback = importPlayback(modelContext: modelContext, clipAggregate.playback)
+            let clipData = clipAggregate.clip
+            let id = clipData.Id.int
+            let name = clipData.name.string
+            let startTime = parseTime(clipData.startTime.string)
+            let endTime = parseTime(clipData.endTime.string)
+            let startMeasure = clipData.startMeasure.optionalInt
+            let endMeasure = clipData.endMeasure.optionalInt
+            let isFavorite = clipData.isFavorite.bool
+            let notes = clipData.notes.optionalString
+            let clip = Clip(source: source, name: name, startTime: startTime ?? Date.distantPast, endTime: endTime ?? Date.distantPast, startMeasure: startMeasure, endMeasure: endMeasure, isFavorite: isFavorite, notes: notes, media: media, playback: playback)
+            modelContext.insert(clip)
+            result[id] = clip
+        }
+        
+        return result
+    }
+    
+    
+
     fileprivate func importMedia(modelContext: ModelContext,_ mediaJson: JSON) -> Media {
         let path = mediaJson.path.string
         var mediaDuration = TimeInterval.zero
@@ -302,6 +310,37 @@ struct Importer {
     //            _ = playlistMembers.map { playlist.addToPlaylistMembers($0) }
     //        }
     //    }
+    
+    fileprivate func purgeData(_ modelContext: ModelContext) {
+        // Delete all Playlists
+        let fetchDescriptor2 = FetchDescriptor<Playlist>()
+        if let playlists = try? modelContext.fetch(fetchDescriptor2) {
+            for playlist in playlists {
+                modelContext.delete(playlist)
+            }
+        }
+        
+        // Delete all MediaCollections
+        let fetchDescriptor = FetchDescriptor<MediaCollection>()
+        if let collections = try? modelContext.fetch(fetchDescriptor) {
+            for collection in collections {
+                modelContext.delete(collection)
+            }
+        }
+        
+        // Delete all PlayOrders
+        let fetchDescriptor3 = FetchDescriptor<PlayOrder>()
+        if let playOrders = try? modelContext.fetch(fetchDescriptor3) {
+            for playOrder in playOrders {
+                modelContext.delete(playOrder)
+            }
+        }
+        
+        // TODO: AppSettings
+        // TODO: Backups
+        // TODO: Version
+    }
+
     @MainActor
     func importFromURL(_ url: URL, modelContext: ModelContext) {
         // TODO: errors need to be handled here
@@ -316,17 +355,19 @@ struct Importer {
         
         guard let data = try? String(contentsOf: url, encoding: .utf8) else { return }
         guard let json = try? JSON(string: data) else { return }
-        // 1. Delete all MediaCollections
-        let fetchDescriptor = FetchDescriptor<MediaCollection>()
-        if let collections = try? modelContext.fetch(fetchDescriptor) {
-            for collection in collections {
-                modelContext.delete(collection)
-            }
-        }
         
+        purgeData(modelContext)
+        
+        let playOrdersJson = json.playOrders
+        let playOrderDictionary = importPlayOrders(in: modelContext,  playOrdersJson)
         let collectionsJson = json.collections
         let collections = importCollections(in: modelContext, collectionsJson)
         
+        
+        // TODO: AppSettings
+        // TODO: Backups
+        // TODO: Playlists
+        // TODO: Version
         //        let playlist = json.playlists
         //        importPlaylists(playlist, dataController.container.viewContext, collections)
         //        appRootManager.currentRoot = .home
@@ -354,6 +395,13 @@ func timeInterval(from timeString: String) -> TimeInterval? {
     }
 
     return date.timeIntervalSinceReferenceDate
+}
+
+func parseTime(_ string: String) -> Date? {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "HH:mm:ss.SSSSSSS"
+    formatter.timeZone = TimeZone(secondsFromGMT: 0)
+    return formatter.date(from: string)
 }
 
 func parseISO8601Duration(_ duration: String) -> DateComponents? {

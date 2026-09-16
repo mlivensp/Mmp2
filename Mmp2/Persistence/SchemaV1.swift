@@ -19,7 +19,7 @@ enum SchemaV1: VersionedSchema {
         Playback.self,
         Playlist.self,
         PlaylistItem.self,
-        Setting.self,
+        AppSetting.self,
         Source.self,
         SourceGroup.self,
         Version.self
@@ -75,11 +75,11 @@ enum SchemaV1: VersionedSchema {
         var media: Media
         
         @Relationship(deleteRule: .cascade, inverse: \Playback.clip)
-        var playback: Playback?
+        var playback: Playback
         
         var source: Source?
         
-        public init(source: Source?, name: String, startTime: Date, endTime: Date, startMeasure: Int?, endMeasure: Int?, isFavorite: Bool, media: Media) {
+        public init(source: Source?, name: String, startTime: Date, endTime: Date, startMeasure: Int?, endMeasure: Int?, isFavorite: Bool, notes: String?, media: Media, playback: Playback) {
             self.source = source
             self.primitiveName = name
             self.name_normalized = name.normalizedForSearch
@@ -88,8 +88,10 @@ enum SchemaV1: VersionedSchema {
             self.startMeasure = startMeasure
             self.endMeasure = endMeasure
             self.isFavorite = isFavorite
+            self.notes = notes
             self.clipCreationInProgress = false
             self.media = media
+            self.playback = playback
         }
     }
     
@@ -194,8 +196,7 @@ enum SchemaV1: VersionedSchema {
         var numberOfBounces: Int
         var playback: Playback?
         
-        @Relationship(deleteRule: .cascade, inverse: \PlayOrder.playbackBounce)
-        var playOrder: PlayOrder
+        var playOrder: PlayOrder?
         
         init(slowTempo: Int, timesToPlaySlowTempo: Int, midTempo: Int, timesToPlayMidTempo: Int, fastTempo: Int, timesToPlayFastTempo: Int, numberOfBounces: Int, playback: Playback?, playOrder: PlayOrder) {
             self.slowTempo = slowTempo
@@ -215,14 +216,17 @@ enum SchemaV1: VersionedSchema {
         var slowOrder: Int
         var midOrder: Int
         var fastOrder: Int
-        var playbackBounce: PlaybackBounce?
+        var sortOrder: Int
         
-        init(name: String, slowORder: Int, midOrder: Int, fastOrder: Int, playbackBounce: PlaybackBounce?) {
+        @Relationship(deleteRule: .deny, inverse: \PlaybackBounce.playOrder)
+        var playbackBounce: [PlaybackBounce] = []
+        
+        init(name: String, slowOrder: Int, midOrder: Int, fastOrder: Int, sortOrder: Int) {
             self.name = name
-            self.slowOrder = slowORder
+            self.slowOrder = slowOrder
             self.midOrder = midOrder
             self.fastOrder = fastOrder
-            self.playbackBounce = playbackBounce
+            self.sortOrder = sortOrder
         }
     }
 
@@ -258,7 +262,7 @@ enum SchemaV1: VersionedSchema {
         
     }
 
-    @Model class Setting {
+    @Model class AppSetting {
         var deleteOrphansOnStartup: Bool
         var fixInvalidPathErrors: Bool
         var startupPage: String

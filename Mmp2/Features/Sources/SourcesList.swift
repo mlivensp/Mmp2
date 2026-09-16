@@ -42,9 +42,19 @@ struct SourcesList: View {
                     } label: {
                         Label(group.primitiveName, systemImage: "folder.fill")
                     }
-
+                    
                 case .source(let source):
-                    SourceRow(source: source)
+                    if let clips = source.clips, !clips.isEmpty {
+                        DisclosureGroup {
+                            ForEach(clips) { clip in
+                                ClipRow(clip: clip)
+                            }
+                        } label: {
+                            SourceRow(source: source)
+                        }
+                    } else {
+                        SourceRow(source: source)
+                    }
                 }
             }
         }
