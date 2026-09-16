@@ -18,7 +18,19 @@ struct SourcesView: View {
     var body: some View {
         Group {
             if let collection {
-                SourcesList(collection: collection)
+                SourcesList(
+                    collection: collection,
+                    onSourceTapped: { source in
+                        appRootManager.selectedSource = source
+                        appRootManager.selectedClip = nil
+                        appRootManager.currentRoot = .play
+                    },
+                    onClipTapped: { clip in
+                        appRootManager.selectedSource = nil
+                        appRootManager.selectedClip = clip
+                        appRootManager.currentRoot = .play
+                    }
+                )
             } else {
                 ContentUnavailableView("No Collection Selected", systemImage: "folder")
             }

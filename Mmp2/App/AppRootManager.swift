@@ -38,6 +38,9 @@ final class AppRootManager {
 //            Logger.fluff.info(selectedMediaCollection?.primitiveName ?? "no collection")
         }
     }
+    
+    var selectedSource: Source? = nil
+    var selectedClip: Clip? = nil
 
     enum AppRoots {
         case splash

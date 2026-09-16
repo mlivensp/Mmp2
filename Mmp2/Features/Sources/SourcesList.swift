@@ -9,7 +9,9 @@ import SwiftUI
 
 struct SourcesList: View {
     let collection: MediaCollection
-
+    let onSourceTapped: (Source) -> Void
+    let onClipTapped: (Clip) -> Void
+    
     // Combined list of top-level items
     private var topLevelItems: [TopLevelItem] {
         var items: [TopLevelItem] = []
@@ -48,12 +50,21 @@ struct SourcesList: View {
                         DisclosureGroup {
                             ForEach(clips) { clip in
                                 ClipRow(clip: clip)
+                                    .onTapGesture {
+                                        onClipTapped(clip)
+                                    }
                             }
                         } label: {
                             SourceRow(source: source)
+                                .onTapGesture {
+                                    onSourceTapped(source)
+                                }
                         }
                     } else {
                         SourceRow(source: source)
+                            .onTapGesture {
+                                onSourceTapped(source)
+                            }
                     }
                 }
             }

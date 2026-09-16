@@ -31,7 +31,7 @@ struct Mmp2App: App {
                 case .splash:
                     SplashView()
                 case .play:
-                    SplashView()
+                    SinglePlayerView()
                 case .playlistPlayer:
                     SplashView()
                 case .playlistEditor:
