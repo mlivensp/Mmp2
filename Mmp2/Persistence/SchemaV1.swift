@@ -118,6 +118,7 @@ enum SchemaV1: VersionedSchema {
         var lastPlayed: Date?
         var numberTimesPlayed: Int
         var isArchived: Bool
+        var bookmark: Data?
 
         public init(
             path: String,

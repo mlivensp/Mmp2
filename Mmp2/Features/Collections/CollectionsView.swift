@@ -80,33 +80,51 @@ struct CollectionsView: View {
                     // TODO: handle error
                     print(error.localizedDescription)
                 }
-        }
-//        .fileImporter(isPresented: $isImporting, allowedContentTypes: [.json]) { result in
-//            switch result {
-//            case .success(let url):
-//                let importer = Importer()
-//                importer.importFromURL(url, modelContext: modelContext)
-//            case .failure(let error):
-//                print(error.localizedDescription)
-//            }
-//        }
-//        .fileImporter(
-//            isPresented: $isLocatingSource,
-//            allowedContentTypes: [.folder],  // This restricts the picker to folders only.
-//            allowsMultipleSelection: false
-//        ) { result in
-//            do {
-//                if let url = try result.get().first {
-//                    // If you need persistent access to the directory, consider starting a security-scoped session:
-//                    // _ = url.startAccessingSecurityScopedResource()
-////                    selectedDirectory = url
-////                    viewModel.scanDirectory(at: url)
-//                }
-//            } catch {
-//                // Handle any errors here.
-//                print("Error selecting directory: \(error.localizedDescription)")
-//            }
-//        }
+            }
+            .overlay(alignment: .bottom) {
+                if isWorking {
+                    VStack(spacing: 12) {
+                        ProgressView(value: progress)
+                            .progressViewStyle(.linear)
+                            .padding(.horizontal)
+                        
+                        Button("Cancel") {
+                            cancelRepair()
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                    .padding()
+                    .background(.thinMaterial)
+                    .cornerRadius(12)
+                    .padding()
+                }
+            }
+        //        .fileImporter(isPresented: $isImporting, allowedContentTypes: [.json]) { result in
+        //            switch result {
+        //            case .success(let url):
+        //                let importer = Importer()
+        //                importer.importFromURL(url, modelContext: modelContext)
+        //            case .failure(let error):
+        //                print(error.localizedDescription)
+        //            }
+        //        }
+        //        .fileImporter(
+        //            isPresented: $isLocatingSource,
+        //            allowedContentTypes: [.folder],  // This restricts the picker to folders only.
+        //            allowsMultipleSelection: false
+        //        ) { result in
+        //            do {
+        //                if let url = try result.get().first {
+        //                    // If you need persistent access to the directory, consider starting a security-scoped session:
+        //                    // _ = url.startAccessingSecurityScopedResource()
+        ////                    selectedDirectory = url
+        ////                    viewModel.scanDirectory(at: url)
+        //                }
+        //            } catch {
+        //                // Handle any errors here.
+        //                print("Error selecting directory: \(error.localizedDescription)")
+        //            }
+        //        }
     }
     
     private func locateSourcesRequested() {
@@ -140,12 +158,98 @@ struct CollectionsView: View {
         do {
             // If you need persistent access to the directory, consider starting a security-scoped session:
             // _ = url.startAccessingSecurityScopedResource()
-//            selectedDirectory = url
-//            viewModel.scanDirectory(at: url)
+            //            selectedDirectory = url
+            //            viewModel.scanDirectory(at: url)
+            try startRepair(using: url)
         } catch {
             // Handle any errors here.
             print("Error selecting directory: \(error.localizedDescription)")
         }
+    }
+    
+    @State private var isWorking: Bool = false
+    @State private var progress: Double = 0
+    @State private var repairTask: Task<Void, Never>? = nil
+    
+    //    private func startRepair(using folderURL: URL) throws {
+    //        let fetchDescriptor = FetchDescriptor<Media>(predicate: #Predicate { media in
+    //            media.pathIsValid == false && media.clip == nil
+    //        })
+    //        let items = try modelContext.fetch(fetchDescriptor)
+    //        guard !items.isEmpty else { return }
+    //
+    //        isWorking = true
+    //        progress = 0
+    //        let locator = SourceLocatorActor(modelContext: modelContext)
+    //
+    //        Task {
+    //            do {
+    //                try await locator.repairPaths(
+    //                    in: folderURL,
+    //                    mediaItems: items
+    //                ) { update in
+    //                    // This runs on MainActor (actor guarantees it)
+    //                    self.progress = Double(update.checked) / Double(update.total)
+    //                    self.isWorking = update.checked < update.total
+    //                }
+    //
+    //                // After finishing, reload invalid paths if needed
+    //                // e.g. refresh your collection or UI
+    //            }
+    //            catch is CancellationError {
+    //                print("Repair cancelled")
+    //                isWorking = false
+    //            }
+    //            catch {
+    //                print("Repair failed: \(error)")
+    //                isWorking = false
+    //            }
+    //        }
+    //    }
+    
+    private func startRepair(using folderURL: URL) throws {
+        let fetchDescriptor = FetchDescriptor<Media>(predicate: #Predicate { media in
+            media.pathIsValid == false && media.clip == nil
+        })
+        let items = try modelContext.fetch(fetchDescriptor)
+        guard !items.isEmpty else { return }
+        
+        isWorking = true
+        progress = 0
+        let locator = SourceLocatorActor(modelContainer: modelContext.container)
+        
+        repairTask = Task {
+            do {
+                try await locator.repairPaths(
+                    in: folderURL,
+                    mediaItems: items
+                ) { update in
+                    // MainActor guaranteed by actor
+                    self.progress = Double(update.checked) / Double(update.total)
+                }
+                
+                // Finished
+                isWorking = false
+                repairTask = nil
+                //                loadInvalidPaths()
+                
+            } catch is CancellationError {
+                print("Repair cancelled")
+                isWorking = false
+                repairTask = nil
+                
+            } catch {
+                print("Repair failed: \(error)")
+                isWorking = false
+                repairTask = nil
+            }
+        }
+    }
+    
+    private func cancelRepair() {
+        repairTask?.cancel()
+        repairTask = nil
+        isWorking = false
     }
     
     private func addItem() {
