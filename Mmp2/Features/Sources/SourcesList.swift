@@ -40,6 +40,9 @@ struct SourcesList: View {
                         // Sources inside the group
                         ForEach(group.sources ?? []) { source in
                             SourceRow(source: source)
+                                .onTapGesture {
+                                    onSourceTapped(source)
+                                }
                         }
                     } label: {
                         Label(group.primitiveName, systemImage: "folder.fill")

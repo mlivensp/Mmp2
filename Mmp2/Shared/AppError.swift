@@ -9,4 +9,5 @@ import Foundation
 
 enum AppError: Error {
     case noMedia
+    case invalidPlayback
 }

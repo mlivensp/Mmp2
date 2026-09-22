@@ -8,15 +8,18 @@
 import Foundation
 import SwiftData
 
-enum SchemaV1: VersionedSchema {
-    static let versionIdentifier = Schema.Version(1, 0, 0)
-    static let models: [any PersistentModel.Type] = [
+public enum SchemaV1: VersionedSchema {
+    public static let versionIdentifier = Schema.Version(1, 0, 0)
+    public static let models: [any PersistentModel.Type] = [
         Backup.self,
         MediaCollection.self,
         Clip.self,
 //        CurrentSelection.self,
         Media.self,
         Playback.self,
+        PlaybackConstant.self,
+        PlaybackStepwise.self,
+        PlaybackBounce.self,
         Playlist.self,
         PlaylistItem.self,
         AppSetting.self,
@@ -62,8 +65,8 @@ enum SchemaV1: VersionedSchema {
     @Model class Clip {
         var primitiveName: String
         var name_normalized: String = ""
-        var startTime: Date
-        var endTime: Date
+        var startTime: String
+        var endTime: String
         var startMeasure: Int?
         var endMeasure: Int?
         var isFavorite: Bool
@@ -79,7 +82,7 @@ enum SchemaV1: VersionedSchema {
         
         var source: Source?
         
-        public init(source: Source?, name: String, startTime: Date, endTime: Date, startMeasure: Int?, endMeasure: Int?, isFavorite: Bool, notes: String?, media: Media, playback: Playback) {
+        public init(source: Source?, name: String, startTime: String, endTime: String, startMeasure: Int?, endMeasure: Int?, isFavorite: Bool, notes: String?, media: Media, playback: Playback) {
             self.source = source
             self.primitiveName = name
             self.name_normalized = name.normalizedForSearch
@@ -159,7 +162,7 @@ enum SchemaV1: VersionedSchema {
         }
     }
     
-    @Model class PlaybackConstant {
+    @Model public class PlaybackConstant {
         var tempo: Int
         var timesToPlay: Int?
         var playback: Playback?

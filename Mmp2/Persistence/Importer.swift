@@ -189,13 +189,13 @@ struct Importer {
             let clipData = clipAggregate.clip
             let id = clipData.Id.int
             let name = clipData.name.string
-            let startTime = parseTime(clipData.startTime.string)
-            let endTime = parseTime(clipData.endTime.string)
+            let startTime = clipData.startTime.string
+            let endTime = clipData.endTime.string
             let startMeasure = clipData.startMeasure.optionalInt
             let endMeasure = clipData.endMeasure.optionalInt
             let isFavorite = clipData.isFavorite.bool
             let notes = clipData.notes.optionalString
-            let clip = Clip(source: source, name: name, startTime: startTime ?? Date.distantPast, endTime: endTime ?? Date.distantPast, startMeasure: startMeasure, endMeasure: endMeasure, isFavorite: isFavorite, notes: notes, media: media, playback: playback)
+            let clip = Clip(source: source, name: name, startTime: startTime ?? "", endTime: endTime ?? "", startMeasure: startMeasure, endMeasure: endMeasure, isFavorite: isFavorite, notes: notes, media: media, playback: playback)
             modelContext.insert(clip)
             result[id] = clip
         }

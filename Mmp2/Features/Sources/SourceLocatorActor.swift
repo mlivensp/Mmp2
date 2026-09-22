@@ -85,7 +85,7 @@ actor SourceLocatorActor {
             media.bookmark = bookmarkData
             media.path = url.path  // Store POSIX path
             media.pathIsValid = true
-            print("about to save media with path \(media.path)")
+//            print("about to save media with path \(media.path)")
             try modelContext.save()
         } catch {
             print("Error saving media: \(error)")
