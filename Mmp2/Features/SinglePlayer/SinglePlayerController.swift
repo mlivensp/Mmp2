@@ -49,6 +49,12 @@ final class SinglePlayerController {
     
     func attachVideoPlayer(_ player: AVPlayer) {
         self.videoPlayer = player
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(playerDidReachEnd),
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: player.currentItem
+        )
     }
     
     func start() {
@@ -66,6 +72,28 @@ final class SinglePlayerController {
         
 //        audioPlayer?.stop()
         videoPlayer?.pause()
+    }
+    
+    @objc private func playerDidReachEnd(_ notification: Notification) {
+        if let nextRate = sequencer.nextRate() {
+            if let videoPlayer {
+                let start = clipStart ?? 0
+                let startTime = CMTime(seconds: start, preferredTimescale: 600)
+                videoPlayer.seek(to: startTime) { _ in
+//                    videoPlayer.play()
+                    videoPlayer.rate = Float(nextRate)
+//                    videoPlayer.rate = Float(nextRate)
+//                    videoPlayer.playImmediately(atRate: Float(nextRate))
+                }
+            } /* else if let audioPlayer {
+                let start = clipStart ?? 0
+                audioPlayer.currentTime = start
+                audioPlayer.rate = Float(nextRate)
+                audioPlayer.play()
+            } */
+        } else {
+            stop()
+        }
     }
     
     // MARK: - Async Playback Loop

@@ -8,6 +8,7 @@
 import Foundation
 
 protocol PlayRateSequencer {
-    mutating func nextRate() -> Double?
-    mutating func reset()
+    var currentRate: Float { get set }
+    func nextRate() -> Float?
+    func reset()
 }

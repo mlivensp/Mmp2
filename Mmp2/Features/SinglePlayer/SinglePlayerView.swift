@@ -16,60 +16,41 @@ struct SinglePlayerView: View {
     @State private var playback: Playback?
     @State private var clipStart: Double?
     @State private var clipEnd: Double?
-//    @State private var audioPlayer: AVAudioPlayer?
     @State private var videoPlayer: AVPlayer?
     @State private var resolvedURL: URL?
     @State private var controller: SinglePlayerController?
-
+    @State private var sequencer: PlayRateSequencer = DefaultSequencer()
+    
     private func preparePlayback() throws {
         guard let url = resolvedURL else { return }
-//        guard let media else { return }
+        guard let media else { return }
         guard let playback else { return }
-
-        var sequencer: PlayRateSequencer
         
         do {
-            sequencer = try SequencerFactory.createSequencer(from: playback)
+            sequencer = try SequencerFactory.createSequencer(from: playback, bpm: media.bpm)
         } catch {
             throw error
         }
-
-//        if url.pathExtension.lowercased() == "mp4" {
-            let player = AVPlayer(url: url)
-            videoPlayer = player
-            
-            controller = SinglePlayerController(
-                clipStart: clipStart,
-                clipEnd: clipEnd,
-                sequencer: sequencer
-            )
-            
-            controller?.attachVideoPlayer(player)
-            
-//        }
-//        else {
-//            let player = try? AVAudioPlayer(contentsOf: url)
-//            audioPlayer = player
-//            audioPlayer?.prepareToPlay()
-//            
-//            controller = SinglePlayerController(
-//                clipStart: clipStart,
-//                clipEnd: clipEnd,
-//                sequencer: sequencer
-//            )
-//            
-//            if let player { controller?.attachAudioPlayer(player) }
-//        }
+        
+        let player = AVPlayer(url: url)
+        videoPlayer = player
+        
+        controller = SinglePlayerController(
+            clipStart: clipStart,
+            clipEnd: clipEnd,
+            sequencer: sequencer
+        )
+        
+        controller?.attachVideoPlayer(player)
     }
-
+    
     var body: some View {
         Group {
-            if let url = resolvedURL {
-//                if url.pathExtension.lowercased() == "mp4" {
-                    VideoPlayerView(player: AVPlayer(url: url))
-//                } else {
-//                    AudioPlayerControls(player: audioPlayer)
-//                }
+            if let player = videoPlayer {
+                VStack {
+                    Slider(value: $sequencer.currentRate, in: 0...2)
+                    VideoPlayerView(player: player)
+                }
             } else {
                 Text("Unable to load media")
                     .foregroundColor(.secondary)
@@ -83,18 +64,19 @@ struct SinglePlayerView: View {
         }
         .onDisappear {
             controller?.stop()
-//            audioPlayer?.stop()
-//            videoPlayer?.pause()
+            
+            if let url = resolvedURL {
+                url.stopAccessingSecurityScopedResource()
+                print("🔚 Stopped security-scoped access for \(url.path)")
+            }
         }
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
-//                    viewModel.cleanUp()
                     appRootManager.currentRoot = .home
                 } label: {
                     HStack {
                         Image(systemName: "chevron.left")
-//                        Text(viewModel.backNavigationText)
                     }
                 }
             }
@@ -104,20 +86,23 @@ struct SinglePlayerView: View {
     private func selectMedia() throws {
         if let source = appRootManager.selectedSource {
             media = source.media
+            playback = source.playback
         } else if let clip = appRootManager.selectedClip {
             media = clip.source?.media
+            playback = clip.playback
             clipStart = clip.startTime.durationAsSeconds
             clipEnd = clip.endTime.durationAsSeconds
         } else {
             throw AppError.noMedia
         }
     }
-
+    
     private func resolveURL() throws {
         guard let media else { throw AppError.noMedia }
         guard let bookmark = media.bookmark else { return }
-
+        
         var isStale = false
+        
         do {
             let url = try URL(
                 resolvingBookmarkData: bookmark,
@@ -126,25 +111,26 @@ struct SinglePlayerView: View {
                 bookmarkDataIsStale: &isStale
             )
             
-            if url.startAccessingSecurityScopedResource() {
-                resolvedURL = url
-                print("resolvedURL - \(resolvedURL?.absoluteString ?? "")")
+            if isStale {
+                print("⚠️ Stale bookmark for media")
+                // TODO: trigger re-bookmark flow
+                return
             }
+            
+            let ok = url.startAccessingSecurityScopedResource()
+            print("startAccessingSecurityScopedResource = \(ok) for \(url.path)")
+            
+            guard ok else {
+                print("❌ Failed to start security-scoped access for \(url.path)")
+                return
+            }
+            
+            resolvedURL = url
+            print("✅ resolvedURL - \(url.absoluteString)")
         } catch {
-            print(error.localizedDescription)
+            print("❌ resolveURL error: \(error)")
         }
     }
-
-//    private func preparePlayback() {
-//        guard let url = resolvedURL else { return }
-//
-//        if url.pathExtension.lowercased() == "mp4" {
-//            videoPlayer = AVPlayer(url: url)
-//        } else {
-//            audioPlayer = try? AVAudioPlayer(contentsOf: url)
-//            audioPlayer?.prepareToPlay()
-//        }
-//    }
 }
 
 //#Preview {

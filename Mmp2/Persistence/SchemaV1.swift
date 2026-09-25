@@ -163,12 +163,12 @@ public enum SchemaV1: VersionedSchema {
     }
     
     @Model public class PlaybackConstant {
-        var tempo: Int
+        var rate: Int
         var timesToPlay: Int?
         var playback: Playback?
         
-        init(tempo: Int, timesToPlay: Int? = nil, playback: Playback?) {
-            self.tempo = tempo
+        init(rate: Int, timesToPlay: Int? = nil, playback: Playback?) {
+            self.rate = rate
             self.timesToPlay = timesToPlay
             self.playback = playback
         }

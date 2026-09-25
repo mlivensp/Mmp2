@@ -248,7 +248,7 @@ struct Importer {
                 let max = playbackData.maxRate.optionalInt
                 let playbackStepwise = PlaybackStepwise(start: start, step: step, max: max ?? 100, timesToPlay: timesToPlay ?? 1, playback: playback)
             } else {
-                let playbackConstant = PlaybackConstant(tempo: start, timesToPlay: timesToPlay, playback: playback)
+                let playbackConstant = PlaybackConstant(rate: start, timesToPlay: timesToPlay, playback: playback)
             }
         } else {
             // TODO: import bounce
