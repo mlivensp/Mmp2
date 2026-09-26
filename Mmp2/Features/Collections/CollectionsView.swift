@@ -145,7 +145,7 @@ struct CollectionsView: View {
         } else if locatingSource {
             return [.folder]
         } else {
-            return []
+            return [.text]
         }
     }
     

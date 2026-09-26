@@ -19,12 +19,13 @@ struct SinglePlayerView: View {
     @State private var videoPlayer: AVPlayer?
     @State private var resolvedURL: URL?
     @State private var controller: SinglePlayerController?
-    @State private var sequencer: PlayRateSequencer = DefaultSequencer()
     
     private func preparePlayback() throws {
         guard let url = resolvedURL else { return }
         guard let media else { return }
         guard let playback else { return }
+        
+        let sequencer: PlayRateSequencer
         
         do {
             sequencer = try SequencerFactory.createSequencer(from: playback, bpm: media.bpm)
@@ -36,6 +37,7 @@ struct SinglePlayerView: View {
         videoPlayer = player
         
         controller = SinglePlayerController(
+            bpm: media.bpm,
             clipStart: clipStart,
             clipEnd: clipEnd,
             sequencer: sequencer
@@ -48,7 +50,22 @@ struct SinglePlayerView: View {
         Group {
             if let player = videoPlayer {
                 VStack {
-                    Slider(value: $sequencer.currentRate, in: 0...2)
+                    let formattedRate = controller?.playRate
+                        .formatted(.percent.precision(.fractionLength(0))) ?? "?"
+                    Text(formattedRate)
+                    Slider(
+                        value: playRateBinding,
+                        in: 0...2,
+                        step: 0.01) {
+                            Text("Rate")
+                        } minimumValueLabel: {
+                            Text("0%")
+                        } maximumValueLabel: {
+                            Text("200%")
+                        } onEditingChanged: { _ in
+                            
+                        }
+
                     VideoPlayerView(player: player)
                 }
             } else {
@@ -83,6 +100,15 @@ struct SinglePlayerView: View {
         }
     }
     
+    var playRateBinding: Binding<Float> {
+        Binding(
+            get: { controller?.playRate ?? 1.0 },
+            set: { newValue in
+                controller?.playRate = newValue
+            }
+        )
+    }
+
     private func selectMedia() throws {
         if let source = appRootManager.selectedSource {
             media = source.media

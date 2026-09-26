@@ -8,6 +8,11 @@
 import Foundation
 
 struct SequencerFactory {
+    static func createConstantPlayRateSequencer(rate: Float, bpm: Int?) -> ConstantPlayRateSequencer {
+        let intRate = Int((rate * 100).rounded())
+        return ConstantPlayRateSequencer(rate: intRate, bpm: bpm, timesToPlay: nil)
+    }
+    
     static func createSequencer(from playback: Playback, bpm: Int?) throws -> PlayRateSequencer {
         if playback.playbackBounce == nil {
             if playback.playbackStepwise == nil {
