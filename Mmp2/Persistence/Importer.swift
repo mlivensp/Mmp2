@@ -129,7 +129,7 @@ struct Importer {
             
             let sourceGroups = importSourceGroups(modelContext: modelContext, collectionData.groups.array, mediaCollection)
             let sources = importSources(modelContext: modelContext, sources: collectionData.sources.array, mediaCollection: mediaCollection, sourceGroups: sourceGroups)
-            print("Collection \(name) includes \(mediaCollection.sources?.count ?? -42) sources")
+            print("Collection \(name) includes \(mediaCollection.sources.count ?? -42) sources")
             result.append(mediaCollection)
         }
         
@@ -144,7 +144,7 @@ struct Importer {
             let sortOrder = group.sortOrder.int
             let sourceGroup = SourceGroup(name: name, sortOrder: sortOrder, mediaCollection: mediaCollection)
             modelContext.insert(sourceGroup)
-            mediaCollection.sourceGroups?.append(sourceGroup)
+            mediaCollection.sourceGroups.append(sourceGroup)
             sourceGroups[id] = sourceGroup
         }
         
@@ -206,6 +206,7 @@ struct Importer {
     
 
     fileprivate func importMedia(modelContext: ModelContext,_ mediaJson: JSON) -> Media {
+        let bpm = mediaJson.bpm.optionalInt
         let path = mediaJson.path.string
         var mediaDuration = TimeInterval.zero
         
@@ -217,7 +218,7 @@ struct Importer {
         let pathIsValid = false
         let numberTimesPlayed = mediaJson.numberTimesPlayed.int
         let lastPlayed = mediaJson.lastPlayed.optionalDate
-        let media = Media(path: path, duration: mediaDuration, isArchived: isArchived, pathIsValid: pathIsValid, numberTimesPlayed: numberTimesPlayed, lastPlayed: lastPlayed)
+        let media = Media(bpm: bpm, path: path, duration: mediaDuration, isArchived: isArchived, pathIsValid: pathIsValid, numberTimesPlayed: numberTimesPlayed, lastPlayed: lastPlayed)
         modelContext.insert(media)
         return media
     }

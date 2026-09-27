@@ -15,7 +15,7 @@ struct ConstantSequencerTests {
         let playback = Playback()
         let playbackConstant = PlaybackConstant(rate: 100, timesToPlay: 10, playback: playback)
         playback.playbackConstant = playbackConstant
-        var sequencer = try? SequencerFactory.createSequencer(from: playback, bpm: nil)
+        let sequencer = try? SequencerFactory.createSequencer(from: playback, bpm: nil)
         var actual: [Float] = []
         while let nextRate = sequencer!.nextRate() {
             actual.append(nextRate)
@@ -29,7 +29,7 @@ struct ConstantSequencerTests {
         let playback = Playback()
         let playbackConstant = PlaybackConstant(rate: 1, timesToPlay: nil, playback: playback)
         playback.playbackConstant = playbackConstant
-        var sequencer = try? SequencerFactory.createSequencer(from: playback, bpm: nil)
+        let sequencer = try? SequencerFactory.createSequencer(from: playback, bpm: nil)
         var actual = 0
         let timesToLoop = 100
         for _ in 0..<100 {
@@ -39,6 +39,20 @@ struct ConstantSequencerTests {
         }
         
         let expected = timesToLoop
+        #expect(actual == expected)
+    }
+    
+    @Test func bpmOnceNormalSpeed() async throws {
+        let playback = Playback()
+        let playbackConstant = PlaybackConstant(rate: 72, timesToPlay: 1, playback: playback)
+        playback.playbackConstant = playbackConstant
+        let sequencer = try? SequencerFactory.createSequencer(from: playback, bpm: 72)
+        var actual: [Float] = []
+        while let nextRate = sequencer!.nextRate() {
+            actual.append(nextRate)
+        }
+        
+        let expected = Array(repeating: Float(1.0), count: 1)
         #expect(actual == expected)
     }
 }

@@ -50,10 +50,10 @@ public enum SchemaV1: VersionedSchema {
 //        @Relationship(inverse: \CurrentSelection.collection) var selection: CurrentSelection?
         
         @Relationship(deleteRule: .cascade, inverse: \SourceGroup.mediaCollection)
-        var sourceGroups: [SourceGroup]?
+        var sourceGroups: [SourceGroup] = []
         
         @Relationship(deleteRule: .cascade, inverse: \Source.mediaCollection)
-        var sources: [Source]?
+        var sources: [Source] = []
         
         public init(name: String, clipFolderPath: String? = nil , pathIsValid: Bool = true, notes: String? = nil) {
             self.primitiveName = name
@@ -124,6 +124,7 @@ public enum SchemaV1: VersionedSchema {
         var bookmark: Data?
 
         public init(
+            bpm: Int?,
             path: String,
             duration: Double = 0,
             isArchived: Bool = false,
@@ -132,6 +133,7 @@ public enum SchemaV1: VersionedSchema {
             lastPlayed: Date? = nil,
             
         ) {
+            self.bpm = bpm
             self.path = path
             self.duration = duration
             self.isArchived = isArchived
@@ -241,7 +243,7 @@ public enum SchemaV1: VersionedSchema {
         var notes: String?
         var primitiveName: String
         var shuffle: Bool
-        @Relationship(deleteRule: .cascade, inverse: \PlaylistItem.playlist) var playlistItems: [PlaylistItem]?
+        @Relationship(deleteRule: .cascade, inverse: \PlaylistItem.playlist) var playlistItems: [PlaylistItem] = []
 
         public init(duration: String, primitiveName: String, shuffle: Bool) {
             self.duration = duration
@@ -293,7 +295,7 @@ public enum SchemaV1: VersionedSchema {
         var notes: String?
         
         @Relationship(deleteRule: .cascade, inverse: \Clip.source)
-        var clips: [Clip]?
+        var clips: [Clip] = []
         
         @Relationship(deleteRule: .cascade, inverse: \Media.source)
         var media: Media
@@ -323,7 +325,7 @@ public enum SchemaV1: VersionedSchema {
         var primitiveName: String
         var sortOrder: Int
         @Relationship(deleteRule: .nullify, inverse: \Source.sourceGroup)
-        var sources: [Source]?
+        var sources: [Source] = []
         
         var mediaCollection: MediaCollection?
         

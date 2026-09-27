@@ -9,6 +9,8 @@ import Foundation
 
 @Observable
 class DefaultSequencer: PlayRateSequencer {
+    let displayRate: String = "100%"
+    
     var currentRate: Float = 1.0
     
     func nextRate() -> Float? {

@@ -19,6 +19,7 @@ struct SinglePlayerView: View {
     @State private var videoPlayer: AVPlayer?
     @State private var resolvedURL: URL?
     @State private var controller: SinglePlayerController?
+    @State private var source: Source?
     
     private func preparePlayback() throws {
         guard let url = resolvedURL else { return }
@@ -47,30 +48,73 @@ struct SinglePlayerView: View {
     }
     
     var body: some View {
-        Group {
-            if let player = videoPlayer {
+        HStack {
+            Group {
                 VStack {
-                    let formattedRate = controller?.playRate
-                        .formatted(.percent.precision(.fractionLength(0))) ?? "?"
-                    Text(formattedRate)
-                    Slider(
-                        value: playRateBinding,
-                        in: 0...2,
-                        step: 0.01) {
-                            Text("Rate")
-                        } minimumValueLabel: {
-                            Text("0%")
-                        } maximumValueLabel: {
-                            Text("200%")
-                        } onEditingChanged: { _ in
-                            
+                    Text("Clips")
+                    
+                    let clips: [Clip] = (source?.clips ?? []).sorted {
+                        if $0.startTime == $1.startTime {
+                            return $0.endTime < $1.endTime
                         }
-
-                    VideoPlayerView(player: player)
+                        
+                        return $0.startTime < $1.startTime
+                    }
+                    
+                    ClipListView(clips: clips) { clip in
+                        controller?.stop()
+                        appRootManager.selectedClip = clip
+                        media = clip.media
+                        guard let media else { return }
+                        guard let player = videoPlayer else { return }
+                        let sequencer: PlayRateSequencer
+                        
+                        do {
+                            sequencer = try SequencerFactory.createSequencer(from: clip.playback, bpm: media.bpm)
+                        } catch {
+                            return
+                        }
+                        
+                        controller = SinglePlayerController(
+                            bpm: media.bpm,
+                            clipStart: clip.startTime.durationAsSeconds,
+                            clipEnd: clip.endTime.durationAsSeconds,
+                            sequencer: sequencer
+                        )
+                        
+                        controller?.attachVideoPlayer(player)
+                        controller?.start()
+                    }
+                    .frame(maxWidth: 150)
                 }
-            } else {
-                Text("Unable to load media")
-                    .foregroundColor(.secondary)
+            }
+            
+            Group {
+                if let player = videoPlayer {
+                    VStack {
+//                        let formattedRate = controller?.playRate
+//                            .formatted(.percent.precision(.fractionLength(0))) ?? "?"
+                        Text(controller?.displayRate ?? "?")
+                        Slider(
+                            value: playRateBinding,
+                            in: 0...2,
+                            step: 0.01) {
+                                Text("Rate")
+                            } minimumValueLabel: {
+                                Text("0%")
+                            } maximumValueLabel: {
+                                Text("200%")
+                            }
+                        //                    onEditingChanged: { _ in
+                        //
+                        //                        }
+                        
+                        VideoPlayerView(player: player)
+                    }
+                } else {
+                    Text("Unable to load media")
+                        .foregroundColor(.secondary)
+                }
             }
         }
         .onAppear {
@@ -111,9 +155,11 @@ struct SinglePlayerView: View {
 
     private func selectMedia() throws {
         if let source = appRootManager.selectedSource {
+            self.source = source
             media = source.media
             playback = source.playback
         } else if let clip = appRootManager.selectedClip {
+            self.source = clip.source
             media = clip.source?.media
             playback = clip.playback
             clipStart = clip.startTime.durationAsSeconds

@@ -39,6 +39,7 @@ final class SinglePlayerController {
         clipEnd: Double? = nil,
         sequencer: PlayRateSequencer)
     {
+        self.bpm = bpm
         self.clipStart = clipStart
         self.clipEnd = clipEnd
         self.sequencer = sequencer
@@ -56,14 +57,25 @@ final class SinglePlayerController {
             name: .AVPlayerItemDidPlayToEndTime,
             object: player.currentItem
         )
+        
+        let start = clipStart ?? 0
+        let startTime = CMTime(seconds: start, preferredTimescale: 600)
+        player.seek(to: startTime) { _ in
+//            videoPlayer.rate = Float(nextRate)
+        }
     }
     
     var playRate: Float {
         get { return sequencer.currentRate }
         set {
+            print("Setting new playRate value. newValue: \(newValue) bpm: \(bpm ?? -1)")
             sequencer = SequencerFactory.createConstantPlayRateSequencer(rate: newValue, bpm: bpm)
             videoPlayer?.rate = sequencer.currentRate
         }
+    }
+    
+    var displayRate: String {
+        return sequencer.displayRate
     }
     
     func start() {

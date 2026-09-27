@@ -11,9 +11,13 @@ import Foundation
 class StepwisePlayRateSequencer: PlayRateSequencer {
     var index: Int = 0
     var rates: [Float] = []
+    let bpm: Int?
     
     init(stepwise: PlaybackStepwise, bpm: Int?) throws {
+        self.bpm = bpm
+        
         var divisor: Float
+        
         if let bpm {
             divisor = Float(bpm)
         } else {
@@ -42,6 +46,15 @@ class StepwisePlayRateSequencer: PlayRateSequencer {
     
     var currentRate: Float = 0
     
+    var displayRate: String {
+        if let bpm {
+            let currentBpm = Int((Float(bpm) * currentRate).rounded())
+            return "\(currentBpm) BPM"
+        } else {
+            return currentRate.formatted(.percent.precision(.fractionLength(0)))
+        }
+    }
+
     func nextRate() -> Float? {
         if index >= rates.count {
             return nil

@@ -9,6 +9,7 @@ import Foundation
 
 protocol PlayRateSequencer {
     var currentRate: Float { get set }
+    var displayRate: String { get }
     func nextRate() -> Float?
     func reset()
 }

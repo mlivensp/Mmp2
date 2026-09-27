@@ -41,6 +41,15 @@ class ConstantPlayRateSequencer: PlayRateSequencer {
         }
     }
     
+    var displayRate: String {
+        if let bpm {
+            let currentBpm = Int((Float(bpm) * currentRate).rounded())
+            return "\(currentBpm) BPM"
+        } else {
+            return currentRate.formatted(.percent.precision(.fractionLength(0)))
+        }
+    }
+    
     func nextRate() -> Float? {
         if let index {
             defer { self.index! += 1 }
@@ -50,6 +59,7 @@ class ConstantPlayRateSequencer: PlayRateSequencer {
         }
 
         localCurrentRate = computedRate
+        print("currentRate is \(currentRate)")
         return currentRate
     }
     

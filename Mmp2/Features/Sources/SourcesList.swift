@@ -17,12 +17,12 @@ struct SourcesList: View {
         var items: [TopLevelItem] = []
 
         // 1. Source Groups (sorted)
-        let groups = (collection.sourceGroups ?? [])
+        let groups = (collection.sourceGroups)
             .sorted { $0.sortOrder < $1.sortOrder }   // or by name if you prefer
         items += groups.map { .group($0) }
 
         // 2. Ungrouped sources
-        let ungrouped = (collection.sources ?? [])
+        let ungrouped = (collection.sources)
             .filter { $0.sourceGroup == nil }
             .sorted { ($0.sortOrder) < ($1.sortOrder) }
 
@@ -38,7 +38,7 @@ struct SourcesList: View {
                 case .group(let group):
                     DisclosureGroup {
                         // Sources inside the group
-                        ForEach(group.sources ?? []) { source in
+                        ForEach(group.sources) { source in
                             SourceRow(source: source)
                                 .onTapGesture {
                                     onSourceTapped(source)
@@ -49,9 +49,9 @@ struct SourcesList: View {
                     }
                     
                 case .source(let source):
-                    if let clips = source.clips, !clips.isEmpty {
+                    if !source.clips.isEmpty {
                         DisclosureGroup {
-                            ForEach(clips) { clip in
+                            ForEach(source.clips) { clip in
                                 ClipRow(clip: clip)
                                     .onTapGesture {
                                         onClipTapped(clip)
