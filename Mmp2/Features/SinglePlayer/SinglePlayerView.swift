@@ -20,6 +20,7 @@ struct SinglePlayerView: View {
     @State private var resolvedURL: URL?
     @State private var controller: SinglePlayerController?
     @State private var source: Source?
+    @State private var isAddingClip: Bool = false
     
     private func preparePlayback() throws {
         guard let url = resolvedURL else { return }
@@ -39,8 +40,8 @@ struct SinglePlayerView: View {
         
         controller = SinglePlayerController(
             bpm: media.bpm,
-            clipStart: clipStart,
-            clipEnd: clipEnd,
+            clipStartSeconds: clipStart,
+            clipEndSeconds: clipEnd,
             sequencer: sequencer
         )
         
@@ -51,39 +52,34 @@ struct SinglePlayerView: View {
         HStack {
             Group {
                 VStack {
-                    Text("Clips")
+                    Button(action: switchToSource, label: {
+                        Text("Play Source")
+                    })
+                    
+                    HStack {
+                        Text("Clips")
+                        Button(action: {
+                            isAddingClip.toggle()
+                        }, label: {
+                            Label("", systemImage: isAddingClip ? "minus" : "plus")
+                        })
+                        .backgroundStyle(.clear)
+                    }
+                    
+                    if isAddingClip {
+                        addClipArea
+                    }
                     
                     let clips: [Clip] = (source?.clips ?? []).sorted {
-                        if $0.startTime == $1.startTime {
-                            return $0.endTime < $1.endTime
+                        if $0.startSeconds == $1.startSeconds {
+                            return $0.endSeconds < $1.endSeconds
                         }
                         
-                        return $0.startTime < $1.startTime
+                        return $0.startSeconds < $1.startSeconds
                     }
                     
                     ClipListView(clips: clips) { clip in
-                        controller?.stop()
-                        appRootManager.selectedClip = clip
-                        media = clip.media
-                        guard let media else { return }
-                        guard let player = videoPlayer else { return }
-                        let sequencer: PlayRateSequencer
-                        
-                        do {
-                            sequencer = try SequencerFactory.createSequencer(from: clip.playback, bpm: media.bpm)
-                        } catch {
-                            return
-                        }
-                        
-                        controller = SinglePlayerController(
-                            bpm: media.bpm,
-                            clipStart: clip.startTime.durationAsSeconds,
-                            clipEnd: clip.endTime.durationAsSeconds,
-                            sequencer: sequencer
-                        )
-                        
-                        controller?.attachVideoPlayer(player)
-                        controller?.start()
+                        switchToClip(clip)
                     }
                     .frame(maxWidth: 150)
                 }
@@ -152,6 +148,85 @@ struct SinglePlayerView: View {
             }
         )
     }
+    
+    @State private var addClipStart: String?
+    @State private var addClipEnd: String?
+    
+    private var addClipArea: some View {
+        VStack {
+            HStack {
+                Button(action: {
+                    addClipStart = controller?.position
+                }, label: {
+                    Text("Start")
+                })
+                
+                Text(addClipStart ?? "0:00")
+            }
+            
+            HStack {
+                Button(action: {
+                    addClipEnd = controller?.position
+                }, label: {
+                    Text("End")
+                })
+                
+                Text(addClipEnd ?? "0:00")
+            }
+        }
+        
+    }
+    
+    private func switchToSource() {
+        controller?.stop()
+        appRootManager.selectedClip = nil
+        media = source?.media
+        guard let media else { return }
+        guard let player = videoPlayer else { return }
+        guard let playback = source?.playback else { return }
+        let sequencer: PlayRateSequencer
+        
+        do {
+            sequencer = try SequencerFactory.createSequencer(from: playback, bpm: media.bpm)
+        } catch {
+            return
+        }
+        
+        controller = SinglePlayerController(
+            bpm: media.bpm,
+            clipStartSeconds: nil,
+            clipEndSeconds: nil,
+            sequencer: sequencer
+        )
+        
+        controller?.attachVideoPlayer(player)
+        controller?.start()
+    }
+    
+    private func switchToClip(_ clip: Clip) {
+        controller?.stop()
+        appRootManager.selectedClip = clip
+        media = clip.media
+        guard let media else { return }
+        guard let player = videoPlayer else { return }
+        let sequencer: PlayRateSequencer
+        
+        do {
+            sequencer = try SequencerFactory.createSequencer(from: clip.playback, bpm: media.bpm)
+        } catch {
+            return
+        }
+        
+        controller = SinglePlayerController(
+            bpm: media.bpm,
+            clipStartSeconds: clip.startSeconds,
+            clipEndSeconds: clip.endSeconds,
+            sequencer: sequencer
+        )
+        
+        controller?.attachVideoPlayer(player)
+        controller?.start()
+    }
 
     private func selectMedia() throws {
         if let source = appRootManager.selectedSource {
@@ -162,8 +237,8 @@ struct SinglePlayerView: View {
             self.source = clip.source
             media = clip.source?.media
             playback = clip.playback
-            clipStart = clip.startTime.durationAsSeconds
-            clipEnd = clip.endTime.durationAsSeconds
+            clipStart = clip.startSeconds
+            clipEnd = clip.endSeconds
         } else {
             throw AppError.noMedia
         }

@@ -161,7 +161,13 @@ struct Importer {
             let id = sourceData.sourceId.int
             let name = sourceData.name.string
             let sortOrder = sourceData.sortOrder.int
-            let measure1Start = sourceData.measure1Start.date
+            let measure1Start: Double?
+            if let measure1StartValue = sourceData.measure1Start.optionalString {
+                measure1Start = try? TimeFormatter.shared.seconds(from: measure1StartValue)
+            } else {
+                measure1Start = nil
+            }
+//            let measure1Start = sourceData.measure1Start.optionalDate
             let isFavorite = sourceData.isFavorite.bool
             let notes = sourceData.notes.optionalString
             var sourceGroup: SourceGroup?
@@ -189,13 +195,17 @@ struct Importer {
             let clipData = clipAggregate.clip
             let id = clipData.Id.int
             let name = clipData.name.string
+            
             let startTime = clipData.startTime.string
+            let startSeconds = (try? TimeFormatter.shared.seconds(from: startTime)) ?? 0
             let endTime = clipData.endTime.string
+            let endSeconds = (try? TimeFormatter.shared.seconds(from: endTime)) ?? 0
+            
             let startMeasure = clipData.startMeasure.optionalInt
             let endMeasure = clipData.endMeasure.optionalInt
             let isFavorite = clipData.isFavorite.bool
             let notes = clipData.notes.optionalString
-            let clip = Clip(source: source, name: name, startTime: startTime ?? "", endTime: endTime ?? "", startMeasure: startMeasure, endMeasure: endMeasure, isFavorite: isFavorite, notes: notes, media: media, playback: playback)
+            let clip = Clip(source: source, name: name, startSeconds: startSeconds, endSeconds: endSeconds, startMeasure: startMeasure, endMeasure: endMeasure, isFavorite: isFavorite, notes: notes, media: media, playback: playback)
             modelContext.insert(clip)
             result[id] = clip
         }

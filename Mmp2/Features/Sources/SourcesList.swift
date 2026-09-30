@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SourcesList: View {
+    @Environment(AppRootManager.self) private var appRootManager
+    
     let collection: MediaCollection
     let onSourceTapped: (Source) -> Void
     let onClipTapped: (Clip) -> Void
@@ -15,22 +17,22 @@ struct SourcesList: View {
     // Combined list of top-level items
     private var topLevelItems: [TopLevelItem] {
         var items: [TopLevelItem] = []
-
+        
         // 1. Source Groups (sorted)
         let groups = (collection.sourceGroups)
             .sorted { $0.sortOrder < $1.sortOrder }   // or by name if you prefer
         items += groups.map { .group($0) }
-
+        
         // 2. Ungrouped sources
         let ungrouped = (collection.sources)
             .filter { $0.sourceGroup == nil }
             .sorted { ($0.sortOrder) < ($1.sortOrder) }
-
+        
         items += ungrouped.map { .source($0) }
-
+        
         return items
     }
-
+    
     var body: some View {
         List {
             ForEach(topLevelItems) { item in
@@ -52,10 +54,12 @@ struct SourcesList: View {
                     if !source.clips.isEmpty {
                         DisclosureGroup {
                             ForEach(source.clips) { clip in
-                                ClipRow(clip: clip)
-                                    .onTapGesture {
-                                        onClipTapped(clip)
-                                    }
+                                ClipRow(clip: clip) { clip in
+                                    appRootManager.selectedCategory = .clipEdit(clip: clip, source: source)
+                                }
+                                .onTapGesture {
+                                    onClipTapped(clip)
+                                }
                             }
                         } label: {
                             SourceRow(source: source)

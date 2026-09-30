@@ -28,20 +28,20 @@ final class SinglePlayerController {
     
     private var bpm: Int?
     private var sequencer: PlayRateSequencer
-    private let clipStart: Double?
-    private let clipEnd: Double?
+    private let clipStartSeconds: Double?
+    private let clipEndSeconds: Double?
     
     private var playbackTask: Task<Void, Never>?
     
     init(
         bpm: Int?,
-        clipStart: Double? = nil,
-        clipEnd: Double? = nil,
+        clipStartSeconds: Double? = nil,
+        clipEndSeconds: Double? = nil,
         sequencer: PlayRateSequencer)
     {
         self.bpm = bpm
-        self.clipStart = clipStart
-        self.clipEnd = clipEnd
+        self.clipStartSeconds = clipStartSeconds
+        self.clipEndSeconds = clipEndSeconds
         self.sequencer = sequencer
     }
     
@@ -58,7 +58,7 @@ final class SinglePlayerController {
             object: player.currentItem
         )
         
-        let start = clipStart ?? 0
+        let start = clipStartSeconds ?? 0
         let startTime = CMTime(seconds: start, preferredTimescale: 600)
         player.seek(to: startTime) { _ in
 //            videoPlayer.rate = Float(nextRate)
@@ -78,6 +78,27 @@ final class SinglePlayerController {
         return sequencer.displayRate
     }
     
+    var position: String {
+        guard let videoPlayer else { return "0:00" }
+        let t = CMTimeGetSeconds(videoPlayer.currentTime())
+        if !t.isNaN {
+            return formatCMTime(videoPlayer.currentTime())
+        }
+
+        return "0:00"
+    }
+    
+    func formatCMTime(_ time: CMTime) -> String {
+        let seconds = CMTimeGetSeconds(time)
+        guard !seconds.isNaN else { return "--:--" }
+
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute, .second]
+        formatter.zeroFormattingBehavior = [.pad]
+
+        return formatter.string(from: seconds) ?? "--:--"
+    }
+
     func start() {
         stop()
         sequencer.reset()
@@ -98,7 +119,7 @@ final class SinglePlayerController {
     @objc private func playerDidReachEnd(_ notification: Notification) {
         if let nextRate = sequencer.nextRate() {
             if let videoPlayer {
-                let start = clipStart ?? 0
+                let start = clipStartSeconds ?? 0
                 let startTime = CMTime(seconds: start, preferredTimescale: 600)
                 videoPlayer.seek(to: startTime) { _ in
                     videoPlayer.rate = Float(nextRate)
@@ -165,7 +186,7 @@ final class SinglePlayerController {
     // MARK: - Video
     
     private func playVideoLoop(_ player: AVPlayer) async {
-        guard let start = clipStart, let end = clipEnd else {
+        guard let start = clipStartSeconds, let end = clipEndSeconds else {
             player.play()
             return
         }

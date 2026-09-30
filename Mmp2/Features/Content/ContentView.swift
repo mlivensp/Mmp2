@@ -12,19 +12,22 @@ struct ContentView: View {
     
     var body: some View {
         switch appRootManager.selectedCategory {
-        case "Collections":
+        case .collections:
             CollectionsView()
-        case "Playlists":
+        case .playlists:
             Text("Playlists")
-        case "Favorites":
+        case .favorites:
             Text("Favorites")
-        case "Recents":
+        case .recents:
             Text("Recents")
-        case "Fix Locations":
-            Text("Fix Locations")
-        default:
-            Text("Please choose a group from the sidebar.")
+        case .clipEdit:
+            CollectionsView()
         }
+//        case "Fix Locations":
+//            Text("Fix Locations")
+//        default:
+//            Text("Please choose a group from the sidebar.")
+//        }
     }
 }
 

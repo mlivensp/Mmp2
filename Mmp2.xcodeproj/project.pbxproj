@@ -42,6 +42,7 @@
 				Persistence/SchemaV1.swift,
 				Shared/AppError.swift,
 				"Shared/String+Extensions.swift",
+				Shared/TimeFormatter.swift,
 			);
 			target = DD54A7DC3057467700281B19 /* Mmp2Tests */;
 		};

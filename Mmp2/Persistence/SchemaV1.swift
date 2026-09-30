@@ -5,6 +5,7 @@
 //  Created by Michael Livenspargar on 9/13/26.
 //
 
+import CoreMedia
 import Foundation
 import SwiftData
 
@@ -65,8 +66,8 @@ public enum SchemaV1: VersionedSchema {
     @Model class Clip {
         var primitiveName: String
         var name_normalized: String = ""
-        var startTime: String
-        var endTime: String
+        var startSeconds: Double
+        var endSeconds: Double
         var startMeasure: Int?
         var endMeasure: Int?
         var isFavorite: Bool
@@ -82,12 +83,12 @@ public enum SchemaV1: VersionedSchema {
         
         var source: Source?
         
-        public init(source: Source?, name: String, startTime: String, endTime: String, startMeasure: Int?, endMeasure: Int?, isFavorite: Bool, notes: String?, media: Media, playback: Playback) {
+        public init(source: Source?, name: String, startSeconds: Double, endSeconds: Double, startMeasure: Int?, endMeasure: Int?, isFavorite: Bool, notes: String?, media: Media, playback: Playback) {
             self.source = source
             self.primitiveName = name
             self.name_normalized = name.normalizedForSearch
-            self.startTime = startTime
-            self.endTime = endTime
+            self.startSeconds = startSeconds
+            self.endSeconds = endSeconds
             self.startMeasure = startMeasure
             self.endMeasure = endMeasure
             self.isFavorite = isFavorite
@@ -95,6 +96,22 @@ public enum SchemaV1: VersionedSchema {
             self.clipCreationInProgress = false
             self.media = media
             self.playback = playback
+        }
+        
+        var startCMTime: CMTime {
+            CMTime(seconds: startSeconds, preferredTimescale: 600)
+        }
+
+        var endCMTime: CMTime {
+            CMTime(seconds: endSeconds, preferredTimescale: 600)
+        }
+        
+        var startTimeString: String {
+            TimeFormatter.shared.string(from: startSeconds)
+        }
+
+        var endTimeString: String {
+            TimeFormatter.shared.string(from: endSeconds)
         }
     }
     
@@ -290,7 +307,7 @@ public enum SchemaV1: VersionedSchema {
         var primitiveName: String
         var name_normalized: String = ""
         var sortOrder: Int
-        var measure1Start: Date?
+        var measure1Start: Double?
         var isFavorite: Bool
         var notes: String?
         
@@ -307,7 +324,7 @@ public enum SchemaV1: VersionedSchema {
         var sourceGroup: SourceGroup?
         
         
-        public init(name: String, sortOrder: Int, measure1Start: Date?, isFavorite: Bool, notes: String?, media: Media, playback: Playback, sourceGroup: SourceGroup?) {
+        public init(name: String, sortOrder: Int, measure1Start: Double?, isFavorite: Bool, notes: String?, media: Media, playback: Playback, sourceGroup: SourceGroup?) {
             self.primitiveName = name
             self.name_normalized = name.normalizedForSearch
             self.sortOrder = sortOrder

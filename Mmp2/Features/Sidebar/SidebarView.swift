@@ -26,13 +26,13 @@ struct SidebarView: View {
     var body: some View {
         @Bindable var appRootManager = appRootManager
         
-        List(selection: $appRootManager.selectedCategory) {
-            ForEach(items, id: \.self) { item in
-                NavigationLink(value: item) {
-                    Text(item)
-                }
-            }
-        }
+//        List(selection: $appRootManager.selectedCategory) {
+//            ForEach(items, id: \.self) { item in
+//                NavigationLink(value: item) {
+//                    Text(item)
+//                }
+//            }
+//        }
     }
 }
 

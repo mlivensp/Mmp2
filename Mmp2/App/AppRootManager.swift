@@ -25,13 +25,13 @@ import OSLog
 final class AppRootManager {
     static let shared = AppRootManager()
     
-    var currentRoot: AppRoots = .splash {
+    var currentRoot: AppRoot = .splash {
         didSet {
             print("currentRoot set to \(currentRoot)")
         }
     }
     
-    var selectedCategory = "Collections"
+    var selectedCategory = AppCategory.collections
     var selectedMediaCollection: MediaCollection? {
         didSet {
             Logger.data.info("selectedMediaCollection set to \(self.selectedMediaCollection?.primitiveName ?? "nil")")
@@ -42,7 +42,7 @@ final class AppRootManager {
     var selectedSource: Source? = nil
     var selectedClip: Clip? = nil
 
-    enum AppRoots {
+    enum AppRoot {
         case splash
         case home
         case play
@@ -51,11 +51,37 @@ final class AppRootManager {
         case documents
     }
     
+    enum AppCategory {
+        case collections
+        case playlists
+        case favorites
+        case recents
+        case clipEdit(clip: Clip, source: Source)
+    }
+    
     private init() { }
 }
 
 extension AppRootManager: Equatable {
     static func == (lhs: AppRootManager, rhs: AppRootManager) -> Bool {
         lhs.currentRoot == rhs.currentRoot
+    }
+}
+
+extension AppRootManager.AppCategory: Equatable {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs, rhs) {
+        case (.collections, .collections),
+             (.playlists, .playlists),
+             (.favorites, .favorites),
+             (.recents, .recents):
+            return true
+
+        case let (.clipEdit(a,x), .clipEdit(b,y)):
+            return a.id == b.id && x.id == y.id
+
+        default:
+            return false
+        }
     }
 }

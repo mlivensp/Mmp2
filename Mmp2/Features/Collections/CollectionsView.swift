@@ -32,8 +32,9 @@ struct CollectionsView: View {
             }
         }
         .onChange(of: appRootManager.selectedCategory) { _, newValue in
-            if newValue != "Collections" {
+            guard case .collections = newValue else {
                 appRootManager.selectedMediaCollection = nil
+                return
             }
         }
 #if os(macOS)

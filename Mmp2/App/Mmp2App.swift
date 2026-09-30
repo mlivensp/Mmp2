@@ -47,7 +47,7 @@ struct Mmp2App: App {
                         NavigationStack {
                             ZStack {
                                 switch appRootManager.selectedCategory {
-                                case "Collections":
+                                case .collections:
                                     if appRootManager.selectedMediaCollection == nil {
                                         ContentUnavailableView {
                                             Label("No content selected", systemImage: "exclamationmark.triangle.fill")
@@ -55,19 +55,21 @@ struct Mmp2App: App {
                                     } else {
                                         SourcesView()
                                     }
-                                case "Playlists":
+                                case .playlists:
                                     Text("Playlists")
 //                                    PlaylistsView(dataController: dataController)
-                                case "Favorites":
+                                case .favorites:
                                     Text("Favorites")
-                                case "Recents":
+                                case .recents:
                                     Text("Recents")
 //                                    RecentsView(dataController: dataController)
-                                case "Fix Locations":
-                                    Text("Fix Locations")
+                                case .clipEdit(let clip, let source):
+                                    ClipEditView(clip: clip, source: source)
+//                                case "Fix Locations":
+//                                    Text("Fix Locations")
 //                                    FixLocationsView(dataController: dataController)
-                                default:
-                                    Text("Please choose a group from the sidebar.")
+//                                default:
+//                                    Text("Please choose a group from the sidebar.")
                                 }
                            }
 //                            .navigationDestination(for: NavigationDestination.self) { navigationDestination in
