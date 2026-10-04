@@ -30,7 +30,7 @@ final class PlaybackEditViewModel {
             self.stepwiseVM = PlaybackStepwiseViewModel(start: stepwise.start, step: stepwise.step, max: stepwise.max, timesToPlay: stepwise.timesToPlay)
         } else if let bounce = playback.playbackBounce {
             self.mode = .bounce
-            self.bounceVM = PlaybackBounceViewModel()
+            self.bounceVM = PlaybackBounceViewModel(slowTempo: bounce.slowTempo, slowTempoTimesToPlay: bounce.timesToPlaySlowTempo, midTempo: bounce.midTempo, midTempoTimesToPlay: bounce.timesToPlayMidTempo, fastTempo: bounce.fastTempo, fastTempoTimesToPlay: bounce.timesToPlayFastTempo, numberOfBounces: bounce.numberOfBounces)
         } else {
             // default mode for new clips
             self.mode = .constant
