@@ -62,8 +62,8 @@ struct ClipEditViewContent: View {
                 } else {
                     Section("First Measure") {
                         ErrorFieldContainer(
-                            hasError: vm.startMeasureError != nil,
-                            errorMessage: vm.startMeasureError
+                            hasError: vm.firstMeasureError != nil,
+                            errorMessage: vm.firstMeasureError
                         ) {
                             TextField("", text: $vm.startMeasureString)
                                 .frame(maxWidth: 60)
@@ -72,8 +72,8 @@ struct ClipEditViewContent: View {
                     
                     Section("Last Measure") {
                         ErrorFieldContainer(
-                            hasError: vm.endMeasureError != nil,
-                            errorMessage: vm.endMeasureError
+                            hasError: vm.lastMeasureError != nil,
+                            errorMessage: vm.lastMeasureError
                         ) {
                             TextField("", text: $vm.endMeasureString)
                                 .frame(maxWidth: 60)

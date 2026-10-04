@@ -6,10 +6,18 @@
 //
 
 import Testing
+import SwiftData
 @testable import Mmp2
 
 @MainActor
+@Suite
 struct ClipEditViewModelTests {
+    let testContext: TestModelContext
+    
+    init() throws {
+        testContext = try TestModelContext()
+    }
+    
     @Test func testSecondsValidation() async throws {
         let vm = try createVm();
         vm.startTimeString = "00:01:12.25"
@@ -37,60 +45,55 @@ struct ClipEditViewModelTests {
     }
     
     @Test func testMeasureValidation() async throws {
-        let modelContext = try TestModelContext.shared.makeTestContext()
         let clip = createClip();
         let source = createSource();
         source.measure1Start = 32.6
-        let vm = ClipEditViewContent.ViewModel(clip: clip, source: source, context: modelContext)
+        let vm = ClipEditViewContent.ViewModel(clip: clip, source: source, context: testContext.context)
         vm.startMeasureString = "3"
         vm.endMeasureString = "5"
-        #expect(vm.startMeasureError == nil)
+        #expect(vm.firstMeasureError == nil)
         #expect(Int(vm.startMeasureString) == 3)
-        #expect(vm.endMeasureError == nil)
+        #expect(vm.lastMeasureError == nil)
         #expect(Int(vm.endMeasureString) == 5)
     }
     
     @Test func testStartMeasureFormatBad() async throws {
-        let modelContext = try TestModelContext.shared.makeTestContext()
         let clip = createClip();
         let source = createSource();
         source.measure1Start = 32.6
-        let vm = ClipEditViewContent.ViewModel(clip: clip, source: source, context: modelContext)
+        let vm = ClipEditViewContent.ViewModel(clip: clip, source: source, context: testContext.context)
         vm.startMeasureString = "d"
         vm.endMeasureString = "5"
-        #expect(vm.startMeasureError != nil)
-        #expect(vm.endMeasureError == nil)
+        #expect(vm.firstMeasureError != nil)
+        #expect(vm.lastMeasureError == nil)
     }
     
     @Test func testEndMeasureFormatBad() async throws {
-        let modelContext = try TestModelContext.shared.makeTestContext()
         let clip = createClip();
         let source = createSource();
         source.measure1Start = 32.6
-        let vm = ClipEditViewContent.ViewModel(clip: clip, source: source, context: modelContext)
+        let vm = ClipEditViewContent.ViewModel(clip: clip, source: source, context: testContext.context)
         vm.startMeasureString = "3"
         vm.endMeasureString = "5.625"
-        #expect(vm.startMeasureError == nil)
-        #expect(vm.endMeasureError != nil)
+        #expect(vm.firstMeasureError == nil)
+        #expect(vm.lastMeasureError != nil)
     }
 
     @Test func testMeasureRangeError() async throws {
-        let modelContext = try TestModelContext.shared.makeTestContext()
         let clip = createClip();
         let source = createSource();
         source.measure1Start = 32.6
-        let vm = ClipEditViewContent.ViewModel(clip: clip, source: source, context: modelContext)
+        let vm = ClipEditViewContent.ViewModel(clip: clip, source: source, context: testContext.context)
         vm.startMeasureString = "3"
         vm.endMeasureString = "2"
-        #expect(vm.startMeasureError != nil)
-        #expect(vm.endMeasureError != nil)
+        #expect(vm.firstMeasureError != nil)
+        #expect(vm.lastMeasureError != nil)
     }
 
     fileprivate func createVm() throws -> ClipEditViewContent.ViewModel {
-        let modelContext = try TestModelContext.shared.makeTestContext()
         let clip = createClip()
         let source = createSource()
-        return ClipEditViewContent.ViewModel(clip: clip, source: source, context: modelContext)
+        return ClipEditViewContent.ViewModel(clip: clip, source: source, context: testContext.context)
     }
 
     fileprivate func createClip() -> Mmp2.Clip {
@@ -103,6 +106,5 @@ struct ClipEditViewModelTests {
         let dummySourceMedia = Mmp2.Media(bpm: 90, path: "", duration: 62)
         let dummySourcePlayback = Mmp2.Playback()
         return Mmp2.Source(name: "Sample Source", sortOrder: 0, measure1Start: nil, isFavorite: false, notes: nil, media: dummySourceMedia, playback: dummySourcePlayback, sourceGroup: nil)
-
     }
 }

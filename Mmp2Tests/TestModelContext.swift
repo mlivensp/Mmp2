@@ -10,25 +10,19 @@ import SwiftData
 
 @MainActor
 struct TestModelContext {
-    static let shared = TestModelContext()
-
-    private init() {}
+    private let container: ModelContainer
+    let context: ModelContext
     
-    func makeInMemoryContainer() throws -> ModelContainer {
+    init() throws {
         let schema = SchemaV1.schema
         let config = ModelConfiguration(
             isStoredInMemoryOnly: true
         )
 
-        return try ModelContainer(
+        container = try ModelContainer(
             for: schema,
             configurations: [config]
         )
+        context = ModelContext(container)
     }
-    
-    func makeTestContext() throws -> ModelContext {
-        let container = try makeInMemoryContainer()
-        return ModelContext(container)
-    }
-
 }

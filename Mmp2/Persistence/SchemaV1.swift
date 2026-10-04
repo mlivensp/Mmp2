@@ -68,8 +68,8 @@ public enum SchemaV1: VersionedSchema {
         var name_normalized: String = ""
         var startSeconds: Double
         var endSeconds: Double
-        var startMeasure: Int?
-        var endMeasure: Int?
+        var firstMeasure: Int?
+        var lastMeasure: Int?
         var isFavorite: Bool
         var createClipFile: Bool? = false
         var clipCreationInProgress: Bool
@@ -89,8 +89,8 @@ public enum SchemaV1: VersionedSchema {
             self.name_normalized = name.normalizedForSearch
             self.startSeconds = startSeconds
             self.endSeconds = endSeconds
-            self.startMeasure = startMeasure
-            self.endMeasure = endMeasure
+            self.firstMeasure = startMeasure
+            self.lastMeasure = endMeasure
             self.isFavorite = isFavorite
             self.notes = notes
             self.clipCreationInProgress = false
