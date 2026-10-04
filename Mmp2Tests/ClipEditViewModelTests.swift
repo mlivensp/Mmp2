@@ -11,7 +11,7 @@ import Testing
 @MainActor
 struct ClipEditViewModelTests {
     @Test func testSecondsValidation() async throws {
-        let vm = createVm();
+        let vm = try createVm();
         vm.startTimeString = "00:01:12.25"
         vm.endTimeString = "00:02:12.25"
         #expect(vm.startSecondsError == nil)
@@ -21,7 +21,7 @@ struct ClipEditViewModelTests {
     }
     
     @Test func testEndSecondsFormatBad() async throws {
-        let vm = createVm()
+        let vm = try createVm()
         vm.startTimeString = "ab:cd"
         vm.endTimeString = "4:5:6:7:8"
         #expect(vm.startSecondsError != nil)
@@ -29,7 +29,7 @@ struct ClipEditViewModelTests {
     }
     
     @Test func testSecondsRangeError() async throws {
-        let vm = createVm()
+        let vm = try createVm()
         vm.startTimeString = "00:02:05.72"
         vm.endTimeString = "00:01:45.13"
         #expect(vm.startSecondsError != nil)
@@ -37,10 +37,11 @@ struct ClipEditViewModelTests {
     }
     
     @Test func testMeasureValidation() async throws {
+        let modelContext = try TestModelContext.shared.makeTestContext()
         let clip = createClip();
         let source = createSource();
         source.measure1Start = 32.6
-        let vm = ClipEditView.ViewModel(clip: clip, source: source)
+        let vm = ClipEditViewContent.ViewModel(clip: clip, source: source, context: modelContext)
         vm.startMeasureString = "3"
         vm.endMeasureString = "5"
         #expect(vm.startMeasureError == nil)
@@ -50,10 +51,11 @@ struct ClipEditViewModelTests {
     }
     
     @Test func testStartMeasureFormatBad() async throws {
+        let modelContext = try TestModelContext.shared.makeTestContext()
         let clip = createClip();
         let source = createSource();
         source.measure1Start = 32.6
-        let vm = ClipEditView.ViewModel(clip: clip, source: source)
+        let vm = ClipEditViewContent.ViewModel(clip: clip, source: source, context: modelContext)
         vm.startMeasureString = "d"
         vm.endMeasureString = "5"
         #expect(vm.startMeasureError != nil)
@@ -61,10 +63,11 @@ struct ClipEditViewModelTests {
     }
     
     @Test func testEndMeasureFormatBad() async throws {
+        let modelContext = try TestModelContext.shared.makeTestContext()
         let clip = createClip();
         let source = createSource();
         source.measure1Start = 32.6
-        let vm = ClipEditView.ViewModel(clip: clip, source: source)
+        let vm = ClipEditViewContent.ViewModel(clip: clip, source: source, context: modelContext)
         vm.startMeasureString = "3"
         vm.endMeasureString = "5.625"
         #expect(vm.startMeasureError == nil)
@@ -72,20 +75,22 @@ struct ClipEditViewModelTests {
     }
 
     @Test func testMeasureRangeError() async throws {
+        let modelContext = try TestModelContext.shared.makeTestContext()
         let clip = createClip();
         let source = createSource();
         source.measure1Start = 32.6
-        let vm = ClipEditView.ViewModel(clip: clip, source: source)
+        let vm = ClipEditViewContent.ViewModel(clip: clip, source: source, context: modelContext)
         vm.startMeasureString = "3"
         vm.endMeasureString = "2"
         #expect(vm.startMeasureError != nil)
         #expect(vm.endMeasureError != nil)
     }
 
-    fileprivate func createVm() -> ClipEditView.ViewModel {
+    fileprivate func createVm() throws -> ClipEditViewContent.ViewModel {
+        let modelContext = try TestModelContext.shared.makeTestContext()
         let clip = createClip()
         let source = createSource()
-        return ClipEditView.ViewModel(clip: clip, source: source)
+        return ClipEditViewContent.ViewModel(clip: clip, source: source, context: modelContext)
     }
 
     fileprivate func createClip() -> Mmp2.Clip {

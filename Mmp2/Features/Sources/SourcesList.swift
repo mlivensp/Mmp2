@@ -41,10 +41,35 @@ struct SourcesList: View {
                     DisclosureGroup {
                         // Sources inside the group
                         ForEach(group.sources) { source in
-                            SourceRow(source: source)
-                                .onTapGesture {
-                                    onSourceTapped(source)
+                            if source.clips.isEmpty {
+                                SourceRow(source: source)
+                                    .onTapGesture {
+                                        onSourceTapped(source)
+                                    }
+                            } else {
+                                DisclosureGroup {
+                                    let sortedClips = source.clips.sorted(by: {
+                                        if $0.startSeconds == $1.startSeconds {
+                                            return $0.endSeconds < $1.endSeconds
+                                        } else {
+                                            return $0.startSeconds < $1.startSeconds
+                                        }
+                                    })
+                                    ForEach(sortedClips) { clip in
+                                        ClipRow(clip: clip) { clip in
+                                            appRootManager.selectedCategory = .clipEdit(clip: clip, source: source)
+                                        }
+                                        .onTapGesture {
+                                            onClipTapped(clip)
+                                        }
+                                    }
+                                } label: {
+                                    SourceRow(source: source)
+                                        .onTapGesture {
+                                            onSourceTapped(source)
+                                        }
                                 }
+                            }
                         }
                     } label: {
                         Label(group.primitiveName, systemImage: "folder.fill")
@@ -53,7 +78,14 @@ struct SourcesList: View {
                 case .source(let source):
                     if !source.clips.isEmpty {
                         DisclosureGroup {
-                            ForEach(source.clips) { clip in
+                            let sortedClips = source.clips.sorted(by: {
+                                if $0.startSeconds == $1.startSeconds {
+                                    return $0.endSeconds < $1.endSeconds
+                                } else {
+                                    return $0.startSeconds < $1.startSeconds
+                                }
+                            })
+                            ForEach(sortedClips) { clip in
                                 ClipRow(clip: clip) { clip in
                                     appRootManager.selectedCategory = .clipEdit(clip: clip, source: source)
                                 }

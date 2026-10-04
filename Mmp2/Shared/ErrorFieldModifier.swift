@@ -13,11 +13,11 @@ struct ErrorFieldModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .padding(6)
-            .overlay(
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(hasError ? Color.red : Color.clear, lineWidth: 1)
-            )
+//            .padding(6)
+//            .overlay(
+//                RoundedRectangle(cornerRadius: 6)
+//                    .stroke(hasError ? Color.red : Color.clear, lineWidth: 1)
+//            )
     }
 }
 

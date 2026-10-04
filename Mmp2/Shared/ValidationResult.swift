@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum FieldValidation<T> {
+enum ValidationResult<T> {
     case success(T)
     case failure(String)
 }

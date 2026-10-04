@@ -114,19 +114,6 @@ public enum SchemaV1: VersionedSchema {
             TimeFormatter.shared.string(from: endSeconds)
         }
     }
-    
-//    @Model class CurrentSelection {
-//        var category: String?
-//        var clip: Clip?
-//        var collection: MediaCollection?
-//        var playlist: Playlist?
-//        @Relationship(inverse: \Source.selection) var source: Source?
-//        @Relationship(inverse: \SourceGroup.selection) var sourceGroup: SourceGroup?
-//        
-//        public init() {
-//
-//        }
-//    }
 
     @Model class Media {
         var source: Source?

@@ -6,12 +6,16 @@
 //
 
 import Foundation
+import SwiftData
 
-extension ClipEditView {
+extension ClipEditViewContent {
     @Observable
     final class ViewModel {
         var clip: Clip
         var source: Source
+        let context: ModelContext
+        
+        var playbackVM: PlaybackEditViewModel
         
         // Editable fields
         var name: String {
@@ -19,6 +23,21 @@ extension ClipEditView {
                 _ = validateName()
             }
         }
+        
+        var bpmString: String {
+            didSet {
+                let result = validateBpm()
+                switch result {
+                case .success(let value):
+                    bpm = value
+                    playbackVM.bpm = value
+                case .failure(let message):
+                    bpmError = message
+                }
+            }
+        }
+        
+        var bpm: Int?
         
         var startTimeString: String {
             didSet {
@@ -57,6 +76,7 @@ extension ClipEditView {
         
         // Per-field errors
         var nameError: String?
+        var bpmError: String?
         var startSecondsError: String?
         var endSecondsError: String?
         var startMeasureError: String?
@@ -65,11 +85,26 @@ extension ClipEditView {
         var measureMode = false
         var isValid = true
         
-        init(clip: Clip, source: Source) {
+        init(clip: Clip, source: Source, context: ModelContext) {
             self.clip = clip
             self.source = source
+            self.context = context
             
             self.name = clip.primitiveName
+            
+            if clip.isNew {
+                self.bpm = nil
+                self.bpmString = ""
+            } else {
+                self.bpm = clip.media.bpm
+                
+                if let bpm = clip.media.bpm {
+                    self.bpmString = String(bpm)
+                } else {
+                    self.bpmString = ""
+                }
+            }
+            
             self.startSeconds = clip.startSeconds
             self.startTimeString = String(clip.startSeconds)
             self.endSeconds = clip.endSeconds
@@ -78,6 +113,8 @@ extension ClipEditView {
             self.notes = clip.notes ?? ""
             self.startMeasureString = clip.startMeasure.map(String.init) ?? ""
             self.endMeasureString = clip.endMeasure.map(String.init) ?? ""
+            
+            self.playbackVM = PlaybackEditViewModel(playback: clip.playback, bpm: clip.media.bpm)
             measureMode = determineMeasureMode()
             isValid = validate()
         }
@@ -107,6 +144,20 @@ extension ClipEditView {
             }
             
             return true
+        }
+        
+        fileprivate func validateBpm() -> ValidationResult<Int?> {
+            bpmError = nil
+            
+            if bpmString.isEmpty {
+                return .success(nil)
+            } else {
+                if let bpm = Int(bpmString) {
+                    return .success(bpm)
+                }
+            }
+            
+            return .failure("BPM must be a valid whole number.")
         }
         
         fileprivate func validateStartEndSeconds() -> Bool {
@@ -157,13 +208,12 @@ extension ClipEditView {
             return true
         }
         
-        fileprivate func validateSeconds(_ text: String, fieldName: String) -> FieldValidation<Double> {
+        fileprivate func validateSeconds(_ text: String, fieldName: String) -> ValidationResult<Double> {
             do {
                 return .success(try TimeFormatter.shared.seconds(from: text))
             } catch {
                 return .failure("\(fieldName) must be a valid time string.")
             }
-
         }
 
         fileprivate func validateStartEndMeasures() -> Bool {
@@ -214,7 +264,7 @@ extension ClipEditView {
             return true
         }
 
-        fileprivate func validateMeasure(_ text: String, fieldName: String) -> FieldValidation<Int> {
+        fileprivate func validateMeasure(_ text: String, fieldName: String) -> ValidationResult<Int> {
             guard !text.isEmpty else {
                 return .failure("\(fieldName) is required.")
             }
@@ -241,7 +291,7 @@ extension ClipEditView {
             return isValid
         }
         
-        func save() -> Bool {
+        func save() throws -> Bool {
             guard validate() else { return false }
             
             clip.primitiveName = name
@@ -250,11 +300,34 @@ extension ClipEditView {
             clip.endSeconds = endSeconds
             clip.isFavorite = isFavorite
             clip.notes = notes.isEmpty ? nil : notes
-            clip.startMeasure = startMeasure
-            clip.endMeasure = endMeasure
             
+            if measureMode {
+                clip.startMeasure = startMeasure
+                clip.endMeasure = endMeasure
+            } else {
+                clip.startMeasure = nil
+                clip.endMeasure = nil
+            }
+            
+            playbackVM.apply(to: clip.playback)
+            
+            if clip.isNew {
+                let duration = endSeconds - startSeconds
+                let media = createMedia(bpm: bpm, duration: duration)
+                clip.media = media
+                
+                clip.playback = Playback()
+                clip.source = source
+                context.insert(clip)
+            }
+            
+            try context.save()
             return true
         }
+        
+        fileprivate func createMedia(bpm: Int?, duration: Double) -> Media {
+            let media = Media(bpm: bpm, path: "", duration: duration)
+            return media
+        }
     }
-    
 }

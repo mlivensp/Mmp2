@@ -353,7 +353,7 @@ struct Importer {
     }
 
     @MainActor
-    func importFromURL(_ url: URL, modelContext: ModelContext) {
+    func importFromURL(_ url: URL, modelContext: ModelContext) throws {
         // TODO: errors need to be handled here
         guard url.startAccessingSecurityScopedResource() else {
             print("Failed to access security-scoped resource")
@@ -382,6 +382,7 @@ struct Importer {
         //        let playlist = json.playlists
         //        importPlaylists(playlist, dataController.container.viewContext, collections)
         //        appRootManager.currentRoot = .home
+        try modelContext.save()
     }
 }
 //func format(dateComponents: DateComponents) -> String {

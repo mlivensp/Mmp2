@@ -73,7 +73,12 @@ struct CollectionsView: View {
                 case .success(let url):
                     guard let url = url.first else { return }
                     if isImporting {
-                        importData(url: url)
+                        do {
+                            try importData(url: url)
+                        } catch {
+                            // TODO: notify user
+                            let _ = print(error.localizedDescription)
+                        }
                     } else if isLocatingSource {
                         locateSources(url: url)
                     }
@@ -100,32 +105,6 @@ struct CollectionsView: View {
                     .padding()
                 }
             }
-        //        .fileImporter(isPresented: $isImporting, allowedContentTypes: [.json]) { result in
-        //            switch result {
-        //            case .success(let url):
-        //                let importer = Importer()
-        //                importer.importFromURL(url, modelContext: modelContext)
-        //            case .failure(let error):
-        //                print(error.localizedDescription)
-        //            }
-        //        }
-        //        .fileImporter(
-        //            isPresented: $isLocatingSource,
-        //            allowedContentTypes: [.folder],  // This restricts the picker to folders only.
-        //            allowsMultipleSelection: false
-        //        ) { result in
-        //            do {
-        //                if let url = try result.get().first {
-        //                    // If you need persistent access to the directory, consider starting a security-scoped session:
-        //                    // _ = url.startAccessingSecurityScopedResource()
-        ////                    selectedDirectory = url
-        ////                    viewModel.scanDirectory(at: url)
-        //                }
-        //            } catch {
-        //                // Handle any errors here.
-        //                print("Error selecting directory: \(error.localizedDescription)")
-        //            }
-        //        }
     }
     
     private func locateSourcesRequested() {
@@ -150,9 +129,9 @@ struct CollectionsView: View {
         }
     }
     
-    private func importData(url: URL) {
+    private func importData(url: URL) throws {
         let importer = Importer()
-        importer.importFromURL(url, modelContext: modelContext)
+        try importer.importFromURL(url, modelContext: modelContext)
     }
     
     private func locateSources(url: URL) {
