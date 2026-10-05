@@ -164,7 +164,136 @@ struct PlaybackStepwiseViewModelTests {
 
         #expect(vm.timesToPlayError == "Times To Play is required.")
     }
-
+    
+    // MARK: - Cross-field validation: max > start
+    
+    @Test("max > start: valid when max is greater than start")
+    func maxGreaterThanStartValid() {
+        let vm = makeVM(start: 50, step: 5, max: 100, timesToPlay: 3)
+        
+        #expect(vm.isValid)
+        #expect(vm.maxError == nil)
+    }
+    
+    @Test("max > start: invalid when max equals start")
+    func maxEqualsStartInvalid() {
+        let vm = makeVM(start: 50, step: 5, max: 50, timesToPlay: 3)
+        
+        #expect(!vm.isValid)
+        #expect(vm.maxError == "Max must be greater than Start.")
+    }
+    
+    @Test("max > start: invalid when max is less than start")
+    func maxLessThanStartInvalid() {
+        let vm = makeVM(start: 100, step: 5, max: 50, timesToPlay: 3)
+        
+        #expect(!vm.isValid)
+        #expect(vm.maxError == "Max must be greater than Start.")
+    }
+    
+    @Test("max > start: error clears when max is increased above start")
+    func maxGreaterThanStartErrorClears() {
+        let vm = makeVM(start: 50, step: 5, max: 50, timesToPlay: 3)
+        #expect(vm.maxError != nil)
+        
+        vm.maxString = "100"
+        
+        #expect(vm.maxError == nil)
+        #expect(vm.isValid)
+    }
+    
+    @Test("max > start: error clears when start is decreased below max")
+    func maxGreaterThanStartErrorClearsViaStart() {
+        let vm = makeVM(start: 100, step: 5, max: 50, timesToPlay: 3)
+        #expect(vm.maxError != nil)
+        
+        vm.startString = "40"
+        
+        #expect(vm.maxError == nil)
+        #expect(vm.isValid)
+    }
+    
+    // MARK: - Cross-field validation: start + step <= max
+    
+    @Test("start + step <= max: valid when sum is less than max")
+    func startPlusStepLessThanMaxValid() {
+        let vm = makeVM(start: 50, step: 20, max: 100, timesToPlay: 3)
+        
+        #expect(vm.isValid)
+        #expect(vm.stepError == nil)
+    }
+    
+    @Test("start + step <= max: valid when sum equals max")
+    func startPlusStepEqualsMaxValid() {
+        let vm = makeVM(start: 50, step: 50, max: 100, timesToPlay: 3)
+        
+        #expect(vm.isValid)
+        #expect(vm.stepError == nil)
+    }
+    
+    @Test("start + step <= max: invalid when sum exceeds max")
+    func startPlusStepExceedsMaxInvalid() {
+        let vm = makeVM(start: 50, step: 60, max: 100, timesToPlay: 3)
+        
+        #expect(!vm.isValid)
+        #expect(vm.stepError == "Start + Step must not exceed Max.")
+    }
+    
+    @Test("start + step <= max: error clears when step is decreased")
+    func startPlusStepErrorClearsViaStep() {
+        let vm = makeVM(start: 50, step: 60, max: 100, timesToPlay: 3)
+        #expect(vm.stepError != nil)
+        
+        vm.stepString = "30"
+        
+        #expect(vm.stepError == nil)
+        #expect(vm.isValid)
+    }
+    
+    @Test("start + step <= max: error clears when start is decreased")
+    func startPlusStepErrorClearsViaStart() {
+        let vm = makeVM(start: 60, step: 60, max: 100, timesToPlay: 3)
+        #expect(vm.stepError != nil)
+        
+        vm.startString = "30"
+        
+        #expect(vm.stepError == nil)
+        #expect(vm.isValid)
+    }
+    
+    @Test("start + step <= max: error clears when max is increased")
+    func startPlusStepErrorClearsViaMax() {
+        let vm = makeVM(start: 50, step: 60, max: 100, timesToPlay: 3)
+        #expect(vm.stepError != nil)
+        
+        vm.maxString = "150"
+        
+        #expect(vm.stepError == nil)
+        #expect(vm.isValid)
+    }
+    
+    @Test("start + step <= max: skipped when step fails field validation")
+    func startPlusStepSkippedWhenStepInvalid() {
+        let vm = makeVM(start: 50, step: 20, max: 100, timesToPlay: 3)
+        
+        vm.stepString = "abc"
+        
+        #expect(vm.stepError == "Step must be a number greater than zero.")
+        #expect(!vm.isValid)
+    }
+    
+    @Test("start + step <= max: no error when max > start but sum exceeds max (max > start only)")
+    func maxGreaterThanStartTakesPriority() {
+        let vm = makeVM(start: 100, step: 50, max: 150, timesToPlay: 3)
+        
+        // First violate max > start
+        vm.maxString = "50"
+        
+        #expect(vm.maxError == "Max must be greater than Start.")
+        // The step rule should not run because max <= start
+        #expect(vm.stepError == nil)
+        #expect(!vm.isValid)
+    }
     // MARK: - Validators
 
     @Test("validateStart")
@@ -265,3 +394,4 @@ struct PlaybackStepwiseViewModelTests {
         return nil
     }
 }
+

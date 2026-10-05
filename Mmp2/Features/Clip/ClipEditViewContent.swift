@@ -96,6 +96,10 @@ struct ClipEditViewContent: View {
                 //                }
                 
                 Section {
+                    PlaybackEditView(vm: vm.playbackVM)
+                }
+                
+                Section {
                     HStack {
                         Spacer()
                         Button("Save") {

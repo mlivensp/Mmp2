@@ -32,6 +32,10 @@ final class PlaybackConstantViewModel {
         
         validate()
     }
+    
+    static func `default`() -> PlaybackConstantViewModel {
+        PlaybackConstantViewModel(rate: 100, timesToPlay: 1)
+    }
 
     var rateString: String {
         get { return storedRateString }
@@ -114,7 +118,13 @@ final class PlaybackConstantViewModel {
         rateError == nil && timesToPlayError == nil
     }
     
-    func apply(to playbackConstant: PlaybackConstant) {
+    func apply(to playbackConstant: PlaybackConstant) throws {
+        validate()
+        
+        guard isValid else {
+            throw AppError.attemptToSaveInvalidState("PlaybackConstant")
+        }
+        
         playbackConstant.rate = rate
         playbackConstant.timesToPlay = timesToPlay
     }

@@ -23,6 +23,10 @@ final class PlaybackStepwiseViewModel {
     var stepError: String?
     var maxError: String?
     var timesToPlayError: String?
+    
+    static func `default`() -> PlaybackStepwiseViewModel {
+        PlaybackStepwiseViewModel(start: 100, step: 2, max: 110, timesToPlay: 1)
+    }
 
     init(start: Int, step: Int, max: Int, timesToPlay: Int) {
         self.start = start
@@ -42,8 +46,8 @@ final class PlaybackStepwiseViewModel {
         get { storedStartString }
         set {
             storedStartString = newValue
-            let result = validateStart(storedStartString)
-            applyStartValidationResult(result)
+            applyStartValidationResult(validateStart(storedStartString))
+            validateRelationships()
         }
     }
     
@@ -51,8 +55,8 @@ final class PlaybackStepwiseViewModel {
         get { storedStepString }
         set {
             storedStepString = newValue
-            let result = validateStep(storedStepString)
-            applyStepValidationResult(result)
+            applyStepValidationResult(validateStep(storedStepString))
+            validateRelationships()
         }
     }
     
@@ -60,11 +64,11 @@ final class PlaybackStepwiseViewModel {
         get { storedMaxString }
         set {
             storedMaxString = newValue
-            let result = validateMax(storedMaxString)
-            applyMaxValidationResult(result)
+            applyMaxValidationResult(validateMax(storedMaxString))
+            validateRelationships()
         }
     }
-    
+
     var timesToPlayString: String {
         get { storedTimesToPlayString }
         set {
@@ -73,29 +77,21 @@ final class PlaybackStepwiseViewModel {
             applyTimesToPlayValidationResult(result)
         }
     }
+    
+    // MARK: validation
 
     func validateStart(_ startValue: String) -> ValidationResult<Int> {
         if startValue.isEmpty {
             return .failure("Start is required.")
         } else {
-            if let max = Int(startValue) {
-                if max > 0 {
-                    return .success(max)
+            if let start = Int(startValue) {
+                if start > 0 {
+                    return .success(start)
                 }
             }
         }
         
         return .failure("Start must be a number greater than zero.")
-    }
-    
-    private func applyStartValidationResult(_ result: ValidationResult<Int>) {
-        switch result {
-        case .success(let value):
-            startError = nil
-            start = value
-        case .failure(let message):
-            startError = message
-        }
     }
     
     func validateStep(_ stepValue: String) -> ValidationResult<Int> {
@@ -112,16 +108,6 @@ final class PlaybackStepwiseViewModel {
         return .failure("Step must be a number greater than zero.")
     }
     
-    private func applyStepValidationResult(_ result: ValidationResult<Int>) {
-        switch result {
-        case .success(let value):
-            stepError = nil
-            step = value
-        case .failure(let message):
-            stepError = message
-        }
-    }
-    
     func validateMax(_ maxValue: String) -> ValidationResult<Int> {
         if maxValue.isEmpty {
             return .failure("Max is required.")
@@ -134,16 +120,6 @@ final class PlaybackStepwiseViewModel {
         }
         
         return .failure("Max must be a number greater than zero.")
-    }
-    
-    private func applyMaxValidationResult(_ result: ValidationResult<Int>) {
-        switch result {
-        case .success(let value):
-            maxError = nil
-            max = value
-        case .failure(let message):
-            maxError = message
-        }
     }
     
     func validateTimesToPlay(_ timesToPlayValue: String) -> ValidationResult<Int> {
@@ -160,6 +136,64 @@ final class PlaybackStepwiseViewModel {
         return .failure("Times To Play must be a number greater than zero.")
     }
     
+    // Cross-field validation. Only runs for fields that passed their own validation.
+    // Re-applies the field-level result first so stale relationship errors are cleared.
+    func validateRelationships() {
+        let startResult = validateStart(storedStartString)
+        let stepResult = validateStep(storedStepString)
+        let maxResult = validateMax(storedMaxString)
+        
+        // Reset max/step errors to their field-level state
+        applyMaxValidationResult(maxResult)
+        applyStepValidationResult(stepResult)
+        
+        guard case .success(let startValue) = startResult,
+              case .success(let maxValue) = maxResult else { return }
+        
+        // Max > start
+        if maxValue <= startValue {
+            maxError = "Max must be greater than Start."
+            return // start + step <= max cannot hold if max <= start
+        }
+        
+        // start + step <= max
+        if case .success(let stepValue) = stepResult, startValue + stepValue > maxValue {
+            stepError = "Start + Step must not exceed Max."
+        }
+    }
+    
+    private func applyStartValidationResult(_ result: ValidationResult<Int>) {
+        switch result {
+        case .success(let value):
+            startError = nil
+            start = value
+        case .failure(let message):
+            startError = message
+        }
+    }
+    
+    // MARK: apply validation result
+
+    private func applyStepValidationResult(_ result: ValidationResult<Int>) {
+        switch result {
+        case .success(let value):
+            stepError = nil
+            step = value
+        case .failure(let message):
+            stepError = message
+        }
+    }
+
+    private func applyMaxValidationResult(_ result: ValidationResult<Int>) {
+        switch result {
+        case .success(let value):
+            maxError = nil
+            max = value
+        case .failure(let message):
+            maxError = message
+        }
+    }
+
     private func applyTimesToPlayValidationResult(_ result: ValidationResult<Int>) {
         switch result {
         case .success(let value):
@@ -175,14 +209,11 @@ final class PlaybackStepwiseViewModel {
     }
 
     func validate() {
-        let startResult = validateStart(storedStartString)
-        applyStartValidationResult(startResult)
-        let stepResult = validateStep(storedStepString)
-        applyStepValidationResult(stepResult)
-        let maxResult = validateMax(storedMaxString)
-        applyMaxValidationResult(maxResult)
-        let timesToPlayResult = validateStart(storedTimesToPlayString)
-        applyTimesToPlayValidationResult(timesToPlayResult)
+        applyStartValidationResult(validateStart(storedStartString))
+        applyStepValidationResult(validateStep(storedStepString))
+        applyMaxValidationResult(validateMax(storedMaxString))
+        applyTimesToPlayValidationResult(validateTimesToPlay(storedTimesToPlayString))
+        validateRelationships()
     }
     
     func apply(to stepwise: PlaybackStepwise) throws {

@@ -7,10 +7,14 @@
 
 import Foundation
 
-enum PlaybackMode {
+enum PlaybackMode: CaseIterable {
     case constant
     case stepwise
     case bounce
+}
+
+extension PlaybackMode: Identifiable {
+    var id: Self { self }
 }
 
 extension PlaybackMode {

@@ -7,26 +7,24 @@
 
 import Foundation
 
-enum AppError: Error {
+nonisolated enum AppError: Error, Equatable {
     case noMedia
     case invalidPlayback
     case invalidTimeFormat
     case attemptToSaveInvalidState(String)
-    case badThing
+    
+//    static func == (lhs: AppError, rhs: AppError) -> Bool {
+//            switch (lhs, rhs) {
+//            case (.noMedia, .noMedia),
+//                 (.invalidPlayback, .invalidPlayback),
+//                 (.invalidTimeFormat, .invalidTimeFormat):
+//                return true
+//                
+//            case let (.attemptToSaveInvalidState(a), .attemptToSaveInvalidState(b)):
+//                return a == b
+//
+//            default:
+//                return false
+//            }
+//        }
 }
-
-extension AppError: Equatable {
-    static func == (lhs: AppError, rhs: AppError) -> Bool {
-            switch (lhs, rhs) {
-            case (.noMedia, .noMedia),
-                 (.invalidPlayback, .invalidPlayback),
-                 (.invalidTimeFormat, .invalidTimeFormat):
-                return true
-                
-            case let (.attemptToSaveInvalidState(a), .attemptToSaveInvalidState(b)):
-                return a == b
-
-            default:
-                return false
-            }
-        }}

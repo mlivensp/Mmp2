@@ -149,7 +149,7 @@ import SwiftData
     var timesToPlay: Int?
     var playback: Playback?
     
-    init(rate: Int, timesToPlay: Int? = nil, playback: Playback?) {
+    init(rate: Int, timesToPlay: Int? = nil, playback: Playback? = nil) {
         self.rate = rate
         self.timesToPlay = timesToPlay
         self.playback = playback
@@ -163,7 +163,7 @@ import SwiftData
     var timesToPlay: Int
     var playback: Playback?
     
-    init(start: Int, step: Int, max: Int, timesToPlay: Int, playback: Playback?) {
+    init(start: Int, step: Int, max: Int, timesToPlay: Int, playback: Playback? = nil) {
         self.start = start
         self.step = step
         self.max = max
@@ -184,7 +184,7 @@ import SwiftData
     
     var playOrder: PlayOrder?
     
-    init(slowTempo: Int, timesToPlaySlowTempo: Int, midTempo: Int, timesToPlayMidTempo: Int, fastTempo: Int, timesToPlayFastTempo: Int, numberOfBounces: Int, playback: Playback?, playOrder: PlayOrder) {
+    init(slowTempo: Int, timesToPlaySlowTempo: Int, midTempo: Int, timesToPlayMidTempo: Int, fastTempo: Int, timesToPlayFastTempo: Int, numberOfBounces: Int, playOrder: PlayOrder? = nil, playback: Playback? = nil) {
         self.slowTempo = slowTempo
         self.timesToPlaySlowTempo = timesToPlaySlowTempo
         self.midTempo = midTempo
@@ -317,7 +317,6 @@ import SwiftData
 @Model public class Version {
     var dbVersion: Int32 = 0
     public init() {
-
     }
 }
 

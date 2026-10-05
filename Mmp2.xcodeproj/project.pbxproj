@@ -59,11 +59,6 @@
 			path = Mmp2Tests;
 			sourceTree = "<group>";
 		};
-		DD54A7EA3057467700281B19 /* Mmp2UITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Mmp2UITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,7 +91,6 @@
 			children = (
 				DD54A7D03057467600281B19 /* Mmp2 */,
 				DD54A7E03057467700281B19 /* Mmp2Tests */,
-				DD54A7EA3057467700281B19 /* Mmp2UITests */,
 				DD54A7CF3057467600281B19 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -171,9 +165,6 @@
 			);
 			dependencies = (
 				DD54A7E93057467700281B19 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				DD54A7EA3057467700281B19 /* Mmp2UITests */,
 			);
 			name = Mmp2UITests;
 			packageProductDependencies = (

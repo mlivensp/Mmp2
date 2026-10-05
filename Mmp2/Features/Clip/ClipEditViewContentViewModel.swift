@@ -47,7 +47,7 @@ extension ClipEditViewContent {
             self.source = source
             self.context = context
             
-            self.playbackVM = PlaybackEditViewModel(playback: clip.playback, bpm: clip.media.bpm)
+            self.playbackVM = PlaybackEditViewModel(playback: clip.playback, bpm: clip.media.bpm, context: context)
             
             storedNameString = clip.primitiveName
             
@@ -235,8 +235,6 @@ extension ClipEditViewContent {
             firstMeasureError = nil
             lastMeasureError = nil
 
-            var isValid = true
-
             // Validate start
             let firstMeasureValidationResult = validateMeasure(startMeasureString, fieldName: "Start measure")
             applyFirstMeasureValidationResult(firstMeasureValidationResult)
@@ -377,7 +375,7 @@ extension ClipEditViewContent {
                 clip.lastMeasure = nil
             }
             
-            playbackVM.apply(to: clip.playback)
+            try playbackVM.apply(to: clip.playback, context: context)
             
 //            if clip.isNew {
 //                let duration = endSeconds - startSeconds
