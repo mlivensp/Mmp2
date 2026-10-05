@@ -30,7 +30,7 @@ struct SourcesList: View {
         
         items += ungrouped.map { .source($0) }
         
-        return items
+        return items.sorted(by: { $0.sortOrder < $1.sortOrder } )
     }
     
     var body: some View {

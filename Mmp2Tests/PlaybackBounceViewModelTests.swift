@@ -640,4 +640,128 @@ struct PlaybackBounceViewModelTests {
             context: context
         )
     }
+
+    // MARK: - apply(to:)
+
+    @Test("apply copies values to PlaybackBounce when valid")
+    func applyCopiesValues() throws {
+        let vm = makeVM(
+            slowTempo: 60, slowTempoTimesToPlay: 1,
+            midTempo: 80, midTempoTimesToPlay: 2,
+            fastTempo: 100, fastTempoTimesToPlay: 3,
+            numberOfBounces: 4
+        )
+        let playOrder = PlayOrder.default()
+        let model = PlaybackBounce(
+            slowTempo: 1, timesToPlaySlowTempo: 2,
+            midTempo: 3, timesToPlayMidTempo: 4,
+            fastTempo: 5, timesToPlayFastTempo: 6,
+            numberOfBounces: 7,
+            playOrder: playOrder
+        )
+
+        vm.slowTempoString = "70"
+        vm.slowTempoTimesToPlayString = "8"
+        vm.midTempoString = "90"
+        vm.midTempoTimesToPlayString = "6"
+        vm.fastTempoString = "110"
+        vm.fastTempoTimesToPlayString = "5"
+        vm.numberOfBouncesString = "12"
+        vm.playOrder = playOrder
+
+        try vm.apply(to: model)
+        #expect(model.slowTempo == 70)
+        #expect(model.timesToPlaySlowTempo == 8)
+        #expect(model.midTempo == 90)
+        #expect(model.timesToPlayMidTempo == 6)
+        #expect(model.fastTempo == 110)
+        #expect(model.timesToPlayFastTempo == 5)
+        #expect(model.numberOfBounces == 12)
+        #expect(model.playOrder === playOrder)
+    }
+
+    @Test("apply throws and leaves model untouched when state is invalid")
+    func applyThrowsWhenInvalid() {
+        let vm = makeDefaultVM()
+        let playOrder = PlayOrder.default()
+        let model = PlaybackBounce(
+            slowTempo: 10, timesToPlaySlowTempo: 2,
+            midTempo: 15, timesToPlayMidTempo: 3,
+            fastTempo: 20, timesToPlayFastTempo: 4,
+            numberOfBounces: 5,
+            playOrder: playOrder
+        )
+        vm.slowTempoString = "bad" // invalid input
+
+        #expect(throws: Error.self) {
+            try vm.apply(to: model)
+        }
+        // Model should be unchanged
+        #expect(model.slowTempo == 10)
+        #expect(model.timesToPlaySlowTempo == 2)
+        #expect(model.midTempo == 15)
+        #expect(model.timesToPlayMidTempo == 3)
+        #expect(model.fastTempo == 20)
+        #expect(model.timesToPlayFastTempo == 4)
+        #expect(model.numberOfBounces == 5)
+        #expect(model.playOrder === playOrder)
+    }
+
+    @Test("apply allows empty tempo when timesToPlay is zero")
+    func applyAllowsEmptyTempoIfTimesToPlayZero() throws {
+        let vm = makeVM(
+            slowTempo: 60, slowTempoTimesToPlay: 1,
+            midTempo: 80, midTempoTimesToPlay: 2,
+            fastTempo: 100, fastTempoTimesToPlay: 0,
+            numberOfBounces: 4
+        )
+        let playOrder = PlayOrder.default()
+        let model = PlaybackBounce(
+            slowTempo: 1, timesToPlaySlowTempo: 2,
+            midTempo: 3, timesToPlayMidTempo: 4,
+            fastTempo: 5, timesToPlayFastTempo: 6,
+            numberOfBounces: 7,
+            playOrder: playOrder
+        )
+        vm.fastTempoString = ""
+        vm.fastTempoTimesToPlayString = "0"
+
+        try vm.apply(to: model)
+        #expect(model.fastTempo == 0)
+        #expect(model.timesToPlayFastTempo == 0)
+    }
+
+    @Test("apply throws and does not modify model if more than one timesToPlay is zero")
+    func applyThrowsIfMultipleTimesToPlayZero() {
+        let vm = makeVM(
+            slowTempo: 60, slowTempoTimesToPlay: 0,
+            midTempo: 80, midTempoTimesToPlay: 0,
+            fastTempo: 100, fastTempoTimesToPlay: 3,
+            numberOfBounces: 4
+        )
+        let playOrder = PlayOrder.default()
+        let model = PlaybackBounce(
+            slowTempo: 1, timesToPlaySlowTempo: 2,
+            midTempo: 3, timesToPlayMidTempo: 4,
+            fastTempo: 5, timesToPlayFastTempo: 6,
+            numberOfBounces: 7,
+            playOrder: playOrder
+        )
+        vm.slowTempoString = ""
+        vm.slowTempoTimesToPlayString = "0"
+        vm.midTempoString = ""
+        vm.midTempoTimesToPlayString = "0"
+
+        #expect(throws: Error.self) {
+            try vm.apply(to: model)
+        }
+        #expect(model.slowTempo == 1)
+        #expect(model.timesToPlaySlowTempo == 2)
+        #expect(model.midTempo == 3)
+        #expect(model.timesToPlayMidTempo == 4)
+        #expect(model.fastTempo == 5)
+        #expect(model.timesToPlayFastTempo == 6)
+        #expect(model.numberOfBounces == 7)
+        #expect(model.playOrder === playOrder)
+    }
 }

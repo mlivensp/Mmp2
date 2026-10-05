@@ -86,6 +86,7 @@ struct PlaybackBounceView: View {
             Picker("", selection: $vm.playOrder) {
                 ForEach(vm.playOrders) { playOrder in
                     Text(playOrder.name)
+                        .tag(playOrder)
                 }
             }
             .pickerStyle(.menu)   // This makes it behave like a dropdown

@@ -48,7 +48,7 @@ final class PlaybackEditViewModel {
             self.bounceVM = PlaybackBounceViewModel.default(context: context)
         }
     }
-    
+        
     func apply(to playback: Playback, context: ModelContext) throws {
         // 1. Switch mode (handles deletion + creation)
         playback.switchMode(to: mode, context: context)

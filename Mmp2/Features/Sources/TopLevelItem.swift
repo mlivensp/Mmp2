@@ -19,3 +19,12 @@ enum TopLevelItem: Identifiable, Hashable {
         }
     }
 }
+
+extension TopLevelItem: SortableSource {
+    var sortOrder: Int {
+        switch self {
+        case .group(let g): return g.sortOrder
+        case .source(let s): return s.sortOrder
+        }
+    }
+}

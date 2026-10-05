@@ -393,5 +393,41 @@ struct PlaybackStepwiseViewModelTests {
         if case .failure(let message) = result { return message }
         return nil
     }
-}
 
+    // MARK: - apply(to:)
+
+//    @Test("apply copies values to PlaybackStepwise when valid")
+//    func applyCopiesValues() throws {
+//        let vm = makeVM(start: 60, step: 5, max: 120, timesToPlay: 3)
+//        let model = Mmp2.PlaybackStepwise(start: 1, step: 1, max: 1, timesToPlay: 1, playback: nil)
+//
+//        vm.startString = "80"
+//        vm.stepString = "7"
+//        vm.maxString = "200"
+//        vm.timesToPlayString = "6"
+//
+//        try vm.apply(to: model)
+//
+//        #expect(model.start == 80)
+//        #expect(model.step == 7)
+//        #expect(model.max == 200)
+//        #expect(model.timesToPlay == 6)
+//    }
+//
+//    @Test("apply throws and leaves model untouched when state is invalid")
+//    func applyThrowsWhenInvalid() {
+//        let vm = makeVM(start: 60, step: 5, max: 120, timesToPlay: 3)
+//        let model = Mmp2.PlaybackStepwise(start: 2, step: 4, max: 6, timesToPlay: 8, playback: nil)
+//
+//        vm.startString = "bad" // invalid input
+//
+//        #expect(throws: (any Error).self) {
+//            try vm.apply(to: model)
+//        }
+//        // Model should be unchanged
+//        #expect(model.start == 2)
+//        #expect(model.step == 4)
+//        #expect(model.max == 6)
+//        #expect(model.timesToPlay == 8)
+//    }
+}

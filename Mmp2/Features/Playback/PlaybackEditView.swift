@@ -15,6 +15,7 @@ struct PlaybackEditView: View {
             Picker("", selection: $vm.mode) {
                 ForEach(PlaybackMode.allCases) { mode in
                     Text(mode.label)
+                        .tag(mode)
                 }
             }
             .pickerStyle(.menu)   // This makes it behave like a dropdown
