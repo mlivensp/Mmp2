@@ -34,12 +34,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				App/Global.swift,
-				Features/Sequencer/ConstantPlayRateSequencer.swift,
-				Features/Sequencer/DefaultSequencer.swift,
-				Features/Sequencer/PlayRateSequencer.swift,
-				Shared/AppError.swift,
 				"Shared/String+Extensions.swift",
-				Shared/TimeFormatter.swift,
 			);
 			target = DD54A7DC3057467700281B19 /* Mmp2Tests */;
 		};
