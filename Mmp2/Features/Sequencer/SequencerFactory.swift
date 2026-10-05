@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 
 struct SequencerFactory {
     static func createConstantPlayRateSequencer(rate: Float, bpm: Int?) -> ConstantPlayRateSequencer {

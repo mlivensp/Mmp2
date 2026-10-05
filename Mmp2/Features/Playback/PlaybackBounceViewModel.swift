@@ -9,13 +9,13 @@ import Foundation
 
 @Observable
 final class PlaybackBounceViewModel {
-    private var slowTempo: Int
-    private var slowTempoTimesToPlay: Int
-    private var midTempo: Int
-    private var midTempoTimesToPlay: Int
-    private var fastTempo: Int
-    private var fastTempoTimesToPlay: Int
-    private var numberOfBounces: Int
+    internal var slowTempo: Int
+    internal var slowTempoTimesToPlay: Int
+    internal var midTempo: Int
+    internal var midTempoTimesToPlay: Int
+    internal var fastTempo: Int
+    internal var fastTempoTimesToPlay: Int
+    internal var numberOfBounces: Int
     
     private var storedSlowTempoString: String
     private var storedSlowTempoTimesToPlayString: String
@@ -48,7 +48,7 @@ final class PlaybackBounceViewModel {
         self.storedMidTempoTimesToPlayString = String(midTempoTimesToPlay)
         self.storedFastTempoString = String(fastTempo)
         self.storedFastTempoTimesToPlayString = String(fastTempoTimesToPlay)
-        self.storedNumberOfBouncesString = String(fastTempoTimesToPlay)
+        self.storedNumberOfBouncesString = String(numberOfBounces)
         
         validate()
     }
@@ -93,7 +93,7 @@ final class PlaybackBounceViewModel {
         get { storedFastTempoString }
         set {
             storedFastTempoString = newValue
-            let result = validateTempo(storedSlowTempoString, fieldName: "Fast Tempo")
+            let result = validateTempo(storedFastTempoString, fieldName: "Fast Tempo")
             applyFastTempoValidationResult(result)
         }
     }
@@ -121,12 +121,13 @@ final class PlaybackBounceViewModel {
             return .failure("\(fieldName) is required.")
         } else {
             if let tempo = Int(text) {
-                return .success(tempo)
-            }
-            else {
-                return .failure("\(fieldName) must be a number greater than zero.")
+                
+                if tempo > 0 {
+                    return .success(tempo)
+                }
             }
         }
+        return .failure("\(fieldName) must be a number greater than zero.")
     }
     
     private func validateTimesToPlay(_ text: String, fieldName: String) -> ValidationResult<Int> {
@@ -136,10 +137,9 @@ final class PlaybackBounceViewModel {
             if let timesToPlay = Int(text) {
                 return .success(timesToPlay)
             }
-            else {
-                return .failure("\(fieldName) Times To Play must be a number greater than zero.")
-            }
         }
+        
+        return .failure("\(fieldName) Times To Play must be a number or empty.")
     }
     
     private func validateNumberOfBounces(_ text: String) -> ValidationResult<Int> {
@@ -147,12 +147,14 @@ final class PlaybackBounceViewModel {
             return .failure("Number Of Bounces is required.")
         } else {
             if let tempo = Int(text) {
-                return .success(tempo)
-            }
-            else {
-                return .failure("Number Of Bounces must be a number greater than zero.")
+                
+                if tempo > 0 {
+                    return .success(tempo)
+                }
             }
         }
+        
+        return .failure("Number Of Bounces must be a number greater than zero.")
     }
 
     private func applySlowTempoValidationResult(_ result: ValidationResult<Int>) {

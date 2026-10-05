@@ -69,7 +69,7 @@ final class PlaybackStepwiseViewModel {
         get { storedTimesToPlayString }
         set {
             storedTimesToPlayString = newValue
-            let result = validateStart(storedTimesToPlayString)
+            let result = validateTimesToPlay(storedTimesToPlayString)
             applyTimesToPlayValidationResult(result)
         }
     }
@@ -78,12 +78,14 @@ final class PlaybackStepwiseViewModel {
         if startValue.isEmpty {
             return .failure("Start is required.")
         } else {
-            guard let start = Int(startValue) else {
-                return .failure("Start must be a whole number.")
+            if let max = Int(startValue) {
+                if max > 0 {
+                    return .success(max)
+                }
             }
-            
-            return .success(start)
         }
+        
+        return .failure("Start must be a number greater than zero.")
     }
     
     private func applyStartValidationResult(_ result: ValidationResult<Int>) {
@@ -100,12 +102,14 @@ final class PlaybackStepwiseViewModel {
         if stepValue.isEmpty {
             return .failure("Step is required.")
         } else {
-            guard let step = Int(stepValue) else {
-                return .failure("Step must be a whole number.")
+            if let step = Int(stepValue) {
+                if step > 0 {
+                    return .success(step)
+                }
             }
-            
-            return .success(step)
         }
+        
+        return .failure("Step must be a number greater than zero.")
     }
     
     private func applyStepValidationResult(_ result: ValidationResult<Int>) {
@@ -122,12 +126,14 @@ final class PlaybackStepwiseViewModel {
         if maxValue.isEmpty {
             return .failure("Max is required.")
         } else {
-            guard let max = Int(maxValue) else {
-                return .failure("Max must be a whole number.")
+            if let max = Int(maxValue) {
+                if max > 0 {
+                    return .success(max)
+                }
             }
-            
-            return .success(max)
         }
+        
+        return .failure("Max must be a number greater than zero.")
     }
     
     private func applyMaxValidationResult(_ result: ValidationResult<Int>) {
@@ -144,12 +150,14 @@ final class PlaybackStepwiseViewModel {
         if timesToPlayValue.isEmpty {
             return .failure("Times To Play is required.")
         } else {
-            guard let timesToPlay = Int(timesToPlayValue) else {
-                return .failure("Times To Play must be a whole number.")
+            if let timesToPlay = Int(timesToPlayValue) {
+                if timesToPlay > 0 {
+                    return .success(timesToPlay)
+                }
             }
-            
-            return .success(timesToPlay)
         }
+        
+        return .failure("Times To Play must be a number greater than zero.")
     }
     
     private func applyTimesToPlayValidationResult(_ result: ValidationResult<Int>) {

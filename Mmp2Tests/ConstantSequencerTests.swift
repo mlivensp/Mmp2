@@ -6,8 +6,8 @@
 //
 
 import Testing
-import Mmp2
 import SwiftData
+@testable import Mmp2
 
 struct ConstantSequencerTests {
 

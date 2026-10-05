@@ -173,7 +173,7 @@ extension ClipEditViewContent {
                 clipsToCheck = existingClips.filter { $0.persistentModelID != clip.persistentModelID}
             }
             
-            let sameNameClips = clipsToCheck.filter{ $0.primitiveName == clip.primitiveName }
+            let sameNameClips = clipsToCheck.filter{ $0.primitiveName == nameValue }
             
             if sameNameClips.isEmpty {
                 return .success(nameValue)

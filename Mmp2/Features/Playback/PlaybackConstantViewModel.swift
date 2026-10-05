@@ -77,11 +77,13 @@ final class PlaybackConstantViewModel {
             return .failure("Rate is required.")
         } else {
             if let rate = Int(rateValue) {
-                return .success(rate)
+                if rate > 0 {
+                    return .success(rate)
+                }
             }
         }
         
-        return .failure("Rate must be a valid whole number.")
+        return .failure("Rate must be a number greater than zero.")
     }
     
     fileprivate func validateTimesToPlay(_ timesToPlayValue: String) -> ValidationResult<Int?> {
@@ -89,11 +91,13 @@ final class PlaybackConstantViewModel {
             return .success(nil)
         } else {
             if let timesToPlay = Int(timesToPlayValue) {
-                return .success(timesToPlay)
+                if timesToPlay > 0 {
+                    return .success(timesToPlay)
+                }
             }
         }
         
-        return .failure("Times To Play must be empty or a valid whole number.")
+        return .failure("Times To Play must be empty or a number greater than zero.")
     }
     
     func validate() {

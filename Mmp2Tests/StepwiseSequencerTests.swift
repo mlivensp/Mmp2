@@ -6,7 +6,9 @@
 //
 
 import Testing
+@testable import Mmp2
 
+@MainActor
 struct StepwiseSequencerTests {
 
     @Test func rateStepsOncePerRate() async throws {
