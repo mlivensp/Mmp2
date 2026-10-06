@@ -21,22 +21,23 @@ import SwiftData
 }
 
 @Model public class MediaCollection {
-    var clipFolderPath: String?
+//    var clipFolderPath: String?
+    var primitiveName: String
     var name_normalized: String
     var notes: String?
     var pathIsValid: Bool
-    var primitiveName: String
-    
+
     @Relationship(deleteRule: .cascade, inverse: \SourceGroup.mediaCollection)
     var sourceGroups: [SourceGroup] = []
     
     @Relationship(deleteRule: .cascade, inverse: \Source.mediaCollection)
     var sources: [Source] = []
     
-    public init(name: String, clipFolderPath: String? = nil , pathIsValid: Bool = true, notes: String? = nil) {
+    public init(name: String, pathIsValid: Bool = true, notes: String? = nil) {
         self.primitiveName = name
         self.name_normalized = name.normalizedForSearch
         self.pathIsValid = pathIsValid
+        self.notes = notes
     }
 }
 

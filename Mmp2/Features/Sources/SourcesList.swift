@@ -40,7 +40,8 @@ struct SourcesList: View {
                 case .group(let group):
                     DisclosureGroup {
                         // Sources inside the group
-                        ForEach(group.sources) { source in
+                        let sortedSources = group.sources.sorted(by: { $0.sortOrder < $1.sortOrder })
+                        ForEach(sortedSources) { source in
                             if source.clips.isEmpty {
                                 SourceRow(source: source) { source in
                                     // TODO: think about how to get rid of force unwrap

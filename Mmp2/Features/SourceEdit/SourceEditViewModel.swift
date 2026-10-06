@@ -16,19 +16,19 @@ extension SourceEditView {
         var context: ModelContext
         
         var playbackVM: PlaybackEditViewModel
-        
-        internal var storedNameString: String
-        private var storedBpmString: String
-        private var storedSortOrderString: String
-        private var storedMeasure1StartString: String
-        private var storedSourceGroupString: String
-        private var storedSourceGroup: SourceGroup?
 
         private var bpm: Int?
         private var sortOrder: Int
         private var measure1Start: Double?
         internal var isFavorite: Bool
         internal var notes: String
+
+        internal var storedNameString: String
+        private var storedBpmString: String
+        private var storedSortOrderString: String
+        private var storedMeasure1StartString: String
+        private var storedSourceGroupString: String
+        private var storedSourceGroup: SourceGroup?
 
         var nameError: String?
         var bpmError: String?

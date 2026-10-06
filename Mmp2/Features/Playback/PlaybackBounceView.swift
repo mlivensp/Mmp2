@@ -83,15 +83,17 @@ struct PlaybackBounceView: View {
                 }
             }
             
-            Picker("", selection: $vm.playOrder) {
-                Text("Select a play order").tag(nil as PlayOrder?)
-                
-                ForEach(vm.playOrders) { playOrder in
-                    Text(playOrder.name)
-                        .tag(playOrder)
+            Section("Play Order") {
+                Picker("", selection: $vm.playOrder) {
+                    Text("Select a play order").tag(nil as PlayOrder?)
+                    
+                    ForEach(vm.playOrders) { playOrder in
+                        Text(playOrder.name)
+                            .tag(playOrder)
+                    }
                 }
+                .pickerStyle(.menu)   // This makes it behave like a dropdown
             }
-            .pickerStyle(.menu)   // This makes it behave like a dropdown
         }
     }
 }

@@ -18,13 +18,6 @@ extension ClipEditView {
         var playbackVM: PlaybackEditViewModel
         
         var measureMode = false
-
-        internal var storedNameString: String
-        private var storedBpmString: String
-        private var storedStartTimeString: String
-        private var storedEndTimeString: String
-        private var storedFirstMeasureString: String
-        private var storedLastMeasureString: String
         
         internal var bpm: Int?
         internal var startSeconds: Double
@@ -33,6 +26,13 @@ extension ClipEditView {
         internal var lastMeasure: Int?
         internal var isFavorite: Bool
         internal var notes: String
+
+        internal var storedNameString: String
+        private var storedBpmString: String
+        private var storedStartTimeString: String
+        private var storedEndTimeString: String
+        private var storedFirstMeasureString: String
+        private var storedLastMeasureString: String
         
         // Per-field errors
         var nameError: String?
@@ -152,10 +152,9 @@ extension ClipEditView {
             }
         }
         
-        // MARK: validation functions
+        // MARK: validation
+        
         fileprivate func validateName(_ nameValue: String) -> ValidationResult<String> {
-            nameError = nil
-            
             if nameValue.trimmingCharacters(in: .whitespaces).isEmpty {
                 return .failure("Name is required.")
             }
@@ -275,6 +274,7 @@ extension ClipEditView {
         }
         
         // MARK: apply validation results
+        
         private func applyNameValidationResult(_ result: ValidationResult<String>) {
             switch result {
             case .success:
@@ -376,24 +376,8 @@ extension ClipEditView {
             }
             
             try playbackVM.apply(to: clip.playback, context: context)
-            
-//            if clip.isNew {
-//                let duration = endSeconds - startSeconds
-//                let media = createMedia(bpm: bpm, duration: duration)
-//                clip.media = media
-//                
-//                clip.playback = Playback()
-//                clip.source = source
-//                context.insert(clip)
-//            }
-            
             try context.save()
             return true
         }
-        
-//        fileprivate func createMedia(bpm: Int?, duration: Double) -> Media {
-//            let media = Media(bpm: bpm, path: "", duration: duration)
-//            return media
-//        }
     }
 }

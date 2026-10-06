@@ -9,42 +9,89 @@ import Foundation
 import SwiftData
 
 extension Playback {
-    @MainActor
     func switchMode(
         to newMode: PlaybackMode,
         context: ModelContext
     ) {
-        // Delete old submodel if switching modes
-        if newMode != .constant, let old = playbackConstant {
-            context.delete(old)
-            playbackConstant = nil
-        }
-        if newMode != .stepwise, let old = playbackStepwise {
-            context.delete(old)
-            playbackStepwise = nil
-        }
-        if newMode != .bounce, let old = playbackBounce {
-            context.delete(old)
-            playbackBounce = nil
+        // Delete whichever submodel is NOT the new mode
+        func deleteIfNeeded<T: PersistentModel>(_ current: inout T?) {
+            if let old = current {
+                context.delete(old)
+                current = nil
+            }
         }
 
-        // Create the new one if needed
         switch newMode {
         case .constant:
+            deleteIfNeeded(&playbackStepwise)
+            deleteIfNeeded(&playbackBounce)
+
             if playbackConstant == nil {
-                playbackConstant = PlaybackConstant.createNew()
+                let new = PlaybackConstant.createNew()
+                context.insert(new)
+                playbackConstant = new
             }
+
         case .stepwise:
+            deleteIfNeeded(&playbackConstant)
+            deleteIfNeeded(&playbackBounce)
+
             if playbackStepwise == nil {
-                playbackStepwise = PlaybackStepwise.createNew()
+                let new = PlaybackStepwise.createNew()
+                context.insert(new)
+                playbackStepwise = new
             }
+
         case .bounce:
+            deleteIfNeeded(&playbackConstant)
+            deleteIfNeeded(&playbackStepwise)
+
             if playbackBounce == nil {
-                playbackBounce = PlaybackBounce.createNew()
+                let new = PlaybackBounce.createNew()
+                context.insert(new)
+                playbackBounce = new
             }
         }
     }
 }
+
+//extension Playback {
+//    @MainActor
+//    func switchMode(
+//        to newMode: PlaybackMode,
+//        context: ModelContext
+//    ) {
+//        // Delete old submodel if switching modes
+//        if newMode != .constant, let old = playbackConstant {
+//            context.delete(old)
+//            playbackConstant = nil
+//        }
+//        if newMode != .stepwise, let old = playbackStepwise {
+//            context.delete(old)
+//            playbackStepwise = nil
+//        }
+//        if newMode != .bounce, let old = playbackBounce {
+//            context.delete(old)
+//            playbackBounce = nil
+//        }
+//
+//        // Create the new one if needed
+//        switch newMode {
+//        case .constant:
+//            if playbackConstant == nil {
+//                playbackConstant = PlaybackConstant.createNew()
+//            }
+//        case .stepwise:
+//            if playbackStepwise == nil {
+//                playbackStepwise = PlaybackStepwise.createNew()
+//            }
+//        case .bounce:
+//            if playbackBounce == nil {
+//                playbackBounce = PlaybackBounce.createNew()
+//            }
+//        }
+//    }
+//}
 
 extension PlaybackConstant {
     static func createNew() -> PlaybackConstant {

@@ -26,7 +26,6 @@ struct SourceEditForm: View {
                         errorMessage: vm.nameError
                     ) {
                         TextField("", text: $vm.name)
-                            .padding(.trailing, defaultTrailingPadding)
                     }
                 }
                 
@@ -78,12 +77,10 @@ struct SourceEditForm: View {
                 
                 Section("Or New Group") {
                     TextField("", text: $vm.sourceGroupString)
-                        .padding(.trailing, defaultTrailingPadding)
                 }
                 
                 Section("Notes") {
                     TextField("", text: $vm.notes)
-                        .padding(.trailing, defaultTrailingPadding)
                 }
                 
                 Section {
@@ -117,6 +114,7 @@ struct SourceEditForm: View {
                 }
             }
             .scrollContentBackground(.hidden)   // optional, but recommended
+            .padding(defaultTrailingPadding)
         }
     }
 }
