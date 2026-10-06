@@ -28,6 +28,16 @@ extension CollectionEditView {
             self.notes = collection.notes ?? ""
         }
         
+        var sources: [Source] {
+            collection.sources.sorted(by: {
+                if $0.effectiveSortOrder == $1.effectiveSortOrder {
+                    return $0.sortOrder < $1.sortOrder
+                } else {
+                    return $0.sortOrder < $1.sortOrder
+                }
+            } )
+        }
+        
         var nameString: String {
             get { storedNameString }
             set {
@@ -90,6 +100,19 @@ extension CollectionEditView {
         func validate() -> Bool {
             applyNameValidationResult(validateName(storedNameString))
             return isValid
+        }
+        
+        func save() throws -> Bool {
+            guard validate() else {
+                throw AppError.attemptToSaveInvalidState("CollectionEditViewModel")
+            }
+            
+            collection.primitiveName = storedNameString
+            collection.name_normalized = storedNameString.normalizedForSearch
+            collection.notes = notes.isEmpty ? nil : notes
+            
+            try context.save()
+            return true
         }
     }
 }

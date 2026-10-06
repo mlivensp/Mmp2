@@ -7,4 +7,4 @@
 
 import Foundation
 
-let defaultTrailingPadding: CGFloat = 12
+let formPadding: CGFloat = 12

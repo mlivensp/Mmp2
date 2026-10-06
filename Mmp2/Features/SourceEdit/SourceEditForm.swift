@@ -114,7 +114,7 @@ struct SourceEditForm: View {
                 }
             }
             .scrollContentBackground(.hidden)   // optional, but recommended
-            .padding(defaultTrailingPadding)
+            .padding(formPadding)
         }
     }
 }

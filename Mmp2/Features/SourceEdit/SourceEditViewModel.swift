@@ -17,9 +17,9 @@ extension SourceEditView {
         
         var playbackVM: PlaybackEditViewModel
 
-        private var bpm: Int?
-        private var sortOrder: Int
-        private var measure1Start: Double?
+        internal var bpm: Int?
+        internal var sortOrder: Int
+        internal var measure1Start: Double?
         internal var isFavorite: Bool
         internal var notes: String
 

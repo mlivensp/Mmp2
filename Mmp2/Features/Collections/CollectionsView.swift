@@ -39,12 +39,12 @@ struct CollectionsView: View {
                 .onDelete(perform: deleteItems)
             }
         }
-        .onChange(of: appRootManager.selectedCategory) { _, newValue in
-            guard case .collections = newValue else {
-                appRootManager.selectedMediaCollection = nil
-                return
-            }
-        }
+//        .onChange(of: appRootManager.selectedCategory) { _, newValue in
+//            guard case .collections = newValue else {
+//                appRootManager.selectedMediaCollection = nil
+//                return
+//            }
+//        }
 #if os(macOS)
         .navigationSplitViewColumnWidth(min: 180, ideal: 200)
 #endif

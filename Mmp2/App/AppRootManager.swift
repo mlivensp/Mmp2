@@ -32,10 +32,12 @@ final class AppRootManager {
     }
     
     var selectedCategory = AppCategory.collections
+    var storedMediaCollection: MediaCollection?
     var selectedMediaCollection: MediaCollection? {
-        didSet {
+        get { storedMediaCollection }
+        set {
+            storedMediaCollection = newValue
             Logger.data.info("selectedMediaCollection set to \(self.selectedMediaCollection?.primitiveName ?? "nil")")
-//            Logger.fluff.info(selectedMediaCollection?.primitiveName ?? "no collection")
         }
     }
     

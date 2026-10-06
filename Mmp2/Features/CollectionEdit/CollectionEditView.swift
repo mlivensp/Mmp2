@@ -11,9 +11,10 @@ import SwiftUI
 struct CollectionEditView: View {
     @Environment(\.modelContext) private var context
     
-    let collection: MediaCollection
+    @State var collection: MediaCollection
     var body: some View {
-        Text("Edit \(collection.primitiveName)")
+        let _ = print("CollectionEditView - \(collection.primitiveName)")
+        CollectionEditForm(collection: collection, context: context)
     }
 }
 

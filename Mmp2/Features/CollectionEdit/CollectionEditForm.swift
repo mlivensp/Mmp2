@@ -18,7 +18,54 @@ struct CollectionEditForm: View {
     }
 
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        let _ = print("CollectionEditForm - \(vm.collection.primitiveName)")
+        ScrollView {
+            Form {
+                Section("Name") {
+                    ErrorFieldContainer(
+                        hasError: vm.nameError != nil,
+                        errorMessage: vm.nameError,
+                    ) {
+                        TextField("", text: $vm.nameString)
+                    }
+                }
+                
+                Section("Notes") {
+                    TextField("", text: $vm.notes)
+                }
+            }
+            .scrollContentBackground(.hidden)   // optional, but recommended
+            .padding(formPadding)
+            
+            CollectionEditSourceListView(sources: vm.sources)
+                .padding(formPadding)
+            
+            Section {
+                HStack {
+                    Spacer()
+                    Button("Save") {
+                        do {
+                            if try vm.save() {
+                                appRootManager.selectedCategory = .collections
+                            }
+                        } catch {
+                            let _ = print(error.localizedDescription)
+                            // TODO: notify user
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    
+                    Spacer()
+                    
+                    Button("Cancel") {
+                        appRootManager.selectedCategory = .collections
+                    }
+                    .foregroundColor(.secondary)
+                    
+                    Spacer()
+                }
+            }
+        }
     }
 }
 

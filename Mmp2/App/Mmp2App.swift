@@ -64,6 +64,7 @@ struct Mmp2App: App {
                                     Text("Recents")
 //                                    RecentsView(dataController: dataController)
                                 case .collectionEdit(let collection):
+                                    let _ = print("Mmp2App.appRootManager.collectionEdit - \(collection.primitiveNamesss)")
                                     CollectionEditView(collection: collection)
                                 case .sourceEdit(let source, let collection):
                                     SourceEditView(source: source, collection: collection)

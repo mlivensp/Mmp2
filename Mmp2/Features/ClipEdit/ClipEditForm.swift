@@ -17,7 +17,7 @@ struct ClipEditForm: View {
     }
     
     var body: some View {
-        NavigationStack {
+        ScrollView {
             Form {
                 Section("Name") {
                     ErrorFieldContainer(
@@ -119,7 +119,7 @@ struct ClipEditForm: View {
                     }
                 }
             }
-            .navigationTitle("Edit Clip")
+            .padding(formPadding)
         }
     }
 }
