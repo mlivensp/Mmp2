@@ -10,7 +10,8 @@ import SwiftUI
 
 struct SourceEditForm: View {
     @Environment(AppRootManager.self) private var appRootManager
-    
+    @Environment(\.dismiss) private var dismiss
+
     @State private var vm: SourceEditView.ViewModel
     
     init(source: Source, collection: MediaCollection, context: ModelContext) {
@@ -93,7 +94,7 @@ struct SourceEditForm: View {
                         Button("Save") {
                             do {
                                 if try vm.save() {
-                                    appRootManager.selectedCategory = .collections
+                                    dismiss()
                                 }
                             } catch {
                                 let _ = print(error.localizedDescription)
@@ -105,7 +106,7 @@ struct SourceEditForm: View {
                         Spacer()
                         
                         Button("Cancel") {
-                            appRootManager.selectedCategory = .collections
+                            dismiss()
                         }
                         .foregroundColor(.secondary)
                         

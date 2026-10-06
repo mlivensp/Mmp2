@@ -20,16 +20,8 @@ struct SourcesView: View {
             if let collection {
                 SourcesList(
                     collection: collection,
-                    onSourceTapped: { source in
-                        appRootManager.selectedSource = source
-                        appRootManager.selectedClip = nil
-                        appRootManager.currentRoot = .play
-                    },
-                    onClipTapped: { clip in
-                        appRootManager.selectedSource = nil
-                        appRootManager.selectedClip = clip
-                        appRootManager.currentRoot = .play
-                    }
+                    onSourceTapped: { appRootManager.play(source: $0) },
+                    onClipTapped:   { appRootManager.play(clip: $0) }
                 )
             } else {
                 ContentUnavailableView("No Collection Selected", systemImage: "folder")

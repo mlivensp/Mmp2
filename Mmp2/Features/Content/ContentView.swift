@@ -20,18 +20,7 @@ struct ContentView: View {
             Text("Favorites")
         case .recents:
             Text("Recents")
-        case .collectionEdit:
-            CollectionsView()
-        case .sourceEdit:
-            CollectionsView()
-        case .clipEdit:
-            CollectionsView()
         }
-//        case "Fix Locations":
-//            Text("Fix Locations")
-//        default:
-//            Text("Please choose a group from the sidebar.")
-//        }
     }
 }
 

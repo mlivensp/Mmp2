@@ -19,17 +19,19 @@ struct CollectionsView: View {
     @State private var isLocatingSource: Bool = false
     
     var body: some View {
-        @Bindable var appRootManager = appRootManager
-        
+        let selection = Binding<MediaCollection?>(
+            get: { appRootManager.selectedMediaCollection },
+            set: { appRootManager.selectCollection($0) }
+        )
+
         VStack {
-            List(selection: $appRootManager.selectedMediaCollection) {
+            List(selection: selection) {
                 ForEach(mediaCollections) { mediaCollection in
                     NavigationLink(value: mediaCollection) {
                         Text(mediaCollection.primitiveName)
                             .contextMenu {
                                 Button {
-                                    appRootManager.selectedMediaCollection = mediaCollection
-                                    appRootManager.selectedCategory = .collectionEdit(collection: mediaCollection)
+                                    appRootManager.editCollection(mediaCollection)
                                 } label: {
                                     Label("Edit Collection", systemImage: "pencil")
                                 }

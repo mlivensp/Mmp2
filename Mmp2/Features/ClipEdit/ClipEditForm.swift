@@ -99,7 +99,7 @@ struct ClipEditForm: View {
                         Button("Save") {
                             do {
                                 if try vm.save() {
-                                    appRootManager.selectedCategory = .collections
+                                    dismiss()
                                 }
                             } catch {
                                 let _ = print(error.localizedDescription)
@@ -111,7 +111,7 @@ struct ClipEditForm: View {
                         Spacer()
                         
                         Button("Cancel") {
-                            appRootManager.selectedCategory = .collections
+                            dismiss()
                         }
                         .foregroundColor(.secondary)
                         

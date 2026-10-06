@@ -10,7 +10,9 @@ import SwiftUI
 
 struct CollectionEditForm: View {
     @Environment(AppRootManager.self) private var appRootManager
-    
+    @Environment(\.dismiss) private var dismiss
+    // Save:   if try vm.save() { dismiss() }
+    // Cancel: dismiss()
     @State private var vm: CollectionEditView.ViewModel
     
     init(collection: MediaCollection, context: ModelContext) {
@@ -38,17 +40,16 @@ struct CollectionEditForm: View {
             .padding(formPadding)
             
             CollectionEditSourceListView(sources: vm.sources) { source in
-                appRootManager.selectedCategory = .sourceEdit(source: source, collection: source.mediaCollection!)
+                appRootManager.editSource(source, in: vm.collection)
             }
             .padding(formPadding)
-            
             Section {
                 HStack {
                     Spacer()
                     Button("Save") {
                         do {
                             if try vm.save() {
-                                appRootManager.selectedCategory = .collections
+                                dismiss()
                             }
                         } catch {
                             let _ = print(error.localizedDescription)
@@ -60,7 +61,7 @@ struct CollectionEditForm: View {
                     Spacer()
                     
                     Button("Cancel") {
-                        appRootManager.selectedCategory = .collections
+                        dismiss()
                     }
                     .foregroundColor(.secondary)
                     

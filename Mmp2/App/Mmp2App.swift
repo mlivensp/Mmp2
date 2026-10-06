@@ -44,52 +44,38 @@ struct Mmp2App: App {
                     } content: {
                         ContentView()
                     } detail: {
-                        NavigationStack {
-                            ZStack {
+                        @Bindable var appRootManager = appRootManager
+                        let _ = print("refreshing detail")
+                        NavigationStack(path: $appRootManager.detailPath) {
+                            Group {
                                 switch appRootManager.selectedCategory {
                                 case .collections:
                                     if appRootManager.selectedMediaCollection == nil {
-                                        ContentUnavailableView {
-                                            Label("No content selected", systemImage: "exclamationmark.triangle.fill")
-                                        }
+                                        ContentUnavailableView("No content selected",
+                                            systemImage: "exclamationmark.triangle.fill")
                                     } else {
                                         SourcesView()
                                     }
-                                case .playlists:
-                                    Text("Playlists")
-//                                    PlaylistsView(dataController: dataController)
-                                case .favorites:
-                                    Text("Favorites")
-                                case .recents:
-                                    Text("Recents")
-//                                    RecentsView(dataController: dataController)
+                                case .playlists:  Text("Playlists")
+                                case .favorites:  Text("Favorites")
+                                case .recents:    Text("Recents")
+                                }
+                            }
+                            .navigationDestination(for: DetailRoute.self) { route in
+                                switch route {
                                 case .collectionEdit(let collection):
-//                                    let _ = print("Mmp2App.appRootManager.collectionEdit - \(collection.primitiveNamesss)")
+                                    let _ = print("navigationDestination - CollectionEeitView")
                                     CollectionEditView(collection: collection)
-                                        .id(UUID())
                                 case .sourceEdit(let source, let collection):
+                                    let _ = print("navigationDestination - SourceEditView")
                                     SourceEditView(source: source, collection: collection)
                                 case .clipEdit(let clip, let source):
+                                    let _ = print("navigationDestination - ClipEditView")
                                     ClipEditView(clip: clip, source: source)
-//                                case "Fix Locations":
-//                                    Text("Fix Locations")
-//                                    FixLocationsView(dataController: dataController)
-//                                default:
-//                                    Text("Please choose a group from the sidebar.")
                                 }
-                           }
-//                            .navigationDestination(for: NavigationDestination.self) { navigationDestination in
-//                                switch navigationDestination {
-//                                case .player(let mediaSource):
-//                                    let _ = dataController.selectedMediaSource = mediaSource
-//                                    ContentUnavailableView {
-//                                        Label("Detail View", systemImage: "exclamationmark.triangle.fill")
-//                                    }
-////                                    PlayerView(dataController: dataController, mediaSource: mediaSource)
-//                                }
-//                            }
+                            }
                         }
-                     }
+                    }
                 }
             }
         }

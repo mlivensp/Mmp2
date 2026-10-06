@@ -46,7 +46,7 @@ struct SourcesList: View {
                                 SourceRow(source: source) { source in
                                     // TODO: think about how to get rid of force unwrap
                                     // probably mediaCollection is not optional on source
-                                    appRootManager.selectedCategory = .sourceEdit(source: source, collection: source.mediaCollection!)
+                                    appRootManager.editSource(source, in: source.mediaCollection!)
                                 }
                                 .onTapGesture {
                                     onSourceTapped(source)
@@ -62,7 +62,7 @@ struct SourcesList: View {
                                     })
                                     ForEach(sortedClips) { clip in
                                         ClipRow(clip: clip) { clip in
-                                            appRootManager.selectedCategory = .clipEdit(clip: clip, source: source)
+                                            appRootManager.editClip(clip, of: source)
                                         }
                                         .onTapGesture {
                                             onClipTapped(clip)
@@ -70,7 +70,7 @@ struct SourcesList: View {
                                     }
                                 } label: {
                                     SourceRow(source: source) { source in
-                                        appRootManager.selectedCategory = .sourceEdit(source: source, collection: source.mediaCollection!)
+                                        appRootManager.editSource(source, in: source.mediaCollection!)
                                     }
                                     .onTapGesture {
                                         onSourceTapped(source)
@@ -94,7 +94,7 @@ struct SourcesList: View {
                             })
                             ForEach(sortedClips) { clip in
                                 ClipRow(clip: clip) { clip in
-                                    appRootManager.selectedCategory = .clipEdit(clip: clip, source: source)
+                                    appRootManager.editClip(clip, of: source)
                                 }
                                 .onTapGesture {
                                     onClipTapped(clip)
@@ -102,7 +102,7 @@ struct SourcesList: View {
                             }
                         } label: {
                             SourceRow(source: source) { source in
-                                appRootManager.selectedCategory = .sourceEdit(source: source, collection: source.mediaCollection!)
+                                appRootManager.editSource(source, in: source.mediaCollection!)
                             }
                             .onTapGesture {
                                 onSourceTapped(source)
@@ -110,7 +110,7 @@ struct SourcesList: View {
                         }
                     } else {
                         SourceRow(source: source) { source in
-                            appRootManager.selectedCategory = .sourceEdit(source: source, collection: source.mediaCollection!)
+                            appRootManager.editSource(source, in: source.mediaCollection!)
                         }
                         .onTapGesture {
                             onSourceTapped(source)
