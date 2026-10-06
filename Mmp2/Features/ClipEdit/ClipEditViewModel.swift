@@ -8,7 +8,7 @@
 import Foundation
 import SwiftData
 
-extension ClipEditViewContent {
+extension ClipEditView {
     @Observable
     final class ViewModel {
         var clip: Clip

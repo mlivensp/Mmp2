@@ -63,6 +63,8 @@ struct Mmp2App: App {
                                 case .recents:
                                     Text("Recents")
 //                                    RecentsView(dataController: dataController)
+                                case .sourceEdit(let source, let collection):
+                                    SourceEditView(source: source, collection: collection)
                                 case .clipEdit(let clip, let source):
                                     ClipEditView(clip: clip, source: source)
 //                                case "Fix Locations":

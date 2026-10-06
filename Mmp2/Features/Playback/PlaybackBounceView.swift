@@ -84,6 +84,8 @@ struct PlaybackBounceView: View {
             }
             
             Picker("", selection: $vm.playOrder) {
+                Text("Select a play order").tag(nil as PlayOrder?)
+                
                 ForEach(vm.playOrders) { playOrder in
                     Text(playOrder.name)
                         .tag(playOrder)

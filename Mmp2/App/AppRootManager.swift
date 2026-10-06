@@ -56,6 +56,7 @@ final class AppRootManager {
         case playlists
         case favorites
         case recents
+        case sourceEdit(source: Source, collection: MediaCollection)
         case clipEdit(clip: Clip, source: Source)
     }
     

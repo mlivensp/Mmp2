@@ -42,10 +42,14 @@ struct SourcesList: View {
                         // Sources inside the group
                         ForEach(group.sources) { source in
                             if source.clips.isEmpty {
-                                SourceRow(source: source)
-                                    .onTapGesture {
-                                        onSourceTapped(source)
-                                    }
+                                SourceRow(source: source) { source in
+                                    // TODO: think about how to get rid of force unwrap
+                                    // probably mediaCollection is not optional on source
+                                    appRootManager.selectedCategory = .sourceEdit(source: source, collection: source.mediaCollection!)
+                                }
+                                .onTapGesture {
+                                    onSourceTapped(source)
+                                }
                             } else {
                                 DisclosureGroup {
                                     let sortedClips = source.clips.sorted(by: {
@@ -64,15 +68,17 @@ struct SourcesList: View {
                                         }
                                     }
                                 } label: {
-                                    SourceRow(source: source)
-                                        .onTapGesture {
-                                            onSourceTapped(source)
-                                        }
+                                    SourceRow(source: source) { source in
+                                        appRootManager.selectedCategory = .sourceEdit(source: source, collection: source.mediaCollection!)
+                                    }
+                                    .onTapGesture {
+                                        onSourceTapped(source)
+                                    }
                                 }
                             }
                         }
                     } label: {
-                        Label(group.primitiveName, systemImage: "folder.fill")
+                        Label(group.primitiveName, systemImage: "music.note.square.stack")
                     }
                     
                 case .source(let source):
@@ -94,16 +100,20 @@ struct SourcesList: View {
                                 }
                             }
                         } label: {
-                            SourceRow(source: source)
-                                .onTapGesture {
-                                    onSourceTapped(source)
-                                }
-                        }
-                    } else {
-                        SourceRow(source: source)
+                            SourceRow(source: source) { source in
+                                appRootManager.selectedCategory = .sourceEdit(source: source, collection: source.mediaCollection!)
+                            }
                             .onTapGesture {
                                 onSourceTapped(source)
                             }
+                        }
+                    } else {
+                        SourceRow(source: source) { source in
+                            appRootManager.selectedCategory = .sourceEdit(source: source, collection: source.mediaCollection!)
+                        }
+                        .onTapGesture {
+                            onSourceTapped(source)
+                        }
                     }
                 }
             }

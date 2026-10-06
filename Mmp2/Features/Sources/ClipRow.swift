@@ -12,14 +12,19 @@ struct ClipRow: View {
     let onEdit: (Clip) -> Void
     
     var body: some View {
-        Label(clip.primitiveName, systemImage: "music.note")
-            .contextMenu {
-                Button {
-                    onEdit(clip)
-                } label: {
-                    Label("Edit Clip", systemImage: "pencil")
-                }
+        Label {
+            Text(clip.primitiveName)
+        } icon: {
+            Image(systemName: clip.isFavorite ? "heart.fill" : "music.note")
+                .foregroundStyle(clip.isFavorite ? .red : .primary)
+        }
+        .contextMenu {
+            Button {
+                onEdit(clip)
+            } label: {
+                Label("Edit Clip", systemImage: "pencil")
             }
+        }
     }
 }
 

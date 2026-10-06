@@ -20,6 +20,8 @@ struct ContentView: View {
             Text("Favorites")
         case .recents:
             Text("Recents")
+        case .sourceEdit:
+            CollectionsView()
         case .clipEdit:
             CollectionsView()
         }

@@ -326,7 +326,7 @@ private final class Fixture {
     let context: ModelContext
     let source: Source
     let clip: Clip
-    let vm: ClipEditViewContent.ViewModel
+    let vm: ClipEditView.ViewModel
 
     init(
         name: String = "Clip",
@@ -382,7 +382,7 @@ private final class Fixture {
         
         try! context.save()
 
-        vm = ClipEditViewContent.ViewModel(clip: clip, source: source, context: context)
+        vm = ClipEditView.ViewModel(clip: clip, source: source, context: context)
     }
 
     private static func makeClip(

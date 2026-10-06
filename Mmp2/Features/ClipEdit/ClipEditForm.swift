@@ -6,14 +6,14 @@
 import SwiftData
 import SwiftUI
 
-struct ClipEditViewContent: View {
+struct ClipEditForm: View {
     @Environment(AppRootManager.self) private var appRootManager
     @Environment(\.dismiss) private var dismiss
     
-    @State private var vm: ViewModel
+    @State private var vm: ClipEditView.ViewModel
     
     init(clip: Clip, source: Source, context: ModelContext) {
-        _vm = State(initialValue: ViewModel(clip: clip, source: source, context: context))
+        _vm = State(initialValue: ClipEditView.ViewModel(clip: clip, source: source, context: context))
     }
     
     var body: some View {
@@ -88,12 +88,6 @@ struct ClipEditViewContent: View {
                 Section("Notes") {
                     TextField("", text: $vm.notes)
                 }
-                
-                //                if let error = vm.error {
-                //                    Section {
-                //                        Text(error).foregroundColor(.red)
-                //                    }
-                //                }
                 
                 Section {
                     PlaybackEditView(vm: vm.playbackVM)

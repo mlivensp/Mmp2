@@ -15,7 +15,7 @@ struct ClipEditView: View {
     let source: Source
     
    var body: some View {
-       ClipEditViewContent(clip: clip, source: source, context: context)
+       ClipEditForm(clip: clip, source: source, context: context)
     }
 }
 
