@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CollectionEditSourceListView: View {
     let sources: [Source]
+    let onEdit: (Source) -> Void
 
     private var columns: [GridItem] = [
         GridItem(.flexible(), alignment: .leading),  // source name column
@@ -24,6 +25,13 @@ struct CollectionEditSourceListView: View {
                     .font(.headline)
                 ForEach(sources) { source in
                     Text(source.primitiveName)
+                        .contextMenu {
+                            Button {
+                                onEdit(source)
+                            } label: {
+                                Label("Edit Source", systemImage: "pencil")
+                            }
+                        }
 
                     Text(source.sourceGroup?.primitiveName ?? "")
                 }
@@ -33,5 +41,6 @@ struct CollectionEditSourceListView: View {
 }
 
 #Preview {
-    CollectionEditSourceListView(sources: [])
+    CollectionEditSourceListView(sources: []) { _ in
+    }
 }

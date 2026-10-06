@@ -37,8 +37,10 @@ struct CollectionEditForm: View {
             .scrollContentBackground(.hidden)   // optional, but recommended
             .padding(formPadding)
             
-            CollectionEditSourceListView(sources: vm.sources)
-                .padding(formPadding)
+            CollectionEditSourceListView(sources: vm.sources) { source in
+                appRootManager.selectedCategory = .sourceEdit(source: source, collection: source.mediaCollection!)
+            }
+            .padding(formPadding)
             
             Section {
                 HStack {
