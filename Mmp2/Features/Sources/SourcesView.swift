@@ -5,6 +5,7 @@
 //  Created by Michael Livenspargar on 9/13/26.
 //
 
+import OSLog
 import SwiftUI
 
 struct SourcesView: View {
@@ -16,19 +17,17 @@ struct SourcesView: View {
     }
 
     var body: some View {
-        Group {
-            if let collection {
-                SourcesList(
-                    collection: collection,
-                    onSourceTapped: { appRootManager.play(source: $0) },
-                    onClipTapped:   { appRootManager.play(clip: $0) }
-                )
-            } else {
+        SourcesList(
+            collection: collection,        // make this parameter optional in SourcesList
+            onSourceTapped: { appRootManager.play(source: $0) },
+            onClipTapped:   { appRootManager.play(clip: $0) }
+        )
+        .overlay {
+            if collection == nil {
                 ContentUnavailableView("No Collection Selected", systemImage: "folder")
             }
         }
-    }
-}
+    }}
 
 #Preview {
     SourcesView()

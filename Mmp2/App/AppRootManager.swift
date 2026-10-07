@@ -50,7 +50,7 @@ final class AppRootManager {
     
     func editCollection(_ collection: MediaCollection) {
         Logger.navigation.info("editCollection - \(collection.primitiveName)")
-        selectedMediaCollection = collection
+//        selectedMediaCollection = collection
         resetDetailPath()
         detailPath.append(DetailRoute.collectionEdit(collection))
     }

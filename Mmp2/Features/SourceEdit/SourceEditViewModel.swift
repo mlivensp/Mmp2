@@ -75,6 +75,11 @@ extension SourceEditView {
             _ = validate()
         }
         
+        var mediaPath: String {
+            get { source.media.path ?? "" }
+            set { source.media.path = newValue }
+        }
+        
         var sourceGroups: [SourceGroup] {
             collection.sourceGroups.sorted(by: { $0.sortOrder < $1.sortOrder })
         }

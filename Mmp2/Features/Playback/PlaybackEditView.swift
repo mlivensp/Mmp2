@@ -11,23 +11,21 @@ struct PlaybackEditView: View {
     @Bindable var vm: PlaybackEditViewModel
     
     var body: some View {
-        Section("Playback Mode") {
-            Picker("", selection: $vm.mode) {
-                ForEach(PlaybackMode.allCases) { mode in
-                    Text(mode.label)
-                        .tag(mode)
-                }
+        Picker("Mode", selection: $vm.mode) {
+            ForEach(PlaybackMode.allCases) { mode in
+                Text(mode.label)
+                    .tag(mode)
             }
-            .pickerStyle(.menu)   // This makes it behave like a dropdown
-            
-            switch vm.mode {
-            case .constant:
-                PlaybackConstantView(vm: vm.constantVM)
-            case .stepwise:
-                PlaybackStepwiseView(vm: vm.stepwiseVM)
-            case .bounce:
-                PlaybackBounceView(vm: vm.bounceVM)
-            }
+        }
+        .pickerStyle(.menu)   // This makes it behave like a dropdown
+        
+        switch vm.mode {
+        case .constant:
+            PlaybackConstantView(vm: vm.constantVM)
+        case .stepwise:
+            PlaybackStepwiseView(vm: vm.stepwiseVM)
+        case .bounce:
+            PlaybackBounceView(vm: vm.bounceVM)
         }
     }
 }

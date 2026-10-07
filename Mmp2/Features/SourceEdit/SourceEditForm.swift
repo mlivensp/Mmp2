@@ -11,7 +11,7 @@ import SwiftUI
 struct SourceEditForm: View {
     @Environment(AppRootManager.self) private var appRootManager
     @Environment(\.dismiss) private var dismiss
-
+    
     @State private var vm: SourceEditView.ViewModel
     
     init(source: Source, collection: MediaCollection, context: ModelContext) {
@@ -20,51 +20,72 @@ struct SourceEditForm: View {
     
     var body: some View {
         ScrollView {
+            Text("Source")
+                .font(.title)
             Form {
-                Section("Name") {
-                    ErrorFieldContainer(
-                        hasError: vm.nameError != nil,
-                        errorMessage: vm.nameError
-                    ) {
-                        TextField("", text: $vm.name)
+                HStack {
+                    Button {
+                        print("pick location")
+                    } label: {
+                        Text("Browse")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    TextEditor(text: $vm.mediaPath)   // wraps + grows
+                        .disabled(true)        // if you want it read-only
+                }
+//
+                
+                ErrorFieldContainer(
+                    hasError: vm.nameError != nil,
+                    errorMessage: vm.nameError
+                ) {
+                    HStack {
+                        Text("Name")
+                    TextField("", text: $vm.name)
                     }
                 }
                 
-                Section("BPM") {
-                    ErrorFieldContainer(
-                        hasError: vm.bpmError != nil,
-                        errorMessage: vm.bpmError
-                    ) {
+                ErrorFieldContainer(
+                    hasError: vm.bpmError != nil,
+                    errorMessage: vm.bpmError
+                ) {
+                    HStack {
+                        Text("BPM")
                         TextField("", text: $vm.bpmString)
-                            .frame(maxWidth: 60)
+                            .frame(width: numericFieldWidth)
+                            .multilineTextAlignment(.trailing)
                     }
                 }
                 
-                Section("Sort Order") {
-                    ErrorFieldContainer(
-                        hasError: vm.sortOrderError != nil,
-                        errorMessage: vm.sortOrderError
-                    ) {
+                ErrorFieldContainer(
+                    hasError: vm.sortOrderError != nil,
+                    errorMessage: vm.sortOrderError
+                ) {
+                    HStack {
+                        Text("Sort Order")
                         TextField("", text: $vm.sortOrderString)
-                            .frame(maxWidth: 60)
+                            .frame(width: numericFieldWidth)
+                            .multilineTextAlignment(.trailing)
                     }
                 }
                 
-                Section("Measure 1 Start") {
-                    ErrorFieldContainer(
-                        hasError: vm.measure1StartError != nil,
-                        errorMessage: vm.measure1StartError
-                    ) {
+                ErrorFieldContainer(
+                    hasError: vm.measure1StartError != nil,
+                    errorMessage: vm.measure1StartError
+                ) {
+                    HStack {
+                        Text("Measure 1 Start")
                         TextField("", text: $vm.measure1StartString)
-                            .frame(maxWidth: 100)
+                            .frame(width: 200)
                     }
                 }
                 
                 Toggle(isOn: $vm.isFavorite) {
                     Text("Favorite")
                 }
-                
-                Section("Group") {
+
+                HStack {
+                    Text("Group")
                     Picker("", selection: $vm.sourceGroup) {
                         Text("None").tag(nil as SourceGroup?)
                         
@@ -76,15 +97,17 @@ struct SourceEditForm: View {
                     .pickerStyle(.menu)   // This makes it behave like a dropdown
                 }
                 
-                Section("Or New Group") {
+                HStack {
+                    Text("Or New Group")
                     TextField("", text: $vm.sourceGroupString)
                 }
                 
-                Section("Notes") {
+                HStack {
+                    Text("Notes")
                     TextField("", text: $vm.notes)
                 }
                 
-                Section {
+                Section("Playback") {
                     PlaybackEditView(vm: vm.playbackVM)
                 }
                 

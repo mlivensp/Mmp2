@@ -12,23 +12,27 @@ struct PlaybackConstantView: View {
     
     var body: some View {
         Group {
-            Section("Rate") {
-                ErrorFieldContainer(
-                    hasError: vm.rateError != nil,
-                    errorMessage: vm.rateError
-                ) {
+            ErrorFieldContainer(
+                hasError: vm.rateError != nil,
+                errorMessage: vm.rateError
+            ) {
+                HStack {
+                    Text("Rate")
                     TextField("", text: $vm.rateString)
-                        .frame(maxWidth: 60)
+                        .frame(width: numericFieldWidth)
+                        .multilineTextAlignment(.trailing)
                 }
             }
             
-            Section("Times To Play") {
-                ErrorFieldContainer(
-                    hasError: vm.timesToPlayError != nil,
-                    errorMessage: vm.timesToPlayError
-                ) {
+            ErrorFieldContainer(
+                hasError: vm.timesToPlayError != nil,
+                errorMessage: vm.timesToPlayError
+            ) {
+                HStack {
+                    Text("Times To Play")
                     TextField("", text: $vm.timesToPlayString)
-                        .frame(maxWidth: 60)
+                        .frame(width: numericFieldWidth)
+                        .multilineTextAlignment(.trailing)
                 }
             }
         }

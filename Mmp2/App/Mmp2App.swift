@@ -72,7 +72,9 @@ struct Mmp2App: App {
                                 }
                             }
                         }
-                    }
+                        .onChange(of: appRootManager.detailPath.count) { old, new in
+                            print("detailPath.count \(old) -> \(new)")
+                        }                    }
                 }
             }
         }
