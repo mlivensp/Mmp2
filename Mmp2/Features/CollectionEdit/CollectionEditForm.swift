@@ -11,8 +11,7 @@ import SwiftUI
 struct CollectionEditForm: View {
     @Environment(AppRootManager.self) private var appRootManager
     @Environment(\.dismiss) private var dismiss
-    // Save:   if try vm.save() { dismiss() }
-    // Cancel: dismiss()
+
     @State private var vm: CollectionEditView.ViewModel
     
     init(collection: MediaCollection, context: ModelContext) {
@@ -42,7 +41,8 @@ struct CollectionEditForm: View {
             CollectionEditSourceListView(sources: vm.sources) { source in
                 appRootManager.editSource(source, in: vm.collection)
             }
-            .padding(formPadding)
+            .padding([.leading, .trailing, .bottom], formPadding)
+            
             Section {
                 HStack {
                     Spacer()

@@ -5,6 +5,7 @@
 //  Created by Michael Livenspargar on 9/13/26.
 //
 
+import OSLog
 import SwiftUI
 import SwiftData
 
@@ -62,6 +63,8 @@ struct Mmp2App: App {
                                 }
                             }
                             .navigationDestination(for: DetailRoute.self) { route in
+                                let _ = logDestination(route)
+
                                 switch route {
                                 case .collectionEdit(let collection):
                                     let _ = print("navigationDestination - CollectionEeitView")
@@ -81,5 +84,17 @@ struct Mmp2App: App {
         }
         .modelContainer(sharedModelContainer)
         .environment(appRootManager)
+    }
+    
+    private func logDestination(_ route: DetailRoute) {
+        switch route {            
+        case .collectionEdit(_):
+            Logger.navigation.info("destination - collectionEdit")
+        case .sourceEdit(_, _):
+            Logger.navigation.info("destination - sourceEdit")
+        case .clipEdit(_, _):
+            Logger.navigation.info("destination - clipEdit")
+
+        }
     }
 }

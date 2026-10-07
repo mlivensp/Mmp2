@@ -10,14 +10,34 @@ import SwiftUI
 struct CollectionEditSourceListView: View {
     let sources: [Source]
     let onEdit: (Source) -> Void
-
+    
     private var columns: [GridItem] = [
         GridItem(.flexible(), alignment: .leading),  // source name column
         GridItem(.flexible(), alignment: .leading)   // group name column
     ]
-
+    
     var body: some View {
-        Section("Sources") {
+        VStack(alignment: .leading, spacing: 12) {
+            
+            // --- Toolbar-like header ---
+            HStack {
+                Spacer()
+                
+                Text("Sources")
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                
+                Spacer()
+                
+                Button {
+                    // TODO: add source
+                } label: {
+                    Label("Add Source", systemImage: "plus")
+                }
+                .buttonStyle(.bordered)
+            }
+            .padding(.horizontal)
+            
             LazyVGrid(columns: columns, alignment: .leading, spacing: 6) {
                 Text("Name")
                     .font(.headline)
@@ -32,7 +52,7 @@ struct CollectionEditSourceListView: View {
                                 Label("Edit Source", systemImage: "pencil")
                             }
                         }
-
+                    
                     Text(source.sourceGroup?.primitiveName ?? "")
                 }
             }
