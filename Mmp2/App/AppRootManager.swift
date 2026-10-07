@@ -31,49 +31,61 @@ enum DetailRoute: Hashable {
 @Observable
 final class AppRootManager {
     static let shared = AppRootManager()
-
+    
     var currentRoot: AppRoot = .splash
     var selectedCategory: AppCategory = .collections
-
+    
     var selectedMediaCollection: MediaCollection?
     var selectedSource: Source?
     var selectedClip: Clip?
-
-    /// Navigation stack contents for the home scene's detail column.
-    var detailPath = NavigationPath()
-
+    
     enum AppRoot { case splash, home, play, playlistPlayer, playlistEditor, documents }
     enum AppCategory { case collections, playlists, favorites, recents }
-
+    
     private init() { }
-
+    
     // MARK: Navigation helpers
-
+    
+    /// Navigation stack contents for the home scene's detail column.
+    var detailPath = NavigationPath()
+    
+    // MARK: Navigation helpers
+    
+    private func resetDetailPath() {
+        Logger.navigation.info("resetDetailPath")
+        detailPath = NavigationPath()
+    }
+    
     /// Called when the user picks a different collection: show its sources.
     func selectCollection(_ collection: MediaCollection?) {
+        Logger.navigation.info("selectCollection - \(collection?.primitiveName ?? "<nil>")")
         selectedMediaCollection = collection
-        detailPath.removeAll()
+        resetDetailPath()
     }
-
+    
     func editCollection(_ collection: MediaCollection) {
+        Logger.navigation.info("editCollection - \(collection.primitiveName)")
         selectedMediaCollection = collection
-        detailPath = [.collectionEdit(collection)]
+        resetDetailPath()
+        detailPath.append(DetailRoute.collectionEdit(collection))
     }
-
+    
     func editSource(_ source: Source, in collection: MediaCollection) {
-        detailPath.append(.sourceEdit(source, collection))
+        Logger.navigation.info("editSource - \(source.primitiveName)")
+        detailPath.append(DetailRoute.sourceEdit(source, collection))
     }
-
+    
     func editClip(_ clip: Clip, of source: Source) {
-        detailPath.append(.clipEdit(clip, source))
+        Logger.navigation.info("editClip - \(clip.primitiveName)")
+        detailPath.append(DetailRoute.clipEdit(clip, source))
     }
-
+    
     func play(source: Source) {
         selectedSource = source
         selectedClip = nil
         currentRoot = .play
     }
-
+    
     func play(clip: Clip) {
         selectedSource = nil
         selectedClip = clip
@@ -83,13 +95,13 @@ final class AppRootManager {
 //@Observable
 //final class AppRootManager {
 //    static let shared = AppRootManager()
-//    
+//
 //    var currentRoot: AppRoot = .splash {
 //        didSet {
 //            print("currentRoot set to \(currentRoot)")
 //        }
 //    }
-//    
+//
 //    var selectedCategory = AppCategory.collections
 //    var storedMediaCollection: MediaCollection?
 //    var selectedMediaCollection: MediaCollection? {
@@ -99,7 +111,7 @@ final class AppRootManager {
 //            Logger.data.info("selectedMediaCollection set to \(self.selectedMediaCollection?.primitiveName ?? "nil")")
 //        }
 //    }
-//    
+//
 //    var selectedSource: Source? = nil
 //    var selectedClip: Clip? = nil
 //
@@ -111,14 +123,14 @@ final class AppRootManager {
 //        case playlistEditor
 //        case documents
 //    }
-//    
+//
 //    enum AppCategory {
 //        case collections
 //        case playlists
 //        case favorites
 //        case recents
 //    }
-//    
+//
 //    private init() { }
 //}
 

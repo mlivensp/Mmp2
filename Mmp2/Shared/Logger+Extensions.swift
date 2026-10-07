@@ -13,5 +13,6 @@ extension Logger {
 
     // 2. Create distinct categories for different parts of your app
     static let ui = Logger(subsystem: subsystem, category: "UI")
+    static let navigation = Logger(subsystem: subsystem, category: "navigation")
     static let data = Logger(subsystem: subsystem, category: "Data")
 }
