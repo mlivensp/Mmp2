@@ -15,10 +15,8 @@ struct SourceEditView: View {
     let collection: MediaCollection
     
     var body: some View {
-        NavigationStack {
-            SourceEditForm(source: source, collection: collection, context: context)
-                .navigationTitle("Edit Source")
-        }
+        SourceEditForm(source: source, collection: collection, context: context)
+            .navigationTitle("Edit Source")
     }
 }
 
