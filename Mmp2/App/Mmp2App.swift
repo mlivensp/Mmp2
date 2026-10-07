@@ -50,16 +50,10 @@ struct Mmp2App: App {
                         NavigationStack(path: $appRootManager.detailPath) {
                             Group {
                                 switch appRootManager.selectedCategory {
-                                case .collections:
-                                    if appRootManager.selectedMediaCollection == nil {
-                                        ContentUnavailableView("No content selected",
-                                            systemImage: "exclamationmark.triangle.fill")
-                                    } else {
-                                        SourcesView()
-                                    }
-                                case .playlists:  Text("Playlists")
-                                case .favorites:  Text("Favorites")
-                                case .recents:    Text("Recents")
+                                case .collections: SourcesView()
+                                case .playlists:   Text("Playlists")
+                                case .favorites:   Text("Favorites")
+                                case .recents:     Text("Recents")
                                 }
                             }
                             .navigationDestination(for: DetailRoute.self) { route in
