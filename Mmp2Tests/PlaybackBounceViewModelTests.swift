@@ -636,9 +636,12 @@ struct PlaybackBounceViewModelTests {
             fastTempo: fastTempo,
             fastTempoTimesToPlay: fastTempoTimesToPlay,
             numberOfBounces: numberOfBounces,
-            playOrder: playOrder == nil ? PlayOrder.default() : playOrder,
-            context: context
+            playOrder: playOrder == nil ? makePlayOrder() : playOrder
         )
+    }
+    
+    private func makePlayOrder() -> PlayOrder {
+        PlayOrder(name: "test", slowOrder: 1, midOrder: 2, fastOrder: 3, sortOrder: 1)
     }
 
     // MARK: - apply(to:)
@@ -651,7 +654,7 @@ struct PlaybackBounceViewModelTests {
             fastTempo: 100, fastTempoTimesToPlay: 3,
             numberOfBounces: 4
         )
-        let playOrder = PlayOrder.default()
+        let playOrder = makePlayOrder()
         let model = PlaybackBounce(
             slowTempo: 1, timesToPlaySlowTempo: 2,
             midTempo: 3, timesToPlayMidTempo: 4,
@@ -683,7 +686,7 @@ struct PlaybackBounceViewModelTests {
     @Test("apply throws and leaves model untouched when state is invalid")
     func applyThrowsWhenInvalid() {
         let vm = makeDefaultVM()
-        let playOrder = PlayOrder.default()
+        let playOrder = makePlayOrder()
         let model = PlaybackBounce(
             slowTempo: 10, timesToPlaySlowTempo: 2,
             midTempo: 15, timesToPlayMidTempo: 3,
@@ -715,7 +718,7 @@ struct PlaybackBounceViewModelTests {
             fastTempo: 100, fastTempoTimesToPlay: 0,
             numberOfBounces: 4
         )
-        let playOrder = PlayOrder.default()
+        let playOrder = makePlayOrder()
         let model = PlaybackBounce(
             slowTempo: 1, timesToPlaySlowTempo: 2,
             midTempo: 3, timesToPlayMidTempo: 4,
@@ -739,7 +742,7 @@ struct PlaybackBounceViewModelTests {
             fastTempo: 100, fastTempoTimesToPlay: 3,
             numberOfBounces: 4
         )
-        let playOrder = PlayOrder.default()
+        let playOrder = makePlayOrder()
         let model = PlaybackBounce(
             slowTempo: 1, timesToPlaySlowTempo: 2,
             midTempo: 3, timesToPlayMidTempo: 4,

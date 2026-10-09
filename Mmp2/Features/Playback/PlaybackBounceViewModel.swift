@@ -37,13 +37,11 @@ final class PlaybackBounceViewModel {
     var numberOfBouncesError: String?
     var playOrderError: String?
     
-    var playOrders: [PlayOrder] = []
-    
-    static func `default`(context: ModelContext) -> PlaybackBounceViewModel {
-        PlaybackBounceViewModel(slowTempo: 90, slowTempoTimesToPlay: 1, midTempo: 100, midTempoTimesToPlay: 1, fastTempo: 110, fastTempoTimesToPlay: 1, numberOfBounces: 1, context: context)
+    static func `default`() -> PlaybackBounceViewModel {
+        PlaybackBounceViewModel(slowTempo: 90, slowTempoTimesToPlay: 1, midTempo: 100, midTempoTimesToPlay: 1, fastTempo: 110, fastTempoTimesToPlay: 1, numberOfBounces: 1)
     }
     
-    init(slowTempo: Int, slowTempoTimesToPlay: Int, midTempo: Int, midTempoTimesToPlay: Int, fastTempo: Int, fastTempoTimesToPlay: Int, numberOfBounces: Int, playOrder: PlayOrder? = nil, context: ModelContext) {
+    init(slowTempo: Int, slowTempoTimesToPlay: Int, midTempo: Int, midTempoTimesToPlay: Int, fastTempo: Int, fastTempoTimesToPlay: Int, numberOfBounces: Int, playOrder: PlayOrder? = nil) {
         self.slowTempo = slowTempo
         self.slowTempoTimesToPlay = slowTempoTimesToPlay
         self.midTempo = midTempo
@@ -61,7 +59,6 @@ final class PlaybackBounceViewModel {
         self.storedFastTempoTimesToPlayString = String(fastTempoTimesToPlay)
         self.storedNumberOfBouncesString = String(numberOfBounces)
         
-        playOrders = fetchPlayOrders(context: context)
         validate()
     }
     

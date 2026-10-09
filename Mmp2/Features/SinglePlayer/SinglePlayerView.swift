@@ -8,6 +8,7 @@
 import SwiftUI
 import AVFoundation
 import AVKit
+import OSLog
 
 struct SinglePlayerView: View {
     @Environment(AppRootManager.self) private var appRootManager
@@ -204,6 +205,7 @@ struct SinglePlayerView: View {
     }
     
     private func switchToClip(_ clip: Clip) {
+        Logger.ui.info("SinglePlayerView - switchToClip")
         controller?.stop()
         appRootManager.selectedClip = clip
         media = clip.media
@@ -230,10 +232,12 @@ struct SinglePlayerView: View {
 
     private func selectMedia() throws {
         if let source = appRootManager.selectedSource {
+            Logger.ui.info("SinglePlayerView.selectMedia - source selected")
             self.source = source
             media = source.media
             playback = source.playback
         } else if let clip = appRootManager.selectedClip {
+            Logger.ui.info("SinglePlayerView.selectMedia - clip selected")
             self.source = clip.source
             media = clip.source?.media
             playback = clip.playback

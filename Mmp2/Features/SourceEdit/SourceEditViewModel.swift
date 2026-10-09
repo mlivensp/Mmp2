@@ -80,6 +80,11 @@ extension SourceEditView {
             set { source.media.path = newValue }
         }
         
+        var bookmarkData: Data? {
+            get { source.media.bookmark }
+            set { source.media.bookmark = newValue }
+        }
+        
         var sourceGroups: [SourceGroup] {
             collection.sourceGroups.sorted(by: { $0.sortOrder < $1.sortOrder })
         }
@@ -286,27 +291,34 @@ extension SourceEditView {
             guard validate() else {
                 throw AppError.attemptToSaveInvalidState("SourceEditViewModel")
             }
-            
+
             source.primitiveName = storedNameString
             source.name_normalized = storedNameString.normalizedForSearch
             source.sortOrder = sortOrder
             source.measure1Start = measure1Start
             source.isFavorite = isFavorite
-            
-            if storedSourceGroupString.isEmpty {
-                source.sourceGroup = nil
-            } else {
-                source.sourceGroup = findSourceGroup(name: storedSourceGroupString, collection: collection, context: context)
-            }
-            
-            source.sourceGroup = sourceGroup
             source.notes = notes.isEmpty ? nil : notes
-
             source.media.bpm = bpm
-            try playbackVM.apply(to: source.playback, context: context)
-            
-            try context.save()
-            return true
+
+            // Resolve the group once.
+            source.sourceGroup = storedSourceGroupString.isEmpty
+                ? nil
+            : (sourceGroup ?? findOrCreateSourceGroup(name: storedSourceGroupString))
+
+            do {
+                if source.isNew {
+                    context.insert(source)            // media and playback come with it (cascade relationships)
+                    source.mediaCollection = collection
+                }
+                
+                // Playback is now in the context, so submodels attach to a real parent.
+                try playbackVM.apply(to: source.playback, context: context)
+                try context.save()
+                return true
+            } catch {
+                context.rollback()                    // don't leave a half-saved source behind
+                throw error
+            }
         }
         
         private func findExistingSourceGroup(name: String, collection: MediaCollection, context: ModelContext) -> SourceGroup? {
@@ -317,20 +329,14 @@ extension SourceEditView {
             return nil
         }
         
-        private func findSourceGroup(name: String, collection: MediaCollection, context: ModelContext) -> SourceGroup {
-            if let sourceGroup = findExistingSourceGroup(name: name, collection: collection, context: context) {
-                return sourceGroup
+        private func findOrCreateSourceGroup(name: String) -> SourceGroup {
+            if let existing = findExistingSourceGroup(name: name, collection: collection, context: context) {
+                return existing
             }
-            
-            if var sortOrder = sourceGroups.map( { $0.sortOrder } ).max() {
-                sortOrder += 1
-            } else {
-                sortOrder = 1
-            }
-            
-            let newSourceGroup = SourceGroup(name: name, sortOrder: sortOrder, mediaCollection: collection)
-            context.insert(newSourceGroup)
-            return newSourceGroup
+            let next = (collection.sourceGroups.map(\.sortOrder).max() ?? 0) + 1
+            let group = SourceGroup(name: name, sortOrder: next, mediaCollection: collection)
+            context.insert(group)
+            return group
         }
     }
 }

@@ -27,8 +27,7 @@ extension Playback {
             deleteIfNeeded(&playbackBounce)
 
             if playbackConstant == nil {
-                let new = PlaybackConstant.createNew()
-                context.insert(new)
+                let new = PlaybackConstant.makeDraft()
                 playbackConstant = new
             }
 
@@ -37,8 +36,7 @@ extension Playback {
             deleteIfNeeded(&playbackBounce)
 
             if playbackStepwise == nil {
-                let new = PlaybackStepwise.createNew()
-                context.insert(new)
+                let new = PlaybackStepwise.makeDraft()
                 playbackStepwise = new
             }
 
@@ -47,66 +45,34 @@ extension Playback {
             deleteIfNeeded(&playbackStepwise)
 
             if playbackBounce == nil {
-                let new = PlaybackBounce.createNew()
-                context.insert(new)
+                let new = PlaybackBounce.makeDraft()
                 playbackBounce = new
             }
         }
     }
 }
 
-//extension Playback {
-//    @MainActor
-//    func switchMode(
-//        to newMode: PlaybackMode,
-//        context: ModelContext
-//    ) {
-//        // Delete old submodel if switching modes
-//        if newMode != .constant, let old = playbackConstant {
-//            context.delete(old)
-//            playbackConstant = nil
-//        }
-//        if newMode != .stepwise, let old = playbackStepwise {
-//            context.delete(old)
-//            playbackStepwise = nil
-//        }
-//        if newMode != .bounce, let old = playbackBounce {
-//            context.delete(old)
-//            playbackBounce = nil
-//        }
-//
-//        // Create the new one if needed
-//        switch newMode {
-//        case .constant:
-//            if playbackConstant == nil {
-//                playbackConstant = PlaybackConstant.createNew()
-//            }
-//        case .stepwise:
-//            if playbackStepwise == nil {
-//                playbackStepwise = PlaybackStepwise.createNew()
-//            }
-//        case .bounce:
-//            if playbackBounce == nil {
-//                playbackBounce = PlaybackBounce.createNew()
-//            }
-//        }
-//    }
-//}
+extension Playback {
+    static func makeDraft() -> Playback {
+        let playback = Playback()
+        return playback
+    }
+}
 
 extension PlaybackConstant {
-    static func createNew() -> PlaybackConstant {
+    static func makeDraft() -> PlaybackConstant {
         PlaybackConstant(rate: 100, timesToPlay: nil)
     }
 }
 
 extension PlaybackStepwise {
-    static func createNew() -> PlaybackStepwise {
+    static func makeDraft() -> PlaybackStepwise {
         PlaybackStepwise(start: 80, step: 2, max: 100, timesToPlay: 1)
     }
 }
 
 extension PlaybackBounce {
-    static func createNew() -> PlaybackBounce {
+    static func makeDraft() -> PlaybackBounce {
         PlaybackBounce(slowTempo: 90, timesToPlaySlowTempo: 1, midTempo: 100, timesToPlayMidTempo: 1, fastTempo: 110, timesToPlayFastTempo: 1, numberOfBounces: 1)
     }
 }

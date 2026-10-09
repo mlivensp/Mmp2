@@ -7,12 +7,15 @@
 
 import SwiftData
 import SwiftUI
+internal import UniformTypeIdentifiers
 
 struct SourceEditForm: View {
     @Environment(AppRootManager.self) private var appRootManager
     @Environment(\.dismiss) private var dismiss
     
     @State private var vm: SourceEditView.ViewModel
+    
+    @State private var presentSourcePicker = false
     
     init(source: Source, collection: MediaCollection, context: ModelContext) {
         _vm = State(initialValue: SourceEditView.ViewModel(source: source, collection: collection, context: context))
@@ -25,7 +28,7 @@ struct SourceEditForm: View {
             Form {
                 HStack {
                     Button {
-                        print("pick location")
+                        presentSourcePicker = true
                     } label: {
                         Text("Browse")
                     }
@@ -139,6 +142,37 @@ struct SourceEditForm: View {
             }
             .scrollContentBackground(.hidden)   // optional, but recommended
             .padding(formPadding)
+            .fileImporter(isPresented: $presentSourcePicker,
+                          allowedContentTypes: [.audio, .video]) { result in
+                switch result {
+                case .success(let url):
+                    // 1. Start accessing so we can create the bookmark
+                    guard url.startAccessingSecurityScopedResource() else {
+                        print("Failed to start accessing security-scoped resource")
+                        return
+                    }
+                    defer { url.stopAccessingSecurityScopedResource() }
+                    
+                    do {
+                        // 2. Create a security-scoped bookmark
+                        let bookmarkData = try url.bookmarkData(
+                            options: .withSecurityScope,
+                            includingResourceValuesForKeys: nil,
+                            relativeTo: nil
+                        )
+                        
+                        // 3. Save the bookmark data (example: UserDefaults)
+                        vm.bookmarkData = bookmarkData                        
+                        vm.mediaPath = url.path
+                        
+                    } catch {
+                        print("Failed to create bookmark: \(error.localizedDescription)")
+                    }
+                    
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
         }
     }
 }

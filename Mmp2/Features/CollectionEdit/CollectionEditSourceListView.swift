@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct CollectionEditSourceListView: View {
+    @Environment(AppRootManager.self) private var appRootManager
+
+    let collection: MediaCollection
     let sources: [Source]
     let onEdit: (Source) -> Void
     
@@ -30,7 +33,9 @@ struct CollectionEditSourceListView: View {
                 Spacer()
                 
                 Button {
-                    // TODO: add source
+                    let sortOrder = (collection.sources.map(\.sortOrder).max() ?? 0) + 1
+                    let newSource = Source.makeDraft(sortOrder: sortOrder)
+                    onEdit(newSource)
                 } label: {
                     Label("Add Source", systemImage: "plus")
                 }
@@ -60,7 +65,7 @@ struct CollectionEditSourceListView: View {
     }
 }
 
-#Preview {
-    CollectionEditSourceListView(sources: []) { _ in
-    }
-}
+//#Preview {
+//    CollectionEditSourceListView(sources: []) { _ in
+//    }
+//}

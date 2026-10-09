@@ -10,9 +10,13 @@ import OSLog
 import SwiftData
 
 extension PlayOrder {
-    static func `default`() -> PlayOrder {
-        PlayOrder(name: "default", slowOrder: 1, midOrder: 2, fastOrder: 3, sortOrder: 1)
-    }
+//    static func `default`(context: ModelContext) -> PlayOrder {
+//        let playOrder = PlayOrder(name: "default", slowOrder: 1, midOrder: 2, fastOrder: 3, sortOrder: 1)
+//        context.insert(playOrder)
+//        return playOrder
+//    }
+    
+    
 //    static func queryByName(_ name: String, modelContext: ModelContext) -> PlayOrder? {
 //        let predicate = #Predicate<PlayOrder> { playOrder in
 //            playOrder.name == "Slow-Mid-Fast"

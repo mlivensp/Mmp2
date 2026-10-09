@@ -10,7 +10,8 @@ import SwiftUI
 
 struct PlaybackBounceView: View {
     @Bindable var vm: PlaybackBounceViewModel
-    
+    @Query(sort: \PlayOrder.sortOrder) private var playOrders: [PlayOrder]
+
     var body: some View {
         Group {
             Section("Slow Tempo") {
@@ -87,7 +88,7 @@ struct PlaybackBounceView: View {
                 Picker("", selection: $vm.playOrder) {
                     Text("Select a play order").tag(nil as PlayOrder?)
                     
-                    ForEach(vm.playOrders) { playOrder in
+                    ForEach(playOrders) { playOrder in
                         Text(playOrder.name)
                             .tag(playOrder)
                     }

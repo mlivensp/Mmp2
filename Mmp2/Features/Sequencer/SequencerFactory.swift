@@ -23,7 +23,6 @@ struct SequencerFactory {
                 }
                 return ConstantPlayRateSequencer(rate: playbackConstant.rate, bpm: bpm, timesToPlay: playbackConstant.timesToPlay)
             } else {
-                // TODO: create stepwise sequencer
                 guard let playbackStepwise = playback.playbackStepwise else {
                     throw AppError.invalidPlayback
                 }
