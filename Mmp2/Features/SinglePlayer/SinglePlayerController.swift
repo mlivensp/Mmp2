@@ -28,12 +28,6 @@ final class SinglePlayerController: NSObject {
     
     func attachVideoPlayer(_ player: AVPlayer) {
         self.videoPlayer = player
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(playerDidReachEnd),
-            name: .AVPlayerItemDidPlayToEndTime,
-            object: player.currentItem
-        )
         
         let start = clipStartSeconds ?? 0
         let startTime = CMTime(seconds: start, preferredTimescale: 600)
@@ -92,19 +86,6 @@ final class SinglePlayerController: NSObject {
         videoPlayer?.pause()
     }
     
-    @objc private func playerDidReachEnd(_ notification: Notification) async {
-        if let nextRate = sequencer.nextRate() {
-            if let videoPlayer {
-                videoPlayer.pause()
-                videoPlayer.rate = Float(nextRate)
-                videoPlayer.defaultRate = Float(nextRate)
-                await playVideoLoop(videoPlayer)
-            }
-        } else {
-            stop()
-        }
-    }
-    
     // MARK: - Async Playback Loop
     
     private func runPlaybackLoop() async {
@@ -116,13 +97,12 @@ final class SinglePlayerController: NSObject {
     // MARK: - Video
     
     private func playVideoLoop(_ player: AVPlayer) async {
-        guard let start = clipStartSeconds, let end = clipEndSeconds else {
-            player.play()
-            return
-        }
+        guard let item = player.currentItem else { return }
         
-        let startTime = CMTime(seconds: start, preferredTimescale: 600)
-        let endTime = CMTime(seconds: end, preferredTimescale: 600)
+        let startTime = CMTime(seconds: clipStartSeconds ?? 0, preferredTimescale: 600)
+        if let end = clipEndSeconds {
+            item.forwardPlaybackEndTime = CMTime(seconds: end, preferredTimescale: 600)
+        }
         
         while !Task.isCancelled {
             guard let rate = sequencer.nextRate() else {
@@ -130,18 +110,18 @@ final class SinglePlayerController: NSObject {
                 return
             }
             
-            await player.seek(to: startTime)
-            player.rate = Float(rate)
-            player.defaultRate = Float(rate)
+            // Subscribe before starting playback so the end notification can't be missed.
+            var endNotifications = NotificationCenter.default
+                .notifications(named: .AVPlayerItemDidPlayToEndTime, object: item)
+                .makeAsyncIterator()
             
-            await waitUntilVideoReaches(player, endTime: endTime)
-        }
-    }
-    
-    private func waitUntilVideoReaches(_ player: AVPlayer, endTime: CMTime) async {
-        while player.currentTime() < endTime {
-            try? await Task.sleep(nanoseconds: 50_000_000)
+            await player.seek(to: startTime, toleranceBefore: .zero, toleranceAfter: .zero)
             if Task.isCancelled { return }
+            player.defaultRate = Float(rate)
+            player.rate = Float(rate)
+            
+            // Suspends until the clip end or media end is reached.
+            guard await endNotifications.next() != nil else { return }
         }
     }
 }
