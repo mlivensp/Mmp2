@@ -19,77 +19,102 @@ struct ClipEditForm: View {
     var body: some View {
         ScrollView {
             Form {
-                Section("Name") {
-                    ErrorFieldContainer(
-                        hasError: vm.nameError != nil,
-                        errorMessage: vm.nameError
-                    ) {
+                ErrorFieldContainer(
+                    hasError: vm.nameError != nil,
+                    errorMessage: vm.nameError
+                ) {
+                    HStack {
+                        Text("Name")
                         TextField("", text: $vm.name)
                     }
                 }
-                
-                Section("BPM") {
-                    ErrorFieldContainer(
-                        hasError: vm.bpmError != nil,
-                        errorMessage: vm.bpmError
-                    ) {
+
+                ErrorFieldContainer(
+                    hasError: vm.bpmError != nil,
+                    errorMessage: vm.bpmError
+                ) {
+                    HStack {
+                        Text("BPM")
                         TextField("", text: $vm.bpmString)
                     }
                 }
-                
-                Toggle(isOn: $vm.measureMode) {
-                    Text("Measure Mode")
+
+                ErrorFieldContainer(
+                    hasError: false,
+                    errorMessage: ""
+                ) {
+                    HStack {
+                        Text("Measure Mode")
+                        Toggle(isOn: $vm.measureMode) {
+                            Text("Measure Mode")
+                        }
+                    }
                 }
-                
+
                 if vm.measureMode == false {
-                    Section("Start") {
-                        ErrorFieldContainer(
-                            hasError: vm.startSecondsError != nil,
-                            errorMessage: vm.startSecondsError
-                        ) {
+                    ErrorFieldContainer(
+                        hasError: vm.startSecondsError != nil,
+                        errorMessage: vm.startSecondsError
+                    ) {
+                        HStack {
+                            Text("Start")
                             TextField("", text: $vm.startTimeString)
                         }
                     }
-                    
-                    Section("End") {
-                        ErrorFieldContainer(
-                            hasError: vm.endSecondsError != nil,
-                            errorMessage: vm.endSecondsError
-                        ) {
+
+                    ErrorFieldContainer(
+                        hasError: vm.endSecondsError != nil,
+                        errorMessage: vm.endSecondsError
+                    ) {
+                        HStack {
+                            Text("End")
                             TextField("", text: $vm.endTimeString)
                         }
                     }
                 } else {
-                    Section("First Measure") {
-                        ErrorFieldContainer(
-                            hasError: vm.firstMeasureError != nil,
-                            errorMessage: vm.firstMeasureError
-                        ) {
+                    ErrorFieldContainer(
+                        hasError: vm.firstMeasureError != nil,
+                        errorMessage: vm.firstMeasureError
+                    ) {
+                        HStack {
+                            Text("First Measure")
                             TextField("", text: $vm.startMeasureString)
                                 .frame(maxWidth: 60)
                         }
                     }
-                    
-                    Section("Last Measure") {
-                        ErrorFieldContainer(
-                            hasError: vm.lastMeasureError != nil,
-                            errorMessage: vm.lastMeasureError
-                        ) {
+
+                    ErrorFieldContainer(
+                        hasError: vm.lastMeasureError != nil,
+                        errorMessage: vm.lastMeasureError
+                    ) {
+                        HStack {
+                            Text("Last Measure")
                             TextField("", text: $vm.endMeasureString)
                                 .frame(maxWidth: 60)
                         }
                     }
                 }
                 
-                Section {
-                    Toggle("Favorite", isOn: $vm.isFavorite)
+                ErrorFieldContainer(
+                    hasError: false,
+                    errorMessage: ""
+                ) {
+                    HStack {
+                        Text("Favorite")
+                        Toggle(isOn: $vm.isFavorite) {
+                            Text("Favorite")
+                        }
+                    }
                 }
                 
-                Section("Notes") {
-                    TextField("", text: $vm.notes)
+                ErrorFieldContainer(hasError: false, errorMessage: "") {
+                    HStack {
+                        Text("Notes")
+                        TextField("", text: $vm.notes)
+                    }
                 }
                 
-                Section {
+                Section("Playback") {
                     PlaybackEditView(vm: vm.playbackVM)
                 }
                 

@@ -59,7 +59,6 @@ class ConstantPlayRateSequencer: PlayRateSequencer {
         }
 
         localCurrentRate = computedRate
-        print("currentRate is \(currentRate)")
         return currentRate
     }
     

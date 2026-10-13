@@ -18,7 +18,6 @@ final class PlaybackBounceViewModel {
     internal var fastTempo: Int
     internal var fastTempoTimesToPlay: Int
     internal var numberOfBounces: Int
-    internal var playOrder: PlayOrder?
     
     private var storedSlowTempoString: String
     private var storedSlowTempoTimesToPlayString: String
@@ -27,6 +26,7 @@ final class PlaybackBounceViewModel {
     private var storedFastTempoString: String
     private var storedFastTempoTimesToPlayString: String
     private var storedNumberOfBouncesString: String
+    private var storedPlayOrder: PlayOrder?
     
     var slowTempoError: String?
     var slowTempoTimesToPlayError: String?
@@ -49,7 +49,7 @@ final class PlaybackBounceViewModel {
         self.fastTempo = fastTempo
         self.fastTempoTimesToPlay = fastTempoTimesToPlay
         self.numberOfBounces = numberOfBounces
-        self.playOrder = playOrder
+        self.storedPlayOrder = playOrder
         
         self.storedSlowTempoString = String(slowTempo)
         self.storedSlowTempoTimesToPlayString = String(slowTempoTimesToPlay)
@@ -131,6 +131,14 @@ final class PlaybackBounceViewModel {
         }
     }
     
+    var playOrder: PlayOrder? {
+        get { storedPlayOrder }
+        set {
+            storedPlayOrder = newValue
+            applyPlayOrderValidationResult(validatePlayOrder(storedPlayOrder))
+        }
+    }
+    
     // MARK: validation
 
     private func validateTempo(_ text: String, fieldName: String) -> ValidationResult<Int> {
@@ -174,7 +182,7 @@ final class PlaybackBounceViewModel {
         return .failure("Number Of Bounces must be a number greater than zero.")
     }
     
-    private func validatePlayOrder() -> ValidationResult<PlayOrder> {
+    private func validatePlayOrder(_ playOrder: PlayOrder?) -> ValidationResult<PlayOrder> {
         guard let playOrder else {
             return .failure("Play Order is required.")
         }
@@ -348,7 +356,7 @@ final class PlaybackBounceViewModel {
         applyFastTempoValidationResult(validateTempo(storedFastTempoString, fieldName: "Fast Tempo"))
         applyFastTempoTimesToPlayValidationResult(validateTimesToPlay(storedFastTempoTimesToPlayString, fieldName: "Fast Tempo"))
         applyNumberOfBouncesValidationResult(validateNumberOfBounces(storedNumberOfBouncesString))
-        applyPlayOrderValidationResult(validatePlayOrder())
+        applyPlayOrderValidationResult(validatePlayOrder(storedPlayOrder))
         validateRelationships()
     }
     
@@ -375,7 +383,7 @@ final class PlaybackBounceViewModel {
         bounce.fastTempo = fastTempo
         bounce.timesToPlayFastTempo = fastTempoTimesToPlay
         bounce.numberOfBounces = numberOfBounces
-        bounce.playOrder = playOrder
+        bounce.playOrder = storedPlayOrder
     }
     
     func fetchPlayOrders(context: ModelContext) -> [PlayOrder] {

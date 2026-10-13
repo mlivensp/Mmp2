@@ -1,29 +1,10 @@
 import Foundation
 import AVFoundation
 import AVKit
-
-//final class LinearPlayRateSequencer: PlayRateSequencer {
-//    private var rates: [Float]
-//    private var index = 0
-//
-//    init(rates: [Float]) {
-//        self.rates = rates
-//    }
-//
-//    func nextRate() -> Float? {
-//        guard index < rates.count else { return nil }
-//        defer { index += 1 }
-//        return rates[index]
-//    }
-//
-//    func reset() {
-//        index = 0
-//    }
-//}
+import OSLog
 
 @MainActor @Observable
-final class SinglePlayerController {
-    //    private var audioPlayer: AVAudioPlayer?
+final class SinglePlayerController: NSObject {
     private var videoPlayer: AVPlayer?
     
     private var bpm: Int?
@@ -45,10 +26,6 @@ final class SinglePlayerController {
         self.sequencer = sequencer
     }
     
-    //    func attachAudioPlayer(_ player: AVAudioPlayer) {
-    //        self.audioPlayer = player
-    //    }
-    
     func attachVideoPlayer(_ player: AVPlayer) {
         self.videoPlayer = player
         NotificationCenter.default.addObserver(
@@ -61,7 +38,7 @@ final class SinglePlayerController {
         let start = clipStartSeconds ?? 0
         let startTime = CMTime(seconds: start, preferredTimescale: 600)
         player.seek(to: startTime) { _ in
-//            videoPlayer.rate = Float(nextRate)
+            Logger.data.info("attachVideoPlayer seekTo")
         }
     }
     
@@ -71,6 +48,7 @@ final class SinglePlayerController {
             print("Setting new playRate value. newValue: \(newValue) bpm: \(bpm ?? -1)")
             sequencer = SequencerFactory.createConstantPlayRateSequencer(rate: newValue, bpm: bpm)
             videoPlayer?.rate = sequencer.currentRate
+            videoPlayer?.defaultRate = sequencer.currentRate
         }
     }
     
@@ -111,25 +89,17 @@ final class SinglePlayerController {
     func stop() {
         playbackTask?.cancel()
         playbackTask = nil
-        
-        //        audioPlayer?.stop()
         videoPlayer?.pause()
     }
     
-    @objc private func playerDidReachEnd(_ notification: Notification) {
+    @objc private func playerDidReachEnd(_ notification: Notification) async {
         if let nextRate = sequencer.nextRate() {
             if let videoPlayer {
-                let start = clipStartSeconds ?? 0
-                let startTime = CMTime(seconds: start, preferredTimescale: 600)
-                videoPlayer.seek(to: startTime) { _ in
-                    videoPlayer.rate = Float(nextRate)
-                }
-            } /* else if let audioPlayer {
-               let start = clipStart ?? 0
-               audioPlayer.currentTime = start
-               audioPlayer.rate = Float(nextRate)
-               audioPlayer.play()
-               } */
+                videoPlayer.pause()
+                videoPlayer.rate = Float(nextRate)
+                videoPlayer.defaultRate = Float(nextRate)
+                await playVideoLoop(videoPlayer)
+            }
         } else {
             stop()
         }
@@ -138,50 +108,10 @@ final class SinglePlayerController {
     // MARK: - Async Playback Loop
     
     private func runPlaybackLoop() async {
-        //        if let audioPlayer {
-        //            await playAudioLoop(audioPlayer)
-        //        } else
         if let videoPlayer {
             await playVideoLoop(videoPlayer)
         }
     }
-    
-    // MARK: - Audio
-    
-    //    private func playAudioLoop(_ player: AVAudioPlayer) async {
-    //        guard let start = clipStart, let end = clipEnd else {
-    //            player.play()
-    //            return
-    //        }
-    //
-    //        player.enableRate = true
-    //
-    //        while !Task.isCancelled {
-    //            guard let rate = sequencer.nextRate() else {
-    //                stop()
-    //                return
-    //            }
-    //
-    //            player.rate = Float(rate)
-    //            player.currentTime = start
-    //            player.play()
-    //
-    //            // Wait until reaching end
-    //            await waitUntilAudioReaches(player, endTime: end)
-    //
-    ////            if !loopEnabled {
-    ////                stop()
-    ////                return
-    ////            }
-    //        }
-    //    }
-    //
-    //    private func waitUntilAudioReaches(_ player: AVAudioPlayer, endTime: TimeInterval) async {
-    //        while player.currentTime < endTime {
-    //            try? await Task.sleep(nanoseconds: 50_000_000) // 50ms
-    //            if Task.isCancelled { return }
-    //        }
-    //    }
     
     // MARK: - Video
     
@@ -202,6 +132,7 @@ final class SinglePlayerController {
             
             await player.seek(to: startTime)
             player.rate = Float(rate)
+            player.defaultRate = Float(rate)
             
             await waitUntilVideoReaches(player, endTime: endTime)
         }

@@ -29,11 +29,10 @@ struct SequencerFactory {
                 return try StepwisePlayRateSequencer(stepwise: playbackStepwise, bpm: bpm)
             }
         } else {
-            // TODO: create bounce sequencer
-            guard let playbackConstant = playback.playbackConstant else {
+            guard let playbackBounce = playback.playbackBounce else {
                 throw AppError.invalidPlayback
             }
-            return ConstantPlayRateSequencer(rate: playbackConstant.rate, bpm: bpm, timesToPlay: playbackConstant.timesToPlay)
+            return try BouncePlayRateSequencer(bounce: playbackBounce, bpm: bpm)
         }
     }
 }

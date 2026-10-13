@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import OSLog
 
 @Observable
-final class BounceRateSequencer: PlayRateSequencer {
+final class BouncePlayRateSequencer: PlayRateSequencer {
     var index: Int = 0
     var rates: [Float] = []
     let bpm: Int?
@@ -37,6 +38,10 @@ final class BounceRateSequencer: PlayRateSequencer {
             .map { Float($0) / divisor }
         
         currentRate = rates[0]
+        
+        for rate in rates {
+            Logger.data.info("Bounce rate: \(rate)")
+        }
     }
 
     
