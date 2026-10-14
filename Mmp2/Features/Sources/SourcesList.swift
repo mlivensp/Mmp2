@@ -14,112 +14,57 @@ struct SourcesList: View {
     let onSourceTapped: (Source) -> Void
     let onClipTapped: (Clip) -> Void
     
-    // Combined list of top-level items
     private var topLevelItems: [TopLevelItem] {
+        guard let collection else { return [] }
+        
         var items: [TopLevelItem] = []
         
-        // 1. Source Groups (sorted)
-        let groups = (collection?.sourceGroups ?? [])
-            .sorted { $0.sortOrder < $1.sortOrder }   // or by name if you prefer
+        // 1. Groups
+        let groups = collection.sourceGroups.map {
+            TopLevelSourceGroup(
+                sourceGroup: $0,
+                sources: topLevelSources($0.sources)
+            )
+        }
         items += groups.map { .group($0) }
         
         // 2. Ungrouped sources
-        let ungrouped = (collection?.sources ?? [])
+        let ungrouped = collection.sources
             .filter { $0.sourceGroup == nil }
-            .sorted { ($0.sortOrder) < ($1.sortOrder) }
+            .map { TopLevelSource(source: $0) }
         
         items += ungrouped.map { .source($0) }
         
-        return items.sorted(by: { $0.sortOrder < $1.sortOrder } )
+        return items.sorted { $0.sortOrder < $1.sortOrder }
+    }
+    
+    private func topLevelSources(_ sources: [Source]) -> [TopLevelSource] {
+        sources.map { TopLevelSource(source: $0) }
     }
     
     var body: some View {
         List {
             ForEach(topLevelItems) { item in
                 switch item {
-                case .group(let group):
-                    DisclosureGroup {
-                        // Sources inside the group
-                        let sortedSources = group.sources.sorted(by: { $0.sortOrder < $1.sortOrder })
-                        ForEach(sortedSources) { source in
-                            if source.clips.isEmpty {
-                                SourceRow(source: source) { source in
-                                    // TODO: think about how to get rid of force unwrap
-                                    // probably mediaCollection is not optional on source
-                                    appRootManager.editSource(source, in: source.mediaCollection!)
-                                }
-                                .onTapGesture {
-                                    onSourceTapped(source)
-                                }
-                            } else {
-                                DisclosureGroup {
-                                    let sortedClips = source.clips.sorted(by: {
-                                        if $0.startSeconds == $1.startSeconds {
-                                            return $0.endSeconds < $1.endSeconds
-                                        } else {
-                                            return $0.startSeconds < $1.startSeconds
-                                        }
-                                    })
-                                    ForEach(sortedClips) { clip in
-                                        ClipRow(clip: clip) { clip in
-                                            appRootManager.editClip(clip, of: source)
-                                        }
-                                        .onTapGesture {
-                                            onClipTapped(clip)
-                                        }
-                                    }
-                                } label: {
-                                    SourceRow(source: source) { source in
-                                        appRootManager.editSource(source, in: source.mediaCollection!)
-                                    }
-                                    .onTapGesture {
-                                        onSourceTapped(source)
-                                    }
-                                }
-                            }
-                        }
-                    } label: {
-                        Label(group.primitiveName, systemImage: "music.note.square.stack")
-                    }
+                case .group(let wrapper):
+                    GroupSection(
+                        wrapper: wrapper,
+                        onSourceTapped: onSourceTapped,
+                        onClipTapped: onClipTapped,
+                        appRootManager: appRootManager
+                    )
                     
-                case .source(let source):
-                    if !source.clips.isEmpty {
-                        DisclosureGroup {
-                            let sortedClips = source.clips.sorted(by: {
-                                if $0.startSeconds == $1.startSeconds {
-                                    return $0.endSeconds < $1.endSeconds
-                                } else {
-                                    return $0.startSeconds < $1.startSeconds
-                                }
-                            })
-                            ForEach(sortedClips) { clip in
-                                ClipRow(clip: clip) { clip in
-                                    appRootManager.editClip(clip, of: source)
-                                }
-                                .onTapGesture {
-                                    onClipTapped(clip)
-                                }
-                            }
-                        } label: {
-                            SourceRow(source: source) { source in
-                                appRootManager.editSource(source, in: source.mediaCollection!)
-                            }
-                            .onTapGesture {
-                                onSourceTapped(source)
-                            }
-                        }
-                    } else {
-                        SourceRow(source: source) { source in
-                            appRootManager.editSource(source, in: source.mediaCollection!)
-                        }
-                        .onTapGesture {
-                            onSourceTapped(source)
-                        }
-                    }
+                case .source(let wrapper):
+                    SourceSection(
+                        wrapper: wrapper,
+                        onSourceTapped: onSourceTapped,
+                        onClipTapped: onClipTapped,
+                        appRootManager: appRootManager
+                    )
                 }
             }
         }
-        .listStyle(.sidebar)          // optional – looks nice in a split view
+        .listStyle(.sidebar)
     }
 }
 //#Preview {

@@ -334,7 +334,7 @@ extension SourceEditView {
                 return existing
             }
             let next = (collection.sourceGroups.map(\.sortOrder).max() ?? 0) + 1
-            let group = SourceGroup(name: name, sortOrder: next, mediaCollection: collection)
+            let group = SourceGroup(name: name, sortOrder: next, isExpanded: false, mediaCollection: collection)
             context.insert(group)
             return group
         }

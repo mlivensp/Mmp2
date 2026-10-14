@@ -9,13 +9,13 @@ import Foundation
 import SwiftData
 
 enum TopLevelItem: Identifiable, Hashable {
-    case group(SourceGroup)
-    case source(Source)
+    case group(TopLevelSourceGroup)
+    case source(TopLevelSource)
 
     var id: some Hashable {
         switch self {
-        case .group(let g): return g.persistentModelID
-        case .source(let s): return s.persistentModelID
+        case .group(let g): return g.id
+        case .source(let s): return s.id
         }
     }
 }

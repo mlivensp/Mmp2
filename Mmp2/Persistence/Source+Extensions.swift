@@ -28,6 +28,7 @@ extension Source {
             sortOrder: sortOrder,
             measure1Start: nil,
             isFavorite: false,
+            isExpanded: false,
             notes: nil,
             media: Media.makeDraft(),
             playback: Playback(),

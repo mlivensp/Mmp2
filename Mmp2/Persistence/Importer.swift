@@ -142,7 +142,8 @@ struct Importer {
             let id = group.sourceGroupId.int
             let name = group.name.string
             let sortOrder = group.sortOrder.int
-            let sourceGroup = SourceGroup(name: name, sortOrder: sortOrder, mediaCollection: mediaCollection)
+            let isExpanded = group.isExpanded.bool
+            let sourceGroup = SourceGroup(name: name, sortOrder: sortOrder, isExpanded: isExpanded, mediaCollection: mediaCollection)
             modelContext.insert(sourceGroup)
             mediaCollection.sourceGroups.append(sourceGroup)
             sourceGroups[id] = sourceGroup
@@ -169,13 +170,14 @@ struct Importer {
             }
 //            let measure1Start = sourceData.measure1Start.optionalDate
             let isFavorite = sourceData.isFavorite.bool
+            let isExpanded = sourceData.isExpanded.bool
             let notes = sourceData.notes.optionalString
             var sourceGroup: SourceGroup?
             if let sourceGroupId = sourceData.sourceGroupId.optionalInt {
                 sourceGroup = sourceGroups[sourceGroupId]
             }
             
-            let source = Source(name: name, sortOrder: sortOrder, measure1Start: measure1Start, isFavorite: isFavorite, notes: notes, media: media, playback: playback, sourceGroup: sourceGroup)
+            let source = Source(name: name, sortOrder: sortOrder, measure1Start: measure1Start, isFavorite: isFavorite, isExpanded: isExpanded, notes: notes, media: media, playback: playback, sourceGroup: sourceGroup)
             modelContext.insert(source)
             source.mediaCollection = mediaCollection
 

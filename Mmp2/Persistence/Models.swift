@@ -270,6 +270,7 @@ import SwiftData
     var sortOrder: Int
     var measure1Start: Double?
     var isFavorite: Bool
+    var isExpanded: Bool
     var notes: String?
     
     @Relationship(deleteRule: .cascade, inverse: \Clip.source)
@@ -285,12 +286,13 @@ import SwiftData
     var sourceGroup: SourceGroup?
     
     
-    public init(name: String, sortOrder: Int, measure1Start: Double?, isFavorite: Bool, notes: String?, media: Media, playback: Playback, sourceGroup: SourceGroup?) {
+    public init(name: String, sortOrder: Int, measure1Start: Double?, isFavorite: Bool, isExpanded: Bool, notes: String?, media: Media, playback: Playback, sourceGroup: SourceGroup?) {
         self.primitiveName = name
         self.name_normalized = name.normalizedForSearch
         self.sortOrder = sortOrder
         self.measure1Start = measure1Start
         self.isFavorite = isFavorite
+        self.isExpanded = isExpanded
         self.notes = notes
         self.media = media
         self.playback = playback
@@ -302,15 +304,17 @@ import SwiftData
     var name_normalized: String
     var primitiveName: String
     var sortOrder: Int
+    var isExpanded: Bool
     @Relationship(deleteRule: .nullify, inverse: \Source.sourceGroup)
     var sources: [Source] = []
     
     var mediaCollection: MediaCollection?
     
-    public init(name: String, sortOrder: Int, mediaCollection: MediaCollection?) {
+    public init(name: String, sortOrder: Int, isExpanded: Bool, mediaCollection: MediaCollection?) {
         self.primitiveName = name
         self.name_normalized = name.normalizedForSearch
         self.sortOrder = sortOrder
+        self.isExpanded = isExpanded
         self.mediaCollection = mediaCollection
     }
 }
