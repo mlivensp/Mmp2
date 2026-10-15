@@ -111,7 +111,7 @@ final class SinglePlayerController: NSObject {
             }
             
             // Subscribe before starting playback so the end notification can't be missed.
-            var endNotifications = NotificationCenter.default
+            let endNotifications = NotificationCenter.default
                 .notifications(named: .AVPlayerItemDidPlayToEndTime, object: item)
                 .makeAsyncIterator()
             

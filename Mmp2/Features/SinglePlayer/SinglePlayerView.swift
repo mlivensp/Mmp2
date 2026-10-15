@@ -89,8 +89,8 @@ struct SinglePlayerView: View {
             Group {
                 if let player = videoPlayer {
                     VStack {
-//                        let formattedRate = controller?.playRate
-//                            .formatted(.percent.precision(.fractionLength(0))) ?? "?"
+                        Text(title)
+                            .font(.title)
                         Text(controller?.displayRate ?? "?")
                         Slider(
                             value: playRateBinding,
@@ -102,9 +102,6 @@ struct SinglePlayerView: View {
                             } maximumValueLabel: {
                                 Text("200%")
                             }
-                        //                    onEditingChanged: { _ in
-                        //
-                        //                        }
                         
                         VideoPlayerView(player: player)
                     }
@@ -175,7 +172,22 @@ struct SinglePlayerView: View {
                 Text(addClipEnd ?? "0:00")
             }
         }
+    }
+    
+    var title: String {
+        var names: [String] = []
+        if let clip = appRootManager.selectedClip {
+            names.append(clip.source?.mediaCollection?.primitiveName ?? "?")
+            names.append(clip.source?.primitiveName ?? "?")
+            names.append(clip.primitiveName)
+        } else if let source = appRootManager.selectedSource {
+            names.append(source.mediaCollection?.primitiveName ?? "?")
+            names.append(source.primitiveName)
+        } else {
+            names.append("?")
+        }
         
+        return String(names.joined(separator: " • "))
     }
     
     private func switchToSource() {
@@ -231,12 +243,7 @@ struct SinglePlayerView: View {
     }
 
     private func selectMedia() throws {
-        if let source = appRootManager.selectedSource {
-            Logger.ui.info("SinglePlayerView.selectMedia - source selected")
-            self.source = source
-            media = source.media
-            playback = source.playback
-        } else if let clip = appRootManager.selectedClip {
+        if let clip = appRootManager.selectedClip {
             Logger.ui.info("SinglePlayerView.selectMedia - clip selected")
             self.source = clip.source
             media = clip.source?.media
@@ -244,7 +251,14 @@ struct SinglePlayerView: View {
             clipStart = clip.startSeconds
             clipEnd = clip.endSeconds
         } else {
-            throw AppError.noMedia
+            if let source = appRootManager.selectedSource {
+                Logger.ui.info("SinglePlayerView.selectMedia - source selected")
+                self.source = source
+                media = source.media
+                playback = source.playback
+            } else {
+                throw AppError.noMedia
+            }
         }
     }
     

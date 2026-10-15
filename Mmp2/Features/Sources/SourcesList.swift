@@ -40,6 +40,7 @@ struct SourcesList: View {
     
     private func topLevelSources(_ sources: [Source]) -> [TopLevelSource] {
         sources.map { TopLevelSource(source: $0) }
+            .sorted(by: { $0.sortOrder  < $1.sortOrder })
     }
     
     var body: some View {

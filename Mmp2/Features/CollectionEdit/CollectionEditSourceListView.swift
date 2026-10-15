@@ -16,7 +16,9 @@ struct CollectionEditSourceListView: View {
     
     private var columns: [GridItem] = [
         GridItem(.flexible(), alignment: .leading),  // source name column
-        GridItem(.flexible(), alignment: .leading)   // group name column
+        GridItem(.flexible(), alignment: .leading),  // group name column
+        GridItem(.flexible(), alignment: .leading),  // sort order
+        GridItem(.flexible(), alignment: .leading)   // sort order
     ]
     
     var body: some View {
@@ -48,6 +50,10 @@ struct CollectionEditSourceListView: View {
                     .font(.headline)
                 Text("Group")
                     .font(.headline)
+                Text("Group Sort")
+                    .font(.headline)
+                Text("Sort")
+                    .font(.headline)
                 ForEach(sources) { source in
                     Text(source.primitiveName)
                         .contextMenu {
@@ -59,9 +65,16 @@ struct CollectionEditSourceListView: View {
                         }
                     
                     Text(source.sourceGroup?.primitiveName ?? "")
+                    Text(groupSortOrder(source.sourceGroup?.sortOrder))
+                    Text("\(source.sortOrder)")
                 }
             }
         }
+    }
+    
+    private func groupSortOrder(_ sortOrder: Int?) -> String {
+        guard let sortOrder else { return "" }
+        return "\(sortOrder)"
     }
 }
 
