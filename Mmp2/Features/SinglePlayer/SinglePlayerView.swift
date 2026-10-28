@@ -39,7 +39,6 @@ struct SinglePlayerView: View {
         controller = SinglePlayerController(
             bpm: media.bpm,
             clipStartSeconds: clipStart,
-            clipEndSeconds: clipEnd,
             sequencer: sequencer
         )
         
@@ -172,6 +171,12 @@ struct SinglePlayerView: View {
                 
                 Text(addClipEnd ?? "0:00")
             }
+            
+            Button(action: {
+                
+            }, label: {
+                Text("Add Clip")
+            })
         }
     }
     
@@ -209,7 +214,6 @@ struct SinglePlayerView: View {
         controller = SinglePlayerController(
             bpm: media.bpm,
             clipStartSeconds: nil,
-            clipEndSeconds: nil,
             sequencer: sequencer
         )
         
@@ -235,8 +239,7 @@ struct SinglePlayerView: View {
         controller = SinglePlayerController(
             bpm: media.bpm,
             clipStartSeconds: clip.startSeconds,
-            clipEndSeconds: clip.endSeconds,
-            sequencer: sequencer
+             sequencer: sequencer
         )
         
         controller?.attachVideoPlayer(player)

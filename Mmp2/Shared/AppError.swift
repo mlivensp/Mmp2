@@ -12,6 +12,10 @@ nonisolated enum AppError: Error, Equatable {
     case invalidPlayback
     case invalidTimeFormat
     case attemptToSaveInvalidState(String)
+    case invalidBPM
+    case invalidStartMeasure
+    case invalidEndMeasure
+    case invalidMeasure1Start
     
 //    static func == (lhs: AppError, rhs: AppError) -> Bool {
 //            switch (lhs, rhs) {

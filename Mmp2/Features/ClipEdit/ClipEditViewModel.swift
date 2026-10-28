@@ -362,22 +362,55 @@ extension ClipEditView {
             clip.primitiveName = name
             clip.name_normalized = name.normalizedForSearch
             // TODO: need to calculate seconds from measures
-            clip.startSeconds = startSeconds
-            clip.endSeconds = endSeconds
+            if measureMode {
+                
+            } else {
+            }
+            
             clip.isFavorite = isFavorite
             clip.notes = notes.isEmpty ? nil : notes
             
             if measureMode {
                 clip.firstMeasure = firstMeasure
                 clip.lastMeasure = lastMeasure
+                let (start, end) = try guardedConvertMeasuresToTimes(startMeasure: firstMeasure, endMeasure: lastMeasure, measure1Start: source.measure1Start, bpm: source.media.bpm)
+                clip.startSeconds = start
+                clip.endSeconds = end
             } else {
                 clip.firstMeasure = nil
                 clip.lastMeasure = nil
+                clip.startSeconds = startSeconds
+                clip.endSeconds = endSeconds
             }
             
             try playbackVM.apply(to: clip.playback, context: context)
             try context.save()
             return true
+        }
+        
+        func guardedConvertMeasuresToTimes(startMeasure: Int?, endMeasure: Int?, measure1Start: Double?, bpm: Int?) throws -> (start: Double, end: Double) {
+            guard let startMeasure else { throw AppError.invalidStartMeasure }
+            guard let endMeasure else { throw AppError.invalidEndMeasure }
+            guard let measure1Start else { throw AppError.invalidMeasure1Start }
+            guard let bpm else { throw AppError.invalidBPM }
+            guard bpm > 0 else { throw AppError.invalidBPM }
+            return try convertMeasuresToTimes(startMeasure: startMeasure, endMeasure: endMeasure, bpm: bpm, measure1Start: measure1Start)
+        }
+        
+        func convertMeasuresToTimes(startMeasure: Int, endMeasure: Int, bpm: Int, measure1Start: Double) throws -> (start: Double, end: Double) {
+            guard bpm > 0 else {
+                throw AppError.invalidBPM
+            }
+            
+            let secondsPerBeat = 60.0 / Double(bpm)
+            let secondsPerMeasure = secondsPerBeat * 4
+            
+            let startOffset = startMeasure < 0 ? 0 : 1
+            
+            let start = measure1Start + (Double(startMeasure - startOffset) * secondsPerMeasure)
+            let end = measure1Start + (Double(endMeasure) * secondsPerMeasure)
+            
+            return (start, end)
         }
     }
 }
