@@ -36,9 +36,6 @@ struct SinglePlayerView: View {
             throw error
         }
         
-        let player = AVPlayer(url: url)
-        videoPlayer = player
-        
         controller = SinglePlayerController(
             bpm: media.bpm,
             clipStartSeconds: clipStart,
@@ -46,6 +43,10 @@ struct SinglePlayerView: View {
             sequencer: sequencer
         )
         
+        let item = controller?.createPlayerItem(url: url, endAt: clipEnd)
+        let player = AVPlayer(playerItem: item)
+        
+        videoPlayer = player
         controller?.attachVideoPlayer(player)
     }
     

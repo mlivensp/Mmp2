@@ -10,30 +10,32 @@ final class SinglePlayerController: NSObject {
     private var bpm: Int?
     private var sequencer: PlayRateSequencer
     private let clipStartSeconds: Double?
-    private let clipEndSeconds: Double?
     
     private var playbackTask: Task<Void, Never>?
     
     init(
         bpm: Int?,
         clipStartSeconds: Double? = nil,
-        clipEndSeconds: Double? = nil,
         sequencer: PlayRateSequencer)
     {
         self.bpm = bpm
         self.clipStartSeconds = clipStartSeconds
-        self.clipEndSeconds = clipEndSeconds
         self.sequencer = sequencer
+    }
+    
+    func createPlayerItem(url: URL, endAt: Double?) -> AVPlayerItem {
+        let item = AVPlayerItem(url: url)
+
+        if let endAt {
+            item.forwardPlaybackEndTime =
+                CMTime(seconds: endAt, preferredTimescale: 600)
+        }
+
+        return item
     }
     
     func attachVideoPlayer(_ player: AVPlayer) {
         self.videoPlayer = player
-        
-        let start = clipStartSeconds ?? 0
-        let startTime = CMTime(seconds: start, preferredTimescale: 600)
-        player.seek(to: startTime) { _ in
-            Logger.data.info("attachVideoPlayer seekTo")
-        }
     }
     
     var playRate: Float {
@@ -90,19 +92,25 @@ final class SinglePlayerController: NSObject {
     
     private func runPlaybackLoop() async {
         if let videoPlayer {
-            await playVideoLoop(videoPlayer)
+            await playVideoLoop(videoPlayer, startAt: clipStartSeconds)
         }
     }
     
     // MARK: - Video
     
-    private func playVideoLoop(_ player: AVPlayer) async {
-        guard let item = player.currentItem else { return }
+    private func playVideoLoop(_ player: AVPlayer, startAt: Double?) async {
+        let startTime: CMTime?
         
-        let startTime = CMTime(seconds: clipStartSeconds ?? 0, preferredTimescale: 600)
-        if let end = clipEndSeconds {
-            item.forwardPlaybackEndTime = CMTime(seconds: end, preferredTimescale: 600)
+        if let startAt {
+            startTime = CMTime(seconds: startAt, preferredTimescale: 600)
+        } else {
+            startTime = nil
         }
+        
+        guard let item = player.currentItem else { return }
+        let iterator = NotificationCenter.default
+            .notifications(named: .AVPlayerItemDidPlayToEndTime, object: item)
+            .makeAsyncIterator()
         
         while !Task.isCancelled {
             guard let rate = sequencer.nextRate() else {
@@ -110,18 +118,29 @@ final class SinglePlayerController: NSObject {
                 return
             }
             
-            // Subscribe before starting playback so the end notification can't be missed.
-            let endNotifications = NotificationCenter.default
-                .notifications(named: .AVPlayerItemDidPlayToEndTime, object: item)
-                .makeAsyncIterator()
-            
-            await player.seek(to: startTime, toleranceBefore: .zero, toleranceAfter: .zero)
             if Task.isCancelled { return }
+            
+            if let startTime {
+                await seekPlayer(player, to: startTime)
+            } else {
+                await seekPlayer(player, to: .zero)
+            }
+            
             player.defaultRate = Float(rate)
             player.rate = Float(rate)
             
             // Suspends until the clip end or media end is reached.
-            guard await endNotifications.next() != nil else { return }
+            guard await iterator.next() != nil else {
+                return
+            }
+        }
+    }
+    
+    func seekPlayer(_ player: AVPlayer, to time: CMTime) async {
+        await withCheckedContinuation { continuation in
+            player.seek(to: time) { _ in
+                continuation.resume()
+            }
         }
     }
 }
