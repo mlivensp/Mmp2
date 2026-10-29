@@ -25,8 +25,18 @@ final class AppRootManager {
     var selectedMediaCollection: MediaCollection?
     var selectedSource: Source?
     var selectedClip: Clip?
+    var editingClip: Clip?
     
-    enum AppRoot { case splash, home, play, playlistPlayer, playlistEditor, documents }
+    enum AppRoot {
+        case splash
+        case home
+        case play
+        case playlistPlayer
+        case playlistEditor
+        case documents
+        case clipEdit
+    }
+
     enum AppCategory { case collections, playlists, favorites, recents }
     
     private init() { }

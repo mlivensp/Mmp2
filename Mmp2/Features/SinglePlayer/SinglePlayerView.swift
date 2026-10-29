@@ -43,10 +43,15 @@ struct SinglePlayerView: View {
         )
         
         let item = controller?.createPlayerItem(url: url, endAt: clipEnd)
-        let player = AVPlayer(playerItem: item)
         
-        videoPlayer = player
-        controller?.attachVideoPlayer(player)
+        if let videoPlayer {
+            videoPlayer.replaceCurrentItem(with: item)
+        } else {
+            let player = AVPlayer(playerItem: item)
+            videoPlayer = player
+        }
+        
+        controller?.attachVideoPlayer(videoPlayer!)
     }
     
     var body: some View {
@@ -173,11 +178,27 @@ struct SinglePlayerView: View {
             }
             
             Button(action: {
-                
+                guard let source else { return }
+
+                let clip = Clip(
+                    source: source,
+                    name: "",
+                    startSeconds: 0,
+                    endSeconds: 0,
+                    startMeasure: nil,
+                    endMeasure: nil,
+                    isFavorite: false,
+                    notes: nil,
+                    media: Media(bpm: source.media.bpm, path: ""),
+                    playback: Playback()
+                )
+
+                appRootManager.selectedSource = source
+                appRootManager.editingClip = clip
+                appRootManager.currentRoot = .clipEdit
             }, label: {
                 Text("Add Clip")
-            })
-        }
+            })        }
     }
     
     var title: String {
@@ -200,24 +221,32 @@ struct SinglePlayerView: View {
         controller?.stop()
         appRootManager.selectedClip = nil
         media = source?.media
-        guard let media else { return }
-        guard let player = videoPlayer else { return }
-        guard let playback = source?.playback else { return }
-        let sequencer: PlayRateSequencer
-        
+        playback = source?.playback
+        clipStart = nil
+        clipEnd = nil
         do {
-            sequencer = try SequencerFactory.createSequencer(from: playback, bpm: media.bpm)
+            try preparePlayback()
         } catch {
-            return
+            // TODO: notify user
         }
-        
-        controller = SinglePlayerController(
-            bpm: media.bpm,
-            clipStartSeconds: nil,
-            sequencer: sequencer
-        )
-        
-        controller?.attachVideoPlayer(player)
+//        guard let media else { return }
+//        guard let player = videoPlayer else { return }
+//        guard let playback = source?.playback else { return }
+//        let sequencer: PlayRateSequencer
+//        
+//        do {
+//            sequencer = try SequencerFactory.createSequencer(from: playback, bpm: media.bpm)
+//        } catch {
+//            return
+//        }
+//        
+//        controller = SinglePlayerController(
+//            bpm: media.bpm,
+//            clipStartSeconds: nil,
+//            sequencer: sequencer
+//        )
+//        
+//        controller?.attachVideoPlayer(player)
         controller?.start()
     }
     
@@ -226,23 +255,32 @@ struct SinglePlayerView: View {
         controller?.stop()
         appRootManager.selectedClip = clip
         media = clip.media
-        guard let media else { return }
-        guard let player = videoPlayer else { return }
-        let sequencer: PlayRateSequencer
+        playback = clip.playback
+        clipStart = clip.startSeconds
+        clipEnd = clip.endSeconds
         
         do {
-            sequencer = try SequencerFactory.createSequencer(from: clip.playback, bpm: media.bpm)
+            try preparePlayback()
         } catch {
-            return
+            // TODO: notify user
         }
-        
-        controller = SinglePlayerController(
-            bpm: media.bpm,
-            clipStartSeconds: clip.startSeconds,
-             sequencer: sequencer
-        )
-        
-        controller?.attachVideoPlayer(player)
+//        guard let media else { return }
+//        guard let player = videoPlayer else { return }
+//        let sequencer: PlayRateSequencer
+//        
+//        do {
+//            sequencer = try SequencerFactory.createSequencer(from: clip.playback, bpm: media.bpm)
+//        } catch {
+//            return
+//        }
+//        
+//        controller = SinglePlayerController(
+//            bpm: media.bpm,
+//            clipStartSeconds: clip.startSeconds,
+//             sequencer: sequencer
+//        )
+//        
+//        controller?.attachVideoPlayer(player)
         controller?.start()
     }
 

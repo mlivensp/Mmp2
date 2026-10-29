@@ -33,6 +33,13 @@ struct Mmp2App: App {
                     SplashView()
                 case .play:
                     SinglePlayerView()
+                case .clipEdit:
+                    if let clip = appRootManager.editingClip,
+                       let source = appRootManager.selectedSource {
+                        ClipEditView(clip: clip, source: source)
+                    } else {
+                        SplashView() // fallback, shouldn't normally happen
+                    }
                 case .playlistPlayer:
                     SplashView()
                 case .playlistEditor:

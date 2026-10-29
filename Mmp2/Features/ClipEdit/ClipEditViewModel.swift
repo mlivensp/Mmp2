@@ -361,11 +361,6 @@ extension ClipEditView {
             
             clip.primitiveName = name
             clip.name_normalized = name.normalizedForSearch
-            // TODO: need to calculate seconds from measures
-            if measureMode {
-                
-            } else {
-            }
             
             clip.isFavorite = isFavorite
             clip.notes = notes.isEmpty ? nil : notes
@@ -381,6 +376,10 @@ extension ClipEditView {
                 clip.lastMeasure = nil
                 clip.startSeconds = startSeconds
                 clip.endSeconds = endSeconds
+            }
+            
+            if clip.isNew {
+                context.insert(clip)
             }
             
             try playbackVM.apply(to: clip.playback, context: context)

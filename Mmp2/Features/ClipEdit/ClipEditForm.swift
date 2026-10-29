@@ -28,7 +28,7 @@ struct ClipEditForm: View {
                         TextField("", text: $vm.name)
                     }
                 }
-
+                
                 ErrorFieldContainer(
                     hasError: vm.bpmError != nil,
                     errorMessage: vm.bpmError
@@ -38,7 +38,7 @@ struct ClipEditForm: View {
                         TextField("", text: $vm.bpmString)
                     }
                 }
-
+                
                 ErrorFieldContainer(
                     hasError: false,
                     errorMessage: ""
@@ -50,7 +50,7 @@ struct ClipEditForm: View {
                         }
                     }
                 }
-
+                
                 if vm.measureMode == false {
                     ErrorFieldContainer(
                         hasError: vm.startSecondsError != nil,
@@ -61,7 +61,7 @@ struct ClipEditForm: View {
                             TextField("", text: $vm.startTimeString)
                         }
                     }
-
+                    
                     ErrorFieldContainer(
                         hasError: vm.endSecondsError != nil,
                         errorMessage: vm.endSecondsError
@@ -82,7 +82,7 @@ struct ClipEditForm: View {
                                 .frame(maxWidth: 60)
                         }
                     }
-
+                    
                     ErrorFieldContainer(
                         hasError: vm.lastMeasureError != nil,
                         errorMessage: vm.lastMeasureError
@@ -124,7 +124,7 @@ struct ClipEditForm: View {
                         Button("Save") {
                             do {
                                 if try vm.save() {
-                                    dismiss()
+                                    exit()
                                 }
                             } catch {
                                 let _ = print(error.localizedDescription)
@@ -136,7 +136,7 @@ struct ClipEditForm: View {
                         Spacer()
                         
                         Button("Cancel") {
-                            dismiss()
+                            exit()
                         }
                         .foregroundColor(.secondary)
                         
@@ -145,6 +145,18 @@ struct ClipEditForm: View {
                 }
             }
             .padding(formPadding)
+        }
+    }
+    /// Leaves the editor, whichever way we got here.
+    private func exit() {
+        if appRootManager.currentRoot == .clipEdit {
+            // Came from SinglePlayerView: go back to the player.
+            appRootManager.editingClip = nil
+            appRootManager.currentRoot = .play
+        } else {
+            // Came from the sources list in .home.
+            appRootManager.selectedCategory = .collections
+            dismiss() // keep this if you were already calling it there
         }
     }
 }
