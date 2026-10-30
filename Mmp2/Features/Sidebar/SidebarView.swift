@@ -10,16 +10,6 @@ import SwiftUI
 struct SidebarView: View {
     @Environment(AppRootManager.self) var appRootManager
     
-    let items = [
-        "Collections",
-        "Playlists",
-        "Recents",
-        "Favorites",
-        "Fix Locations"
-    ]
-    
-    @State private var selectedCategory: String?
-
     init() {
     }
 
@@ -27,9 +17,9 @@ struct SidebarView: View {
         @Bindable var appRootManager = appRootManager
         
         List(selection: $appRootManager.selectedCategory) {
-            ForEach(items, id: \.self) { item in
-                NavigationLink(value: item) {
-                    Text(item)
+            ForEach(AppRootManager.AppCategory.allCases) { category in
+                NavigationLink(value: category) {
+                    Text(category.rawValue)
                 }
             }
         }

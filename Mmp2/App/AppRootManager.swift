@@ -37,7 +37,14 @@ final class AppRootManager {
         case clipEdit
     }
 
-    enum AppCategory { case collections, playlists, favorites, recents }
+    enum AppCategory: String, CaseIterable, Identifiable {
+        case collections = "Collections"
+        case playlists = "Playlists"
+        case recents = "Recents"
+        case favorites = "Favorites"
+
+        var id: Self { self }
+    }
     
     private init() { }
     
