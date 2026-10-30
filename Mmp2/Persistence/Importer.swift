@@ -260,8 +260,10 @@ struct Importer {
             if let step = playbackData.step.optionalInt {
                 let max = playbackData.maxRate.optionalInt
                 let playbackStepwise = PlaybackStepwise(start: start, step: step, max: max ?? 100, timesToPlay: timesToPlay ?? 1, playback: playback)
+                playback.playbackStepwise = playbackStepwise
             } else {
                 let playbackConstant = PlaybackConstant(rate: start, timesToPlay: timesToPlay, playback: playback)
+                playback.playbackConstant = playbackConstant
             }
         } else {
             // TODO: import bounce
@@ -303,26 +305,34 @@ struct Importer {
     //
     //        return result
     //    }
-    //
-    //    fileprivate func importPlaylists(_ playlists: JSON, _ context: NSManagedObjectContext, _ collections: [MmpCollection]) {
-    //        for playlistJson in playlists.array {
-    //            let playlist = Playlist(context: context)
-    //            playlist.name = playlistJson.name.string
-    //            playlist.shuffle = playlistJson.shuffle.bool
-    //            playlist.defaultSecondsToDelay = playlistJson.defaultSecondsToDelay.optionalInt ?? 0
-    //            var duration = ""
-    //
-    //            let durationString = playlistJson.duration.string
-    //            if let durationComponents = parseISO8601Duration(durationString) {
-    //                duration = format(dateComponents: durationComponents)
-    //            }
-    //
-    //            playlist.duration = duration
-    //            playlist.notes = playlistJson.notes.string
-    //            let playlistMembers = importPlaylistMembers(playlistJson.members.array, context, collections)
-    //            _ = playlistMembers.map { playlist.addToPlaylistMembers($0) }
-    //        }
-    //    }
+    
+    fileprivate func importPlaylists(in modelContext: ModelContext, _ playlists: JSON) {
+            for playlistJson in playlists.array {
+                let name = playlistJson.name.string
+                let shuffle = playlistJson.shuffle.bool
+                let defaultSecondsToDelay = playlistJson.defaultSecondsToDelay.int
+                let durationString = playlistJson.duration.string
+                let duration = (try? TimeFormatter.shared.seconds(from: durationString)) ?? 0
+            
+//                if let durationComponents = parseISO8601Duration(durationString) {
+//                    duration = format(dateComponents: durationComponents)
+//                }
+    
+                let timesToRepeat = playlistJson.repeat.optionalInt
+                let notes = playlistJson.notes.optionalString
+                
+                let playlist = Playlist(
+                    name: name,
+                    shuffle: shuffle,
+                    defaultSecondsToDelay: defaultSecondsToDelay,
+                    duration: duration,
+                    timesToRepeat: timesToRepeat,
+                    notes: notes)
+                modelContext.insert(playlist)
+//                let playlistMembers = importPlaylistMembers(playlistJson.members.array, context, collections)
+//                _ = playlistMembers.map { playlist.addToPlaylistMembers($0) }
+            }
+        }
     
     fileprivate func purgeData(_ modelContext: ModelContext) {
         // Delete all Playlists
@@ -375,14 +385,14 @@ struct Importer {
         let playOrderDictionary = importPlayOrders(in: modelContext,  playOrdersJson)
         let collectionsJson = json.collections
         let collections = importCollections(in: modelContext, collectionsJson)
-        
+        let playlistJson = json.playlists
+        importPlaylists(in: modelContext, playlistJson)
+
         
         // TODO: AppSettings
         // TODO: Backups
         // TODO: Playlists
         // TODO: Version
-        //        let playlist = json.playlists
-        //        importPlaylists(playlist, dataController.container.viewContext, collections)
         //        appRootManager.currentRoot = .home
         try modelContext.save()
     }

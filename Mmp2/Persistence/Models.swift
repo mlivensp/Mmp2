@@ -218,19 +218,23 @@ import SwiftData
 }
 
 @Model public class Playlist {
-    var defaultSecondsToDelay32: Int32 = 5
-    var duration: String
-    var name_normalized: String?
-    var notes: String?
     var primitiveName: String
     var shuffle: Bool
+    var defaultSecondsToDelay: Int
+    var duration: TimeInterval
+    var timesToRepeat: Int?
+    var notes: String?
+    var name_normalized: String?
     @Relationship(deleteRule: .cascade, inverse: \PlaylistItem.playlist) var playlistItems: [PlaylistItem] = []
 
-    public init(duration: String, primitiveName: String, shuffle: Bool) {
-        self.duration = duration
-        self.primitiveName = primitiveName
+    public init(name: String, shuffle: Bool, defaultSecondsToDelay: Int, duration: TimeInterval, timesToRepeat: Int?, notes: String?) {
+        self.primitiveName = name
+        self.name_normalized = name.normalizedForSearch
         self.shuffle = shuffle
-
+        self.defaultSecondsToDelay = defaultSecondsToDelay
+        self.duration = duration
+        self.timesToRepeat = timesToRepeat
+        self.notes = notes
     }
 }
 

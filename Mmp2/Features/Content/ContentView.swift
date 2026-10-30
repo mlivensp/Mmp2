@@ -15,7 +15,7 @@ struct ContentView: View {
         case .collections:
             CollectionsView()
         case .playlists:
-            Text("Playlists")
+            PlaylistsView()
         case .favorites:
             Text("Favorites")
         case .recents:
