@@ -53,7 +53,6 @@ struct Mmp2App: App {
                         ContentView()
                     } detail: {
                         @Bindable var appRootManager = appRootManager
-                        let _ = print("refreshing detail")
                         NavigationStack(path: $appRootManager.detailPath) {
                             Group {
                                 switch appRootManager.selectedCategory {

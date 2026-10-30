@@ -179,19 +179,7 @@ struct SinglePlayerView: View {
             
             Button(action: {
                 guard let source else { return }
-
-                let clip = Clip(
-                    source: source,
-                    name: "",
-                    startSeconds: 0,
-                    endSeconds: 0,
-                    startMeasure: nil,
-                    endMeasure: nil,
-                    isFavorite: false,
-                    notes: nil,
-                    media: Media(bpm: source.media.bpm, path: ""),
-                    playback: Playback()
-                )
+                let clip = Clip.makeDraft()
 
                 appRootManager.selectedSource = source
                 appRootManager.editingClip = clip

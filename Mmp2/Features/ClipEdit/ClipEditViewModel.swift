@@ -51,6 +51,10 @@ extension ClipEditView {
             
             storedNameString = clip.primitiveName
             
+            if clip.isNew {
+                clip.media.bpm = source.media.bpm
+            }
+            
             if let bpm = clip.media.bpm {
                 self.storedBpmString = String(bpm)
             } else {
@@ -378,10 +382,11 @@ extension ClipEditView {
                 clip.endSeconds = endSeconds
             }
             
-            if clip.isNew {
-                context.insert(clip)
+            if clip.source == nil {
+                clip.source = source
+//                context.insert(clip)
             }
-            
+
             try playbackVM.apply(to: clip.playback, context: context)
             try context.save()
             return true
