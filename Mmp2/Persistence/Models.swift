@@ -225,8 +225,9 @@ import SwiftData
     var timesToRepeat: Int?
     var notes: String?
     var name_normalized: String
+    
     @Relationship(deleteRule: .cascade, inverse: \PlaylistItem.playlist) var playlistItems: [PlaylistItem] = []
-    @Relationship(deleteRule: .cascade, inverse: \PlaylistGroupMember.playlist) var groups: [PlaylistGroupMember] = []
+    @Relationship(deleteRule: .cascade, inverse: \PlaylistGroupItem.playlist) var groups: [PlaylistGroupItem] = []
 
     public init(name: String, shuffle: Bool, defaultSecondsToDelay: Int, duration: TimeInterval, timesToRepeat: Int?, notes: String?) {
         self.primitiveName = name
@@ -243,7 +244,7 @@ import SwiftData
     var primitiveName: String
     var name_normalized: String
     var isExpanded: Bool
-    @Relationship(deleteRule: .cascade, inverse: \PlaylistGroupMember.playlistGroup) var groupMembers: [PlaylistGroupMember] = []
+    @Relationship(deleteRule: .cascade, inverse: \PlaylistGroupItem.playlistGroup) var groupItems: [PlaylistGroupItem] = []
     
     init(name: String, isExpanded: Bool = false) {
         self.primitiveName = name
@@ -252,7 +253,7 @@ import SwiftData
     }
 }
 
-@Model public class PlaylistGroupMember {
+@Model public class PlaylistGroupItem {
     @Relationship var playlistGroup: PlaylistGroup
     @Relationship var playlist: Playlist
     
@@ -263,15 +264,20 @@ import SwiftData
 }
 
 @Model public class PlaylistItem {
-    var secondsToDelay: Int? = 0
     var sequence: Int = 0
-    var clip: Clip?
+    var secondsToDelayOverride: Int?
+    @Relationship var source: Source?
+    @Relationship var clip: Clip?
     @Relationship(deleteRule: .cascade) var playback: Playback?
-    var playlist: Playlist
-//        @Relationship(inverse: \Source.playlistMember) var source: Source?
-    public init(playlist: Playlist) {
-        self.playlist = playlist
+    @Relationship var playlist: Playlist?
 
+    init(sequence: Int, secondsToDelayOverride: Int? = nil, source: Source? = nil, clip: Clip? = nil, playback: Playback? = nil, playlist: Playlist? = nil) {
+        self.sequence = sequence
+        self.secondsToDelayOverride = secondsToDelayOverride
+        self.source = source
+        self.clip = clip
+        self.playback = playback
+        self.playlist = playlist
     }
 }
 

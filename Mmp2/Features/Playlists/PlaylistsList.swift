@@ -12,7 +12,6 @@ struct PlaylistsList: View {
     @Environment(AppRootManager.self) var appRootManager
     @Environment(\.modelContext) private var modelContext
     @Query private var playlistGroups: [PlaylistGroup]
-    @Query private var playlistGroupMembers: [PlaylistGroupMember]
     @Query(sort: \Playlist.name_normalized) private var playlists: [Playlist]
 
     let onPlaylistTapped: (Playlist) -> Void
@@ -24,7 +23,7 @@ struct PlaylistsList: View {
         let groups = playlistGroups.map {
             TopLevelPlaylistGroup(
                 playlistGroup: $0,
-                playlists: topLevelPlaylists($0.groupMembers)
+                playlists: topLevelPlaylists($0.groupItems)
             )
         }
         
@@ -40,8 +39,8 @@ struct PlaylistsList: View {
         return items.sorted { $0.sortOrder < $1.sortOrder }
     }
     
-    private func topLevelPlaylists(_ groupMembers: [PlaylistGroupMember]) -> [TopLevelPlaylist] {
-        groupMembers.map { TopLevelPlaylist(playlist: $0.playlist) }
+    private func topLevelPlaylists(_ groupItemss: [PlaylistGroupItem]) -> [TopLevelPlaylist] {
+        groupItemss.map { TopLevelPlaylist(playlist: $0.playlist) }
             .sorted(by: { $0.sortOrder  < $1.sortOrder })
     }
     

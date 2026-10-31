@@ -103,5 +103,6 @@ final class AppRootManager {
     
     func play(playlist: Playlist) {
         selectedPlaylist = playlist
+        currentRoot = .playlistPlayer
     }
 }

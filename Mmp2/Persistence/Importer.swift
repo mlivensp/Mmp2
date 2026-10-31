@@ -34,6 +34,10 @@ struct JSON: RandomAccessCollection {
         value as? Int
     }
     
+    var optionalInt64: Int64? {
+        value as? Int64
+    }
+    
     var optionalString: String? {
         value as? String
     }
@@ -66,6 +70,10 @@ struct JSON: RandomAccessCollection {
     
     var int: Int {
         optionalInt ?? 0
+    }
+    
+    var int64: Int64 {
+        optionalInt64 ?? 0
     }
     
     var string: String {
@@ -118,8 +126,9 @@ struct Importer {
         return result
     }
     
-    fileprivate func importCollections(in modelContext: ModelContext, _ collections: JSON) -> [MediaCollection] {
-        var result: [MediaCollection] = []
+    fileprivate func importCollections(in modelContext: ModelContext, _ collections: JSON) -> ([Int: Source], [Int: Clip]) {
+        var sourceMap: [Int: Source] = [:]
+        var clipMap: [Int: Clip] = [:]
         for collectionData in collections.array {
             let collection = collectionData.collection
             let name = collection.name.string
@@ -128,12 +137,13 @@ struct Importer {
             modelContext.insert(mediaCollection)
             
             let sourceGroups = importSourceGroups(modelContext: modelContext, collectionData.groups.array, mediaCollection)
-            let sources = importSources(modelContext: modelContext, sources: collectionData.sources.array, mediaCollection: mediaCollection, sourceGroups: sourceGroups)
-            print("Collection \(name) includes \(mediaCollection.sources.count ?? -42) sources")
-            result.append(mediaCollection)
+            let (collectionSourceMap, sourceClipMap) = importSources(modelContext: modelContext, sources: collectionData.sources.array, mediaCollection: mediaCollection, sourceGroups: sourceGroups)
+            sourceMap = sourceMap + collectionSourceMap
+            clipMap = clipMap + sourceClipMap
+            print("Collection \(name) includes \(mediaCollection.sources.count) sources")
         }
         
-        return result
+        return (sourceMap, clipMap)
     }
     
     fileprivate func importSourceGroups(modelContext: ModelContext, _ groups: [JSON], _ mediaCollection: MediaCollection) -> [Int:SourceGroup] {
@@ -152,8 +162,10 @@ struct Importer {
         return sourceGroups
     }
     
-    fileprivate func importSources(modelContext: ModelContext, sources: [JSON], mediaCollection: MediaCollection, sourceGroups: [Int:SourceGroup]) -> [Int:Source] {
-        var result: [Int:Source] = [:]
+    fileprivate func importSources(modelContext: ModelContext, sources: [JSON], mediaCollection: MediaCollection, sourceGroups: [Int: SourceGroup]) -> ([Int: Source], [Int: Clip]) {
+        var sourceMap: [Int:Source] = [:]
+        var clipMap: [Int:Clip] = [:]
+        
         for sourceAggregate in sources {
             let media = importMedia(modelContext: modelContext, sourceAggregate.media)
             let playback = importPlayback(modelContext: modelContext, sourceAggregate.playback)
@@ -181,12 +193,12 @@ struct Importer {
             modelContext.insert(source)
             source.mediaCollection = mediaCollection
             
-            let clips = importClips(modelContext: modelContext, sourceAggregate.clips.array, source: source)
-            //            _ = clips.map { source.addToClips($0) }
-            result[id] = source
+            let clipsForSource = importClips(modelContext: modelContext, sourceAggregate.clips.array, source: source)
+            clipMap = clipMap + clipsForSource
+            sourceMap[id] = source
         }
         
-        return result
+        return (sourceMap, clipMap)
     }
     
     fileprivate func importClips(modelContext: ModelContext, _ clips: [JSON], source: Source) -> [Int:Clip] {
@@ -195,7 +207,7 @@ struct Importer {
             let media = importMedia(modelContext: modelContext, clipAggregate.media)
             let playback = importPlayback(modelContext: modelContext, clipAggregate.playback)
             let clipData = clipAggregate.clip
-            let id = clipData.Id.int
+            let id = clipData.clipId.int
             let name = clipData.name.string
             
             let startTime = clipData.startTime.string
@@ -214,8 +226,6 @@ struct Importer {
         
         return result
     }
-    
-    
     
     fileprivate func importMedia(modelContext: ModelContext,_ mediaJson: JSON) -> Media {
         let bpm = mediaJson.bpm.optionalInt
@@ -272,41 +282,45 @@ struct Importer {
     }
     
     
-    //    fileprivate func importPlaylistMembers(_ members: [JSON], _ context: NSManagedObjectContext, _ collections: [MmpCollection]) -> [PlaylistMember] {
-    //        var result: [PlaylistMember] = []
-    //        for memberJson in members {
-    //            let member = PlaylistMember(context: context)
-    //            member.sequence = Int32(memberJson.sequence.int)
-    //            member.secondsToDelay = memberJson.secondsToDelay.optionalInt
-    //            let collectionName = memberJson.collectionName.string
-    //            let sourceName = memberJson.sourceName.string
-    //            let clipName = memberJson.clipName.optionalString
-    //
-    //            if let collection = collections.first(where: { $0.name == collectionName } ) {
-    //                if let source = collection.collectionSources.first(where: { $0.name == sourceName } ) {
-    //                    if let clipName {
-    //                        if let clip = source.sourceClips.first(where: { $0.name == clipName } ) {
-    //                            member.clip = clip
-    //                        }
-    //                    } else {
-    //                        member.source = source
-    //                    }
-    //                }
-    //            }
-    //
-    //            let playbackJson = memberJson.playback
-    //
-    //            if !(playbackJson.value is NSNull) {
-    //                member.playback = importPlayback(playbackJson, context)
-    //            }
-    //
-    //            result.append(member)
-    //        }
-    //
-    //        return result
-    //    }
+    fileprivate func importPlaylistMembers(in modelContext: ModelContext,_ playlistMembersJson: JSON, sourceMap: [Int: Source], clipMap: [Int: Clip]) -> [PlaylistItem] {
+        var result: [PlaylistItem] = []
+        
+        for playlistItemAggregate in playlistMembersJson.array {
+            let playlistItemJson = playlistItemAggregate.playlistItem
+
+            let source: Source?
+            let clip: Clip?
+            let playback: Playback?
+            
+            if let sourceId = playlistItemJson.sourceId.optionalInt {
+                source = sourceMap[sourceId]
+                clip = nil
+            } else if let clipId = playlistItemJson.clipId.optionalInt {
+                source = nil
+                clip = clipMap[clipId]
+            } else {
+                continue
+            }
+            
+            let sequence = playlistItemJson.sequence.int
+            let secondsToDelayOverride = playlistItemJson.secondsToDelayOverride.optionalInt
+            
+            let playbackJson = playlistItemAggregate.playback
+            
+            if (playbackJson.value is NSNull) {
+                playback = nil
+            } else {
+                playback = importPlayback(modelContext: modelContext, playbackJson)
+            }
+
+            let playlistItem = PlaylistItem(sequence: sequence, secondsToDelayOverride: secondsToDelayOverride, source: source, clip: clip, playback: playback)
+            result.append(playlistItem)
+        }
     
-    fileprivate func importPlaylists(in modelContext: ModelContext, _ playlists: JSON, groupLookups: [String:PlaylistGroup]) {
+        return result
+    }
+    
+    fileprivate func importPlaylists(in modelContext: ModelContext, _ playlists: JSON, groupLookups: [String:PlaylistGroup], sourceMap: [Int: Source], clipMap: [Int: Clip]) {
         for playlistAggregate in playlists.array {
             let playlistJson = playlistAggregate.playlist
             let name = playlistJson.name.string
@@ -335,12 +349,14 @@ struct Importer {
             for groupNameJson in groupNames {
                 let groupName = groupNameJson.string
                 if let playlistGroup = groupLookups[groupName] {
-                    let playlistGroupMember = PlaylistGroupMember(playlistGroup: playlistGroup, playlist: playlist)
-                    modelContext.insert(playlistGroupMember)
+                    let playlistGroupItem = PlaylistGroupItem(playlistGroup: playlistGroup, playlist: playlist)
+                    modelContext.insert(playlistGroupItem)
                 }
             }
-            //                let playlistMembers = importPlaylistMembers(playlistJson.members.array, context, collections)
-            //                _ = playlistMembers.map { playlist.addToPlaylistMembers($0) }
+            
+            let playlistItemsJson = playlistAggregate.playlistItems
+            let playlistItems = importPlaylistMembers(in: modelContext, playlistItemsJson, sourceMap: sourceMap, clipMap: clipMap)
+            _ = playlistItems.map { playlist.playlistItems.append($0) }
         }
     }
     
@@ -414,11 +430,11 @@ struct Importer {
         let playOrdersJson = json.playOrders
         let playOrderDictionary = importPlayOrders(in: modelContext,  playOrdersJson)
         let collectionsJson = json.collections
-        let collections = importCollections(in: modelContext, collectionsJson)
+        let (sourceMap, clipMap) = importCollections(in: modelContext, collectionsJson)
         let playlistGroupsJson = json.playlistGroups
         let playlistGroupLookups = importPlaylistGroups(in: modelContext, playlistGroupsJson)
         let playlistJson = json.playlists
-        importPlaylists(in: modelContext, playlistJson, groupLookups: playlistGroupLookups)
+        importPlaylists(in: modelContext, playlistJson, groupLookups: playlistGroupLookups, sourceMap: sourceMap, clipMap: clipMap)
         
         
         // TODO: AppSettings
@@ -534,5 +550,13 @@ func timeSpan(from components: DateComponents) -> TimeInterval? {
         return timeSpan
     } else {
         return nil
+    }
+}
+
+func +<K, V>(lhs: [K: V], rhs: [K: V]) -> [K: V] {
+    let l = lhs.keys
+    let r = rhs.keys
+    return lhs.merging(rhs) { _, _ in
+        fatalError("Duplicate key")
     }
 }
