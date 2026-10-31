@@ -75,6 +75,9 @@ struct Mmp2App: App {
                                 case .clipEdit(let clip, let source):
                                     let _ = print("navigationDestination - ClipEditView")
                                     ClipEditView(clip: clip, source: source)
+                                case .playlistEdit(let playlist):
+                                    // TODO: PlaylistEdit
+                                    EmptyView()
                                 }
                             }
                         }
@@ -96,7 +99,8 @@ struct Mmp2App: App {
             Logger.navigation.info("destination - sourceEdit")
         case .clipEdit(_, _):
             Logger.navigation.info("destination - clipEdit")
-
+        case .playlistEdit(_):
+            Logger.navigation.info("destination - playlistEdit")
         }
     }
 }

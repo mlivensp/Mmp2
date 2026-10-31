@@ -8,11 +8,21 @@
 import SwiftUI
 
 struct PlaylistRow: View {
+    let playlist: Playlist
+    let onEdit: (Playlist) -> Void
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Text(playlist.primitiveName)
+        .contextMenu {
+            Button {
+                onEdit(playlist)
+            } label: {
+                Label("Edit Playlist", systemImage: "pencil")
+            }
+        }
     }
 }
 
-#Preview {
-    PlaylistRow()
-}
+//#Preview {
+//    PlaylistRow()
+//}

@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct PlaylistsView: View {
+    @Environment(AppRootManager.self) private var appRootManager
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        PlaylistsList(onPlaylistTapped: { appRootManager.play(playlist: $0) })
     }
 }
 

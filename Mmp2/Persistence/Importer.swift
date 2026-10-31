@@ -168,7 +168,7 @@ struct Importer {
             } else {
                 measure1Start = nil
             }
-//            let measure1Start = sourceData.measure1Start.optionalDate
+            //            let measure1Start = sourceData.measure1Start.optionalDate
             let isFavorite = sourceData.isFavorite.bool
             let isExpanded = sourceData.isExpanded.bool
             let notes = sourceData.notes.optionalString
@@ -180,9 +180,9 @@ struct Importer {
             let source = Source(name: name, sortOrder: sortOrder, measure1Start: measure1Start, isFavorite: isFavorite, isExpanded: isExpanded, notes: notes, media: media, playback: playback, sourceGroup: sourceGroup)
             modelContext.insert(source)
             source.mediaCollection = mediaCollection
-
+            
             let clips = importClips(modelContext: modelContext, sourceAggregate.clips.array, source: source)
-//            _ = clips.map { source.addToClips($0) }
+            //            _ = clips.map { source.addToClips($0) }
             result[id] = source
         }
         
@@ -216,7 +216,7 @@ struct Importer {
     }
     
     
-
+    
     fileprivate func importMedia(modelContext: ModelContext,_ mediaJson: JSON) -> Media {
         let bpm = mediaJson.bpm.optionalInt
         let path = mediaJson.path.string
@@ -254,7 +254,7 @@ struct Importer {
         let playbackData = playbackJson.playback
         let start = playbackData.startPlaybackRate.int
         let timesToPlay = playbackData.timesToPlayAtRate.optionalInt
-
+        
         if playbackJson.bounce.value is NSNull {
             
             if let step = playbackData.step.optionalInt {
@@ -270,7 +270,7 @@ struct Importer {
         }
         return playback
     }
-
+    
     
     //    fileprivate func importPlaylistMembers(_ members: [JSON], _ context: NSManagedObjectContext, _ collections: [MmpCollection]) -> [PlaylistMember] {
     //        var result: [PlaylistMember] = []
@@ -306,35 +306,65 @@ struct Importer {
     //        return result
     //    }
     
-    fileprivate func importPlaylists(in modelContext: ModelContext, _ playlists: JSON) {
-            for playlistJson in playlists.array {
-                let name = playlistJson.name.string
-                let shuffle = playlistJson.shuffle.bool
-                let defaultSecondsToDelay = playlistJson.defaultSecondsToDelay.int
-                let durationString = playlistJson.duration.string
-                let duration = (try? TimeFormatter.shared.seconds(from: durationString)) ?? 0
+    fileprivate func importPlaylists(in modelContext: ModelContext, _ playlists: JSON, groupLookups: [String:PlaylistGroup]) {
+        for playlistAggregate in playlists.array {
+            let playlistJson = playlistAggregate.playlist
+            let name = playlistJson.name.string
+            let shuffle = playlistJson.shuffle.bool
+            let defaultSecondsToDelay = playlistJson.defaultSecondsToDelay.int
+            let durationString = playlistJson.duration.string
+            let duration = (try? TimeFormatter.shared.seconds(from: durationString)) ?? 0
             
-//                if let durationComponents = parseISO8601Duration(durationString) {
-//                    duration = format(dateComponents: durationComponents)
-//                }
-    
-                let timesToRepeat = playlistJson.repeat.optionalInt
-                let notes = playlistJson.notes.optionalString
-                
-                let playlist = Playlist(
-                    name: name,
-                    shuffle: shuffle,
-                    defaultSecondsToDelay: defaultSecondsToDelay,
-                    duration: duration,
-                    timesToRepeat: timesToRepeat,
-                    notes: notes)
-                modelContext.insert(playlist)
-//                let playlistMembers = importPlaylistMembers(playlistJson.members.array, context, collections)
-//                _ = playlistMembers.map { playlist.addToPlaylistMembers($0) }
+            //                if let durationComponents = parseISO8601Duration(durationString) {
+            //                    duration = format(dateComponents: durationComponents)
+            //                }
+            
+            let timesToRepeat = playlistJson.repeat.optionalInt
+            let notes = playlistJson.notes.optionalString
+            
+            let playlist = Playlist(
+                name: name,
+                shuffle: shuffle,
+                defaultSecondsToDelay: defaultSecondsToDelay,
+                duration: duration,
+                timesToRepeat: timesToRepeat,
+                notes: notes)
+            modelContext.insert(playlist)
+            
+            let groupNames = playlistAggregate.playlistGroupNames.array
+            for groupNameJson in groupNames {
+                let groupName = groupNameJson.string
+                if let playlistGroup = groupLookups[groupName] {
+                    let playlistGroupMember = PlaylistGroupMember(playlistGroup: playlistGroup, playlist: playlist)
+                    modelContext.insert(playlistGroupMember)
+                }
             }
+            //                let playlistMembers = importPlaylistMembers(playlistJson.members.array, context, collections)
+            //                _ = playlistMembers.map { playlist.addToPlaylistMembers($0) }
         }
+    }
+    
+    fileprivate func importPlaylistGroups(in modelContext: ModelContext, _ playlistGroups: JSON) -> [String:PlaylistGroup] {
+        var result: [String:PlaylistGroup] = [:]
+        for playlistGroupJson in playlistGroups.array {
+            let name = playlistGroupJson.name.string
+            let playlistGroup = PlaylistGroup(name: name)
+            modelContext.insert(playlistGroup)
+            result[name] = playlistGroup
+        }
+        
+        return result
+    }
     
     fileprivate func purgeData(_ modelContext: ModelContext) {
+        // Delete all PlaylistGroups
+        let playlistGroupFetchDescriptor = FetchDescriptor<PlaylistGroup>()
+        if let playlistGroups = try? modelContext.fetch(playlistGroupFetchDescriptor) {
+            for playlistGroup in playlistGroups {
+                modelContext.delete(playlistGroup)
+            }
+        }
+        
         // Delete all Playlists
         let fetchDescriptor2 = FetchDescriptor<Playlist>()
         if let playlists = try? modelContext.fetch(fetchDescriptor2) {
@@ -363,7 +393,7 @@ struct Importer {
         // TODO: Backups
         // TODO: Version
     }
-
+    
     @MainActor
     func importFromURL(_ url: URL, modelContext: ModelContext) throws {
         // TODO: errors need to be handled here
@@ -385,9 +415,11 @@ struct Importer {
         let playOrderDictionary = importPlayOrders(in: modelContext,  playOrdersJson)
         let collectionsJson = json.collections
         let collections = importCollections(in: modelContext, collectionsJson)
+        let playlistGroupsJson = json.playlistGroups
+        let playlistGroupLookups = importPlaylistGroups(in: modelContext, playlistGroupsJson)
         let playlistJson = json.playlists
-        importPlaylists(in: modelContext, playlistJson)
-
+        importPlaylists(in: modelContext, playlistJson, groupLookups: playlistGroupLookups)
+        
         
         // TODO: AppSettings
         // TODO: Backups
@@ -413,11 +445,11 @@ func timeInterval(from timeString: String) -> TimeInterval? {
     let formatter = DateFormatter()
     formatter.dateFormat = "HH:mm:ss.SSSSSSS"
     formatter.timeZone = TimeZone(secondsFromGMT: 0)
-
+    
     guard let date = formatter.date(from: timeString) else {
         return nil
     }
-
+    
     return date.timeIntervalSinceReferenceDate
 }
 
@@ -430,23 +462,23 @@ func parseTime(_ string: String) -> Date? {
 
 func parseISO8601Duration(_ duration: String) -> DateComponents? {
     let pattern = #"^P(?:(?<years>\d+)Y)?(?:(?<months>\d+)M)?(?:(?<weeks>\d+)W)?(?:(?<days>\d+)D)?(?:T(?:(?<hours>\d+)H)?(?:(?<minutes>\d+)M)?(?:(?<seconds>\d+)(?:\.(?<fractionalSeconds>\d+))?S)?)?$"#
-
+    
     // Create the regular expression
     guard let regex = try? NSRegularExpression(pattern: pattern) else {
         print("Invalid regex pattern")
         return nil
     }
-
+    
     // Perform the matching
     let nsRange = NSRange(duration.startIndex..<duration.endIndex, in: duration)
     guard let match = regex.firstMatch(in: duration, range: nsRange) else {
         print("No matches found")
         return nil
     }
-
+    
     // Initialize DateComponents
     var components = DateComponents()
-
+    
     // Helper function to extract integer values from named capture groups
     func getInt(from name: String) -> Int? {
         let nsRange = match.range(withName: name)
@@ -455,7 +487,7 @@ func parseISO8601Duration(_ duration: String) -> DateComponents? {
         }
         return nil
     }
-
+    
     // Helper function to extract Double values from named capture groups
     func getDouble(from name: String) -> Double? {
         let nsRange = match.range(withName: name)
@@ -464,7 +496,7 @@ func parseISO8601Duration(_ duration: String) -> DateComponents? {
         }
         return nil
     }
-
+    
     // Map captured groups to DateComponents
     components.year = getInt(from: "years")
     components.month = getInt(from: "months")
@@ -472,7 +504,7 @@ func parseISO8601Duration(_ duration: String) -> DateComponents? {
     components.day = getInt(from: "days")
     components.hour = getInt(from: "hours")
     components.minute = getInt(from: "minutes")
-
+    
     // Handle seconds (including fractional)
     if let secondsValue = getDouble(from: "seconds") {
         let integerSeconds = Int(secondsValue)
@@ -480,21 +512,21 @@ func parseISO8601Duration(_ duration: String) -> DateComponents? {
         components.second = integerSeconds
         components.nanosecond = Int(fractionalSeconds * 1_000_000_000)
     }
-
+    
     // Convert weeks to days and add to the day component
     if let weekCount = weeks {
         components.day = (components.day ?? 0) + weekCount * 7
     }
-
+    
     return components
 }
 
 func timeSpan(from components: DateComponents) -> TimeInterval? {
     let calendar = Calendar.current
-
+    
     // Creating a reference date, such as the Unix epoch (1970-01-01)
     let referenceDate = Date(timeIntervalSince1970: 0)
-
+    
     // Using the calendar to calculate the date by adding DateComponents to the reference date
     if let date = calendar.date(byAdding: components, to: referenceDate) {
         // Calculating the TimeInterval by finding the difference between the new date and the reference date

@@ -224,8 +224,9 @@ import SwiftData
     var duration: TimeInterval
     var timesToRepeat: Int?
     var notes: String?
-    var name_normalized: String?
+    var name_normalized: String
     @Relationship(deleteRule: .cascade, inverse: \PlaylistItem.playlist) var playlistItems: [PlaylistItem] = []
+    @Relationship(deleteRule: .cascade, inverse: \PlaylistGroupMember.playlist) var groups: [PlaylistGroupMember] = []
 
     public init(name: String, shuffle: Bool, defaultSecondsToDelay: Int, duration: TimeInterval, timesToRepeat: Int?, notes: String?) {
         self.primitiveName = name
@@ -238,9 +239,32 @@ import SwiftData
     }
 }
 
+@Model public class PlaylistGroup {
+    var primitiveName: String
+    var name_normalized: String
+    var isExpanded: Bool
+    @Relationship(deleteRule: .cascade, inverse: \PlaylistGroupMember.playlistGroup) var groupMembers: [PlaylistGroupMember] = []
+    
+    init(name: String, isExpanded: Bool = false) {
+        self.primitiveName = name
+        self.name_normalized = name.normalizedForSearch
+        self.isExpanded = isExpanded
+    }
+}
+
+@Model public class PlaylistGroupMember {
+    @Relationship var playlistGroup: PlaylistGroup
+    @Relationship var playlist: Playlist
+    
+    init(playlistGroup: PlaylistGroup, playlist: Playlist) {
+        self.playlistGroup = playlistGroup
+        self.playlist = playlist
+    }
+}
+
 @Model public class PlaylistItem {
-    var secondsToDelay32: Int32? = 0
-    var sequence: Int32 = 0
+    var secondsToDelay: Int? = 0
+    var sequence: Int = 0
     var clip: Clip?
     @Relationship(deleteRule: .cascade) var playback: Playback?
     var playlist: Playlist

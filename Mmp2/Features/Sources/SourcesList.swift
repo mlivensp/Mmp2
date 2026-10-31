@@ -14,10 +14,10 @@ struct SourcesList: View {
     let onSourceTapped: (Source) -> Void
     let onClipTapped: (Clip) -> Void
     
-    private var topLevelItems: [TopLevelItem] {
+    private var topLevelItems: [TopLevelSourceItem] {
         guard let collection else { return [] }
         
-        var items: [TopLevelItem] = []
+        var items: [TopLevelSourceItem] = []
         
         // 1. Groups
         let groups = collection.sourceGroups.map {

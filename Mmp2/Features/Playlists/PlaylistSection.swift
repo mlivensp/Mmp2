@@ -8,11 +8,16 @@
 import SwiftUI
 
 struct PlaylistSection: View {
+    let wrapper: TopLevelPlaylist
+    let onPlaylistTapped: (Playlist) -> Void
+    let appRootManager: AppRootManager
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        let playlist = wrapper.playlist
+        
+        PlaylistRow(playlist: playlist) { p in
+            appRootManager.editPlaylist(p)
+        }
+        .onTapGesture { onPlaylistTapped(playlist) }
     }
-}
-
-#Preview {
-    PlaylistSection()
 }

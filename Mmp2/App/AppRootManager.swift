@@ -13,6 +13,7 @@ enum DetailRoute: Hashable {
     case collectionEdit(MediaCollection)
     case sourceEdit(Source, MediaCollection)
     case clipEdit(Clip, Source)
+    case playlistEdit(Playlist)
 }
 
 @Observable
@@ -25,6 +26,8 @@ final class AppRootManager {
     var selectedMediaCollection: MediaCollection?
     var selectedSource: Source?
     var selectedClip: Clip?
+    var selectedPlaylist: Playlist?
+    
     var editingClip: Clip?
     
     enum AppRoot {
@@ -82,6 +85,10 @@ final class AppRootManager {
         detailPath.append(DetailRoute.clipEdit(clip, source))
     }
     
+    func editPlaylist(_ playlist: Playlist) {
+        detailPath.append(DetailRoute.playlistEdit(playlist))
+    }
+    
     func play(source: Source) {
         selectedSource = source
         selectedClip = nil
@@ -92,5 +99,9 @@ final class AppRootManager {
         selectedSource = nil
         selectedClip = clip
         currentRoot = .play
+    }
+    
+    func play(playlist: Playlist) {
+        selectedPlaylist = playlist
     }
 }
