@@ -8,7 +8,7 @@
 import Foundation
 import SwiftData
 
-enum TopLevelItem: Identifiable, Hashable {
+enum TopLevelSourceItem: Identifiable, Hashable {
     case group(TopLevelSourceGroup)
     case source(TopLevelSource)
 
@@ -20,7 +20,7 @@ enum TopLevelItem: Identifiable, Hashable {
     }
 }
 
-extension TopLevelItem: SortableSource {
+extension TopLevelSourceItem: SortableSource {
     var sortOrder: Int {
         switch self {
         case .group(let g): return g.sortOrder
