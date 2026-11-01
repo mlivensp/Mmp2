@@ -1,5 +1,5 @@
 //
-//  QueuedPlaylistItem.swift
+//  PlayableItem.swift
 //  Mmp2
 //
 //  Created by Michael Livenspargar on 10/31/26.

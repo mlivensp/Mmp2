@@ -5,12 +5,10 @@ import AVFoundation
 final class MediaPlayerController: NSObject {
     let player = AVPlayer()
     
-    private(set) var playableItem: PlayableItem
-    private var sequencer: PlayRateSequencer
+    private(set) var playableItem: PlayableItem?
+    private var sequencer: PlayRateSequencer?
     
     private var playbackTask: Task<Void, Never>?
-    
-    override init() { }
     
     // MARK: - Loading
 
@@ -22,10 +20,13 @@ final class MediaPlayerController: NSObject {
             forPlaylist: forPlaylist
         )
         self.playableItem = playableItem
-        player.replaceCurrentItem(with: makeAVPlayerItem())
+        player.replaceCurrentItem(with: try makeAVPlayerItem())
     }
 
-    func makeAVPlayerItem() -> AVPlayerItem {
+    private func makeAVPlayerItem() throws -> AVPlayerItem {
+        guard let playableItem else {
+            throw AppError.invalidState
+        }
         let playerItem = AVPlayerItem(url: playableItem.url)
 
         if let endAt = playableItem.end {
@@ -37,17 +38,17 @@ final class MediaPlayerController: NSObject {
     }
     
     var playRate: Float {
-        get { return sequencer.currentRate }
+        get { return sequencer?.currentRate ?? 1 }
         set {
-            print("Setting new playRate value. newValue: \(newValue) bpm: \(playableItem.bpm ?? -1)")
-            sequencer = SequencerFactory.createConstantPlayRateSequencer(rate: newValue, bpm: playableItem.bpm)
-            player.rate = sequencer.currentRate
-            player.defaultRate = sequencer.currentRate
+            print("Setting new playRate value. newValue: \(newValue) bpm: \(playableItem?.bpm ?? -1)")
+            sequencer = SequencerFactory.createConstantPlayRateSequencer(rate: newValue, bpm: playableItem?.bpm)
+            player.defaultRate = sequencer?.currentRate ?? 1
+            player.rate = player.defaultRate
         }
     }
     
     var displayRate: String {
-        return sequencer.displayRate
+        return sequencer?.displayRate ?? "?"
     }
     
     var position: String {
@@ -73,10 +74,11 @@ final class MediaPlayerController: NSObject {
 
     func start(continuation: @escaping () -> Void) {
         stop()
-        sequencer.reset()
+        sequencer?.reset()
         
         playbackTask = Task {
-            await runPlaybackLoop(continuation: continuation)
+            await playVideoLoop(player, startAt: playableItem?.start)
+            if !Task.isCancelled { continuation() }
         }
     }
     
@@ -84,13 +86,6 @@ final class MediaPlayerController: NSObject {
         playbackTask?.cancel()
         playbackTask = nil
         player.pause()
-    }
-    
-    // MARK: - Async Playback Loop
-    
-    private func runPlaybackLoop(continuation: () -> Void) async {
-        await playVideoLoop(player, startAt: playableItem.start)
-        continuation()
     }
     
     // MARK: - Video
@@ -110,8 +105,8 @@ final class MediaPlayerController: NSObject {
             .makeAsyncIterator()
         
         while !Task.isCancelled {
-            guard let rate = sequencer.nextRate() else {
-                stop()
+            guard let rate = sequencer?.nextRate() else {
+                player.pause()
                 return
             }
             

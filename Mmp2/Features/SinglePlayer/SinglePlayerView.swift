@@ -17,9 +17,8 @@ struct SinglePlayerView: View {
     @State private var playback: Playback?
     @State private var clipStart: Double?
     @State private var clipEnd: Double?
-    @State private var videoPlayer: AVPlayer?
     @State private var resolvedURL: URL?
-    @State private var controller: MediaPlayerController?
+    @State private var controller: MediaPlayerController = MediaPlayerController()
     @State private var source: Source?
     @State private var isAddingClip: Bool = false
     
@@ -28,18 +27,11 @@ struct SinglePlayerView: View {
         guard let media else { return }
         guard let playback else { return }
         
-        let sequencer: PlayRateSequencer
-        
-        do {
-            sequencer = try SequencerFactory.createSequencer(from: playback, bpm: media.bpm)
-        } catch {
-            throw error
-        }
         let playableItem = PlayableItem(url: url, title: title, start: clipStart, end: clipEnd, bpm: media.bpm, playback: playback)
         
         controller = MediaPlayerController()
         // TODO: handle error
-        try? controller?.load(playableItem)
+        try? controller.load(playableItem)
     }
     
     var body: some View {
@@ -80,11 +72,11 @@ struct SinglePlayerView: View {
             }
             
             Group {
-                if let player = videoPlayer {
+                if controller.playableItem != nil {
                     VStack {
                         Text(title)
                             .font(.title)
-                        Text(controller?.displayRate ?? "?")
+                        Text(controller.displayRate)
                         Slider(
                             value: playRateBinding,
                             in: 0...2,
@@ -96,11 +88,8 @@ struct SinglePlayerView: View {
                                 Text("200%")
                             }
                         
-                        VideoPlayerView(player: player)
+                        VideoPlayerView(player: controller.player)
                     }
-                } else {
-                    Text("Unable to load media")
-                        .foregroundColor(.secondary)
                 }
             }
         }
@@ -108,12 +97,12 @@ struct SinglePlayerView: View {
             try? selectMedia()
             try? resolveURL()
             try? preparePlayback()
-            controller?.start() {
+            controller.start() {
                 exit()
             }
         }
         .onDisappear {
-            controller?.stop()
+            controller.stop()
             
             if let url = resolvedURL {
                 url.stopAccessingSecurityScopedResource()
@@ -139,9 +128,9 @@ struct SinglePlayerView: View {
     
     var playRateBinding: Binding<Float> {
         Binding(
-            get: { controller?.playRate ?? 1.0 },
+            get: { controller.playRate },
             set: { newValue in
-                controller?.playRate = newValue
+                controller.playRate = newValue
             }
         )
     }
@@ -153,7 +142,7 @@ struct SinglePlayerView: View {
         VStack {
             HStack {
                 Button(action: {
-                    addClipStart = controller?.position
+                    addClipStart = controller.position
                 }, label: {
                     Text("Start")
                 })
@@ -163,7 +152,7 @@ struct SinglePlayerView: View {
             
             HStack {
                 Button(action: {
-                    addClipEnd = controller?.position
+                    addClipEnd = controller.position
                 }, label: {
                     Text("End")
                 })
@@ -206,20 +195,13 @@ struct SinglePlayerView: View {
            let url = resolvedURL {
             let playableItem = PlayableItem(url: url, title: title, start: nil, end: nil, bpm: media.bpm, playback: playback)
             do {
-                try controller?.load(playableItem)
-                controller?.start {
+                try controller.load(playableItem)
+                controller.start {
                     exit()
                 }
             } catch {
                 Logger.ui.error("Failed to load playableItem: \(error.localizedDescription)")
             }
-        }
-
-        do {
-            try preparePlayback()
-        } catch {
-            // TODO: notify user
-            Logger.ui.error("Failed to load playableItem: \(error.localizedDescription)")
         }
     }
     
@@ -229,8 +211,8 @@ struct SinglePlayerView: View {
         if let url = resolvedURL {
             let playableItem = PlayableItem(url: url, title: title, start: clip.startSeconds, end: clip.endSeconds, bpm: clip.media.bpm, playback: clip.playback)
             do {
-                try controller?.load(playableItem)
-                controller?.start {
+                try controller.load(playableItem)
+                controller.start {
                     exit()
                 }
             } catch {

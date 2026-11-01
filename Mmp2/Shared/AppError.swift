@@ -16,6 +16,7 @@ nonisolated enum AppError: Error, Equatable {
     case invalidStartMeasure
     case invalidEndMeasure
     case invalidMeasure1Start
+    case invalidState
     
 //    static func == (lhs: AppError, rhs: AppError) -> Bool {
 //            switch (lhs, rhs) {
