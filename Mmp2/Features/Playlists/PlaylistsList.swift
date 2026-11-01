@@ -24,6 +24,7 @@ struct PlaylistsList: View {
             TopLevelPlaylistGroup(
                 playlistGroup: $0,
                 playlists: topLevelPlaylists($0.groupItems)
+                    .sorted(by: { $0.playlist.primitiveName < $1.playlist.primitiveName })
             )
         }
         
