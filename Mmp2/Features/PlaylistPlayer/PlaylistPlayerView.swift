@@ -1,5 +1,5 @@
 //
-//  PlaylistPlayer.swift
+//  PlaylistPlayerView.swift
 //  Mmp2
 //
 //  Created by Michael Livenspargar on 10/30/26.

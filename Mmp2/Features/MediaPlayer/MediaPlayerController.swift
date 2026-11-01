@@ -2,7 +2,7 @@ import Foundation
 import AVFoundation
 
 @MainActor @Observable
-final class MediaPlayerController: NSObject {
+final class MediaPlayerController {
     let player = AVPlayer()
     
     private(set) var playableItem: PlayableItem?
@@ -40,7 +40,6 @@ final class MediaPlayerController: NSObject {
     var playRate: Float {
         get { return sequencer?.currentRate ?? 1 }
         set {
-            print("Setting new playRate value. newValue: \(newValue) bpm: \(playableItem?.bpm ?? -1)")
             sequencer = SequencerFactory.createConstantPlayRateSequencer(rate: newValue, bpm: playableItem?.bpm)
             player.defaultRate = sequencer?.currentRate ?? 1
             player.rate = player.defaultRate

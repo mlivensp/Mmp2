@@ -19,16 +19,17 @@ final class PlaylistController {
     private var loadedInPass = false
 
     private(set) var current: PlayableItem?
+    private var isStopped = false
+    private var accessReleased = false
 
     init(items: [PlayableItem], repeatCount: Int? = 1) {
         self.items = items
         self.repeatCount = repeatCount.map { max(1, $0) }
     }
-
-    private var isStopped = false
     
     /// Calls onFinished when the last item of the last pass completes.
     func start(onFinished: @escaping () -> Void) {
+        guard !accessReleased else { return }
         isStopped = false
         accessReleased = false
         pass = 0
@@ -37,7 +38,6 @@ final class PlaylistController {
         playCurrent(onFinished: onFinished)
     }
 
-    private var accessReleased = false
     func stop() {
         isStopped = true
         player.stop()

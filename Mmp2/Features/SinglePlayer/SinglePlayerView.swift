@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import AVFoundation
-import AVKit
 import OSLog
 
 struct SinglePlayerView: View {
@@ -18,17 +16,6 @@ struct SinglePlayerView: View {
     @State private var source: Source?
     @State private var isAddingClip: Bool = false
     @State private var appeared = false
-    
-//    private func preparePlayback() throws {
-//        guard let url = resolvedURL else { return }
-//        guard let media else { return }
-//        guard let playback else { return }
-//        
-//        let playableItem = PlayableItem(url: url, title: title, start: clipStart, end: clipEnd, bpm: media.bpm, playback: playback)
-//        
-//        // TODO: handle error
-//        try controller.load(playableItem)
-//    }
     
     var body: some View {
         HStack {
@@ -98,6 +85,7 @@ struct SinglePlayerView: View {
         }
         .onDisappear {
             controller.stop()
+            appeared = false
             
             if let url = resolvedURL {
                 url.stopAccessingSecurityScopedResource()
