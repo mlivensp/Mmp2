@@ -14,7 +14,7 @@ struct PlaylistPlayerView: View {
     @Environment(AppRootManager.self) private var appRootManager
     //    @Environment(\.modelContext) private var modelContext
     
-    @State private var videoPlayer: AVPlayer?
+    //    @State private var videoPlayer: AVPlayer?
     @State private var controller: MediaPlayerController?
     
     @State var playableItems: Queue<PlayableItem> = Queue<PlayableItem>()
@@ -36,43 +36,42 @@ struct PlaylistPlayerView: View {
             throw error
         }
         
-        controller = MediaPlayerController(
-            playableItem: playableItem,
-            sequencer: sequencer
-        )
+        controller = MediaPlayerController()
+        // TODO: handle error
+        try? controller?.load(playableItem)
         
-        let playerItem = controller?.createPlayerItem()
+        //        let playerItem = controller?.createPlayerItem()
         
-        if let videoPlayer {
-            videoPlayer.replaceCurrentItem(with: playerItem)
-        } else {
-            let player = AVPlayer(playerItem: playerItem)
-            videoPlayer = player
-        }
+        //        if let videoPlayer {
+        //            videoPlayer.replaceCurrentItem(with: playerItem)
+        //        } else {
+        //            let player = AVPlayer(playerItem: playerItem)
+        //            videoPlayer = player
+        //        }
         
-        controller?.attachVideoPlayer(videoPlayer!)
+        //        controller?.attachVideoPlayer(videoPlayer!)
     }
-
+    
     var body: some View {
         VStack {
             Group {
-                if let player = videoPlayer, let playableItem {
+                if let playableItem, let controller {
                     VStack {
                         Text(playableItem.title)
                             .font(.title)
-                        Text(controller?.displayRate ?? "?")
-//                        Slider(
-//                            value: playRateBinding,
-//                            in: 0...2,
-//                            step: 0.01) {
-//                                Text("Rate")
-//                            } minimumValueLabel: {
-//                                Text("0%")
-//                            } maximumValueLabel: {
-//                                Text("200%")
-//                            }
+                        Text(controller.displayRate)
+                        //                        Slider(
+                        //                            value: playRateBinding,
+                        //                            in: 0...2,
+                        //                            step: 0.01) {
+                        //                                Text("Rate")
+                        //                            } minimumValueLabel: {
+                        //                                Text("0%")
+                        //                            } maximumValueLabel: {
+                        //                                Text("200%")
+                        //                            }
                         
-                        VideoPlayerView(player: player)
+                        VideoPlayerView(player: controller.player)
                     }
                 } else {
                     Text("Unable to load media")
@@ -161,26 +160,20 @@ struct PlaylistPlayerView: View {
             playback: playback ?? clip.playback)
         return queuedPlaylistItem
     }
-
+    
     func nextItem() {
-        playableItem = playableItems.dequeue()
+        guard let playableItem = playableItems.dequeue() else { exit() }
+        try? controller?.load(playableItem)
+        controller?.start {
+            nextItem()
+        }
         
-        if playableItem == nil {
-            exit()
-        } else {
-            try? preparePlayback()
-            controller?.start {
-                nextItem()
-            }
+        func exit() {
+            controller?.stop()
+            appRootManager.currentRoot = .home
         }
     }
     
-    func exit() {
-        controller?.stop()
-        appRootManager.currentRoot = .home
-    }
-}
-
-//#Preview {
-//    PlaylistPlayerView()
-//}
+    //#Preview {
+    //    PlaylistPlayerView()
+    //}

@@ -37,21 +37,9 @@ struct SinglePlayerView: View {
         }
         let playableItem = PlayableItem(url: url, title: title, start: clipStart, end: clipEnd, bpm: media.bpm, playback: playback)
         
-        controller = MediaPlayerController(
-            playableItem: playableItem,
-            sequencer: sequencer
-        )
-        
-        let item = controller?.createPlayerItem()
-        
-        if let videoPlayer {
-            videoPlayer.replaceCurrentItem(with: item)
-        } else {
-            let player = AVPlayer(playerItem: item)
-            videoPlayer = player
-        }
-        
-        controller?.attachVideoPlayer(videoPlayer!)
+        controller = MediaPlayerController()
+        // TODO: handle error
+        try? controller?.load(playableItem)
     }
     
     var body: some View {
@@ -212,40 +200,43 @@ struct SinglePlayerView: View {
     }
     
     private func switchToSource() {
-        controller?.stop()
         appRootManager.selectedClip = nil
-        media = source?.media
-        playback = source?.playback
-        clipStart = nil
-        clipEnd = nil
+        if let media = source?.media,
+           let playback = source?.playback,
+           let url = resolvedURL {
+            let playableItem = PlayableItem(url: url, title: title, start: nil, end: nil, bpm: media.bpm, playback: playback)
+            do {
+                try controller?.load(playableItem)
+                controller?.start {
+                    exit()
+                }
+            } catch {
+                Logger.ui.error("Failed to load playableItem: \(error.localizedDescription)")
+            }
+        }
+
         do {
             try preparePlayback()
         } catch {
             // TODO: notify user
-        }
-
-        controller?.start() {
-            exit()
+            Logger.ui.error("Failed to load playableItem: \(error.localizedDescription)")
         }
     }
     
     private func switchToClip(_ clip: Clip) {
-        Logger.ui.info("SinglePlayerView - switchToClip")
-        controller?.stop()
         appRootManager.selectedClip = clip
-        media = clip.media
-        playback = clip.playback
-        clipStart = clip.startSeconds
-        clipEnd = clip.endSeconds
         
-        do {
-            try preparePlayback()
-        } catch {
-            // TODO: notify user
-        }
-
-        controller?.start() {
-            exit()
+        if let url = resolvedURL {
+            let playableItem = PlayableItem(url: url, title: title, start: clip.startSeconds, end: clip.endSeconds, bpm: clip.media.bpm, playback: clip.playback)
+            do {
+                try controller?.load(playableItem)
+                controller?.start {
+                    exit()
+                }
+            } catch {
+                // TODO: notify user
+                Logger.ui.error("Failed to load playableItem: \(error.localizedDescription)")
+            }
         }
     }
 
