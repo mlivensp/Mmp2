@@ -6,10 +6,6 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXBuildFile section */
-		DDA691EF309702B000F4E268 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = DDA691EE309702B000F4E268 /* README.md */; };
-/* End PBXBuildFile section */
-
 /* Begin PBXContainerItemProxy section */
 		DD54A7DE3057467700281B19 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -31,7 +27,6 @@
 		DD54A7CE3057467600281B19 /* Mmp2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mmp2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD54A7DD3057467700281B19 /* Mmp2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Mmp2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD54A7E73057467700281B19 /* Mmp2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Mmp2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		DDA691EE309702B000F4E268 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -91,7 +86,6 @@
 			children = (
 				DD54A7D03057467600281B19 /* Mmp2 */,
 				DD54A7E03057467700281B19 /* Mmp2Tests */,
-				DDA691EE309702B000F4E268 /* README.md */,
 				DD54A7CF3057467600281B19 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -223,7 +217,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DDA691EF309702B000F4E268 /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
