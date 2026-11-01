@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct QueuedPlaylistItem {
+struct PlayableItem {
     let url: URL
     let title: String
     let start: TimeInterval?

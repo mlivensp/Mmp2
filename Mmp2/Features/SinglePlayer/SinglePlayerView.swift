@@ -19,7 +19,7 @@ struct SinglePlayerView: View {
     @State private var clipEnd: Double?
     @State private var videoPlayer: AVPlayer?
     @State private var resolvedURL: URL?
-    @State private var controller: SinglePlayerController?
+    @State private var controller: MediaPlayerController?
     @State private var source: Source?
     @State private var isAddingClip: Bool = false
     
@@ -35,14 +35,14 @@ struct SinglePlayerView: View {
         } catch {
             throw error
         }
+        let playableItem = PlayableItem(url: url, title: title, start: clipStart, end: clipEnd, bpm: media.bpm, playback: playback)
         
-        controller = SinglePlayerController(
-            bpm: media.bpm,
-            clipStartSeconds: clipStart,
+        controller = MediaPlayerController(
+            playableItem: playableItem,
             sequencer: sequencer
         )
         
-        let item = controller?.createPlayerItem(url: url, endAt: clipEnd)
+        let item = controller?.createPlayerItem()
         
         if let videoPlayer {
             videoPlayer.replaceCurrentItem(with: item)

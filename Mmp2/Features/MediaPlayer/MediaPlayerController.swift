@@ -1,39 +1,33 @@
 import Foundation
 import AVFoundation
-import AVKit
-import OSLog
 
 @MainActor @Observable
-final class SinglePlayerController: NSObject {
+final class MediaPlayerController: NSObject {
     private var videoPlayer: AVPlayer?
     
-    private var bpm: Int?
+    private var playableItem: PlayableItem
     private var sequencer: PlayRateSequencer
-    private let clipStartSeconds: Double?
     
     private var playbackTask: Task<Void, Never>?
     
     init(
-        bpm: Int?,
-        clipStartSeconds: Double? = nil,
-        sequencer: PlayRateSequencer)
-    {
-        self.bpm = bpm
-        self.clipStartSeconds = clipStartSeconds
-        self.sequencer = sequencer
+        playableItem: PlayableItem,
+        sequencer: PlayRateSequencer) {
+            self.playableItem = playableItem
+            self.sequencer = sequencer
     }
     
-    func createPlayerItem(url: URL, endAt: Double?) -> AVPlayerItem {
-        let item = AVPlayerItem(url: url)
+    func createPlayerItem() -> AVPlayerItem {
+        let playerItem = AVPlayerItem(url: playableItem.url)
 
-        if let endAt {
-            item.forwardPlaybackEndTime =
+        if let endAt = playableItem.end {
+            playerItem.forwardPlaybackEndTime =
                 CMTime(seconds: endAt, preferredTimescale: 600)
         }
 
-        return item
+        return playerItem
     }
-    
+
     func attachVideoPlayer(_ player: AVPlayer) {
         self.videoPlayer = player
     }
@@ -41,8 +35,8 @@ final class SinglePlayerController: NSObject {
     var playRate: Float {
         get { return sequencer.currentRate }
         set {
-            print("Setting new playRate value. newValue: \(newValue) bpm: \(bpm ?? -1)")
-            sequencer = SequencerFactory.createConstantPlayRateSequencer(rate: newValue, bpm: bpm)
+            print("Setting new playRate value. newValue: \(newValue) bpm: \(playableItem.bpm ?? -1)")
+            sequencer = SequencerFactory.createConstantPlayRateSequencer(rate: newValue, bpm: playableItem.bpm)
             videoPlayer?.rate = sequencer.currentRate
             videoPlayer?.defaultRate = sequencer.currentRate
         }
@@ -54,15 +48,16 @@ final class SinglePlayerController: NSObject {
     
     var position: String {
         guard let videoPlayer else { return "0:00" }
-        let t = CMTimeGetSeconds(videoPlayer.currentTime())
+        let currentTime = videoPlayer.currentTime()
+        let t = CMTimeGetSeconds(currentTime)
         if !t.isNaN {
-            return formatCMTime(videoPlayer.currentTime())
+            return MediaPlayerController.formatCMTime(currentTime)
         }
 
         return "0:00"
     }
     
-    func formatCMTime(_ time: CMTime) -> String {
+    static func formatCMTime(_ time: CMTime) -> String {
         let seconds = CMTimeGetSeconds(time)
         guard !seconds.isNaN else { return "--:--" }
 
@@ -92,7 +87,7 @@ final class SinglePlayerController: NSObject {
     
     private func runPlaybackLoop(continuation: () -> Void) async {
         if let videoPlayer {
-            await playVideoLoop(videoPlayer, startAt: clipStartSeconds)
+            await playVideoLoop(videoPlayer, startAt: playableItem.start)
             continuation()
         }
     }

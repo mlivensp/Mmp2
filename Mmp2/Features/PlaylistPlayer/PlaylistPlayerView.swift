@@ -15,29 +15,29 @@ struct PlaylistPlayerView: View {
     //    @Environment(\.modelContext) private var modelContext
     
     @State private var videoPlayer: AVPlayer?
-    @State private var controller: PlaylistPlayerController?
+    @State private var controller: MediaPlayerController?
     
-    @State var playlistItemsQueue: Queue<QueuedPlaylistItem> = Queue<QueuedPlaylistItem>()
-    @State var queuedPlaylistItem: QueuedPlaylistItem?
+    @State var playableItems: Queue<PlayableItem> = Queue<PlayableItem>()
+    @State var playableItem: PlayableItem?
     @State var index = 0
     
     private func preparePlayback() throws {
-        guard let queuedPlaylistItem else { return }
+        guard let playableItem else { return }
         
         let sequencer: PlayRateSequencer
         
         do {
             sequencer = try SequencerFactory.createSequencer(
-                from: queuedPlaylistItem.playback,
-                bpm: queuedPlaylistItem.bpm,
+                from: playableItem.playback,
+                bpm: playableItem.bpm,
                 forPlaylist: true
             )
         } catch {
             throw error
         }
         
-        controller = PlaylistPlayerController(
-            item: queuedPlaylistItem,
+        controller = MediaPlayerController(
+            playableItem: playableItem,
             sequencer: sequencer
         )
         
@@ -56,9 +56,9 @@ struct PlaylistPlayerView: View {
     var body: some View {
         VStack {
             Group {
-                if let player = videoPlayer, let queuedPlaylistItem {
+                if let player = videoPlayer, let playableItem {
                     VStack {
-                        Text(queuedPlaylistItem.title)
+                        Text(playableItem.title)
                             .font(.title)
                         Text(controller?.displayRate ?? "?")
 //                        Slider(
@@ -82,8 +82,8 @@ struct PlaylistPlayerView: View {
         }
         .onAppear {
             let queueableItems = queuePlaylistItems()
-            _ = queueableItems.map { playlistItemsQueue.enqueue($0) }
-            queuedPlaylistItem = playlistItemsQueue.dequeue()
+            _ = queueableItems.map { playableItems.enqueue($0) }
+            playableItem = playableItems.dequeue()
             try? preparePlayback()
             controller?.start {
                 nextItem()
@@ -102,7 +102,7 @@ struct PlaylistPlayerView: View {
         }
     }
     
-    private func queuePlaylistItems() -> [QueuedPlaylistItem] {
+    private func queuePlaylistItems() -> [PlayableItem] {
         let playlistItems = (appRootManager.selectedPlaylist?.playlistItems ?? [])
             .sorted(by: { $0.sequence < $1.sequence })
         let queuedItems = playlistItems.compactMap {
@@ -111,7 +111,7 @@ struct PlaylistPlayerView: View {
         return queuedItems
     }
     
-    private func queuePlaylistItem(_ playlistItem: PlaylistItem) -> QueuedPlaylistItem? {
+    private func queuePlaylistItem(_ playlistItem: PlaylistItem) -> PlayableItem? {
         if let source = playlistItem.source {
             return queueSourcePlaylistItem(source: source, playback: playlistItem.playback)
         } else if let clip = playlistItem.clip {
@@ -122,7 +122,7 @@ struct PlaylistPlayerView: View {
         }
     }
     
-    private func queueSourcePlaylistItem(source: Source, playback: Playback?) -> QueuedPlaylistItem? {
+    private func queueSourcePlaylistItem(source: Source, playback: Playback?) -> PlayableItem? {
         // TODO: log a message explaining nil return
         guard let url = try? source.media.resolveURL() else { return nil }
         
@@ -131,7 +131,7 @@ struct PlaylistPlayerView: View {
         names.append(source.primitiveName)
         let title = String(names.joined(separator: " • "))
         
-        let queuedPlaylistItem = QueuedPlaylistItem(
+        let queuedPlaylistItem = PlayableItem(
             url: url,
             title: title,
             start: nil,
@@ -141,7 +141,7 @@ struct PlaylistPlayerView: View {
         return queuedPlaylistItem
     }
     
-    private func queueClipPlaylistItem(clip: Clip, playback: Playback?) -> QueuedPlaylistItem? {
+    private func queueClipPlaylistItem(clip: Clip, playback: Playback?) -> PlayableItem? {
         // TODO: log a message explaining nil return
         guard let source = clip.source else { return nil }
         guard let url = try? source.media.resolveURL() else { return nil }
@@ -152,7 +152,7 @@ struct PlaylistPlayerView: View {
         names.append(clip.primitiveName)
         
         let title = String(names.joined(separator: " • "))
-        let queuedPlaylistItem = QueuedPlaylistItem(
+        let queuedPlaylistItem = PlayableItem(
             url: url,
             title: title,
             start: clip.startSeconds,
@@ -163,9 +163,9 @@ struct PlaylistPlayerView: View {
     }
 
     func nextItem() {
-        queuedPlaylistItem = playlistItemsQueue.dequeue()
+        playableItem = playableItems.dequeue()
         
-        if queuedPlaylistItem == nil {
+        if playableItem == nil {
             exit()
         } else {
             try? preparePlayback()
