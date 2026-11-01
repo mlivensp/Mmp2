@@ -162,18 +162,22 @@ struct PlaylistPlayerView: View {
     }
     
     func nextItem() {
-        guard let playableItem = playableItems.dequeue() else { exit() }
+        guard let playableItem = playableItems.dequeue() else {
+            exit()
+            return
+        }
+        
         try? controller?.load(playableItem)
         controller?.start {
             nextItem()
         }
-        
-        func exit() {
-            controller?.stop()
-            appRootManager.currentRoot = .home
-        }
     }
     
+    func exit() {
+        controller?.stop()
+        appRootManager.currentRoot = .home
+    }
+}
     //#Preview {
     //    PlaylistPlayerView()
     //}
