@@ -110,14 +110,9 @@ final class MediaPlayerController: NSObject {
                 return
             }
             
+            
+            await seekPlayer(player, to: startTime ?? .zero)
             if Task.isCancelled { return }
-            
-            if let startTime {
-                await seekPlayer(player, to: startTime)
-            } else {
-                await seekPlayer(player, to: .zero)
-            }
-            
             player.defaultRate = Float(rate)
             player.rate = Float(rate)
             
@@ -128,7 +123,7 @@ final class MediaPlayerController: NSObject {
         }
     }
     
-    func seekPlayer(_ player: AVPlayer, to time: CMTime) async {
+    private func seekPlayer(_ player: AVPlayer, to time: CMTime) async {
         await withCheckedContinuation { continuation in
             player.seek(to: time) { _ in
                 continuation.resume()

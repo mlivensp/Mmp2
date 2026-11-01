@@ -13,26 +13,22 @@ import OSLog
 struct SinglePlayerView: View {
     @Environment(AppRootManager.self) private var appRootManager
     
-    @State private var media: Media?
-    @State private var playback: Playback?
-    @State private var clipStart: Double?
-    @State private var clipEnd: Double?
     @State private var resolvedURL: URL?
     @State private var controller: MediaPlayerController = MediaPlayerController()
     @State private var source: Source?
     @State private var isAddingClip: Bool = false
+    @State private var appeared = false
     
-    private func preparePlayback() throws {
-        guard let url = resolvedURL else { return }
-        guard let media else { return }
-        guard let playback else { return }
-        
-        let playableItem = PlayableItem(url: url, title: title, start: clipStart, end: clipEnd, bpm: media.bpm, playback: playback)
-        
-        controller = MediaPlayerController()
-        // TODO: handle error
-        try? controller.load(playableItem)
-    }
+//    private func preparePlayback() throws {
+//        guard let url = resolvedURL else { return }
+//        guard let media else { return }
+//        guard let playback else { return }
+//        
+//        let playableItem = PlayableItem(url: url, title: title, start: clipStart, end: clipEnd, bpm: media.bpm, playback: playback)
+//        
+//        // TODO: handle error
+//        try controller.load(playableItem)
+//    }
     
     var body: some View {
         HStack {
@@ -74,7 +70,7 @@ struct SinglePlayerView: View {
             Group {
                 if controller.playableItem != nil {
                     VStack {
-                        Text(title)
+                        Text(controller.playableItem?.title ?? "?")
                             .font(.title)
                         Text(controller.displayRate)
                         Slider(
@@ -94,12 +90,11 @@ struct SinglePlayerView: View {
             }
         }
         .onAppear {
+            guard !appeared else { return }
+            appeared = true
             try? selectMedia()
             try? resolveURL()
-            try? preparePlayback()
-            controller.start() {
-                exit()
-            }
+            play(makeItem(clip: appRootManager.selectedClip))
         }
         .onDisappear {
             controller.stop()
@@ -169,116 +164,51 @@ struct SinglePlayerView: View {
                 appRootManager.currentRoot = .clipEdit
             }, label: {
                 Text("Add Clip")
-            })        }
-    }
-    
-    var title: String {
-        var names: [String] = []
-        if let clip = appRootManager.selectedClip {
-            names.append(clip.source?.mediaCollection?.primitiveName ?? "?")
-            names.append(clip.source?.primitiveName ?? "?")
-            names.append(clip.primitiveName)
-        } else if let source = appRootManager.selectedSource {
-            names.append(source.mediaCollection?.primitiveName ?? "?")
-            names.append(source.primitiveName)
-        } else {
-            names.append("?")
+            })
         }
-        
-        return String(names.joined(separator: " • "))
     }
     
+    private func makeItem(clip: Clip?) -> PlayableItem? {
+        guard let source, let url = resolvedURL else { return nil }
+        if let clip { return PlayableItem(clip: clip, url: url) }
+        return PlayableItem(source: source, url: url)
+    }
+
+    private func play(_ item: PlayableItem?) {
+        guard let item else { return }
+        do {
+            try controller.load(item)
+            controller.start { exit() }
+        } catch {
+            Logger.ui.error("Failed to load playableItem: \(error.localizedDescription)")
+        }
+    }
+
     private func switchToSource() {
         appRootManager.selectedClip = nil
-        if let media = source?.media,
-           let playback = source?.playback,
-           let url = resolvedURL {
-            let playableItem = PlayableItem(url: url, title: title, start: nil, end: nil, bpm: media.bpm, playback: playback)
-            do {
-                try controller.load(playableItem)
-                controller.start {
-                    exit()
-                }
-            } catch {
-                Logger.ui.error("Failed to load playableItem: \(error.localizedDescription)")
-            }
-        }
+        play(makeItem(clip: nil))
     }
-    
+
     private func switchToClip(_ clip: Clip) {
         appRootManager.selectedClip = clip
-        
-        if let url = resolvedURL {
-            let playableItem = PlayableItem(url: url, title: title, start: clip.startSeconds, end: clip.endSeconds, bpm: clip.media.bpm, playback: clip.playback)
-            do {
-                try controller.load(playableItem)
-                controller.start {
-                    exit()
-                }
-            } catch {
-                // TODO: notify user
-                Logger.ui.error("Failed to load playableItem: \(error.localizedDescription)")
-            }
-        }
+        play(makeItem(clip: clip))
     }
 
     private func selectMedia() throws {
         if let clip = appRootManager.selectedClip {
-            Logger.ui.info("SinglePlayerView.selectMedia - clip selected")
             self.source = clip.source
-            media = clip.source?.media
-            playback = clip.playback
-            clipStart = clip.startSeconds
-            clipEnd = clip.endSeconds
+        } else if let source = appRootManager.selectedSource {
+            self.source = source
         } else {
-            if let source = appRootManager.selectedSource {
-                Logger.ui.info("SinglePlayerView.selectMedia - source selected")
-                self.source = source
-                media = source.media
-                playback = source.playback
-            } else {
-                throw AppError.noMedia
-            }
+            throw AppError.noMedia
         }
     }
     
     private func resolveURL() throws {
-        guard let media else { throw AppError.noMedia }
+        guard let media = source?.media else { throw AppError.noMedia }
         guard let url = try media.resolveURL() else { return }
         resolvedURL = url
     }
-//        guard let bookmark = media.bookmark else { return }
-//        
-//        var isStale = false
-//        
-//        do {
-//            let url = try URL(
-//                resolvingBookmarkData: bookmark,
-//                options: [.withoutUI, .withSecurityScope],
-//                relativeTo: nil,
-//                bookmarkDataIsStale: &isStale
-//            )
-//            
-//            if isStale {
-//                print("⚠️ Stale bookmark for media")
-//                // TODO: trigger re-bookmark flow
-//                return
-//            }
-//            
-//            let ok = url.startAccessingSecurityScopedResource()
-//            print("startAccessingSecurityScopedResource = \(ok) for \(url.path)")
-//            
-//            guard ok else {
-//                print("❌ Failed to start security-scoped access for \(url.path)")
-//                return
-//            }
-//            
-//            resolvedURL = url
-//            print("✅ resolvedURL - \(url.absoluteString)")
-//        } catch {
-//            print("❌ resolveURL error: \(error)")
-//        }
-//    }
 }
 
 //#Preview {

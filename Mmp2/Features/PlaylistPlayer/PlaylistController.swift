@@ -30,25 +30,37 @@ final class PlaylistController {
     /// Calls onFinished when the last item of the last pass completes.
     func start(onFinished: @escaping () -> Void) {
         isStopped = false
+        accessReleased = false
         pass = 0
         index = 0
         loadedInPass = false
         playCurrent(onFinished: onFinished)
     }
 
+    private var accessReleased = false
     func stop() {
         isStopped = true
         player.stop()
+        releaseSecurityScopedAccess()
+    }
+    
+    private func releaseSecurityScopedAccess() {
+        guard !accessReleased else { return }
+        accessReleased = true
+        
+        for item in items {
+            item.url.stopAccessingSecurityScopedResource()
+        }
     }
 
     private func playCurrent(onFinished: @escaping () -> Void) {
         guard !isStopped else { return }
         guard index < items.count else { return onFinished() }
         let item = items[index]
-        current = item
         do {
             try player.load(item, forPlaylist: true)
             loadedInPass = true
+            current = item
         } catch {
             Logger.ui.error("Skipping item: \(error.localizedDescription)")
             return advance(onFinished: onFinished)
