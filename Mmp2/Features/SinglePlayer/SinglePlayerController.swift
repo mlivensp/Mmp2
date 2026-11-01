@@ -73,12 +73,12 @@ final class SinglePlayerController: NSObject {
         return formatter.string(from: seconds) ?? "--:--"
     }
 
-    func start() {
+    func start(continuation: @escaping () -> Void) {
         stop()
         sequencer.reset()
         
         playbackTask = Task {
-            await runPlaybackLoop()
+            await runPlaybackLoop(continuation: continuation)
         }
     }
     
@@ -90,9 +90,10 @@ final class SinglePlayerController: NSObject {
     
     // MARK: - Async Playback Loop
     
-    private func runPlaybackLoop() async {
+    private func runPlaybackLoop(continuation: () -> Void) async {
         if let videoPlayer {
             await playVideoLoop(videoPlayer, startAt: clipStartSeconds)
+            continuation()
         }
     }
     

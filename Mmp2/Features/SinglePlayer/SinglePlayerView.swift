@@ -120,7 +120,9 @@ struct SinglePlayerView: View {
             try? selectMedia()
             try? resolveURL()
             try? preparePlayback()
-            controller?.start()
+            controller?.start() {
+                exit()
+            }
         }
         .onDisappear {
             controller?.stop()
@@ -133,7 +135,7 @@ struct SinglePlayerView: View {
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button {
-                    appRootManager.currentRoot = .home
+                    exit()
                 } label: {
                     HStack {
                         Image(systemName: "chevron.left")
@@ -141,6 +143,10 @@ struct SinglePlayerView: View {
                 }
             }
         }
+    }
+    
+    func exit() {
+        appRootManager.currentRoot = .home
     }
     
     var playRateBinding: Binding<Float> {
@@ -217,25 +223,10 @@ struct SinglePlayerView: View {
         } catch {
             // TODO: notify user
         }
-//        guard let media else { return }
-//        guard let player = videoPlayer else { return }
-//        guard let playback = source?.playback else { return }
-//        let sequencer: PlayRateSequencer
-//        
-//        do {
-//            sequencer = try SequencerFactory.createSequencer(from: playback, bpm: media.bpm)
-//        } catch {
-//            return
-//        }
-//        
-//        controller = SinglePlayerController(
-//            bpm: media.bpm,
-//            clipStartSeconds: nil,
-//            sequencer: sequencer
-//        )
-//        
-//        controller?.attachVideoPlayer(player)
-        controller?.start()
+
+        controller?.start() {
+            exit()
+        }
     }
     
     private func switchToClip(_ clip: Clip) {
@@ -252,24 +243,10 @@ struct SinglePlayerView: View {
         } catch {
             // TODO: notify user
         }
-//        guard let media else { return }
-//        guard let player = videoPlayer else { return }
-//        let sequencer: PlayRateSequencer
-//        
-//        do {
-//            sequencer = try SequencerFactory.createSequencer(from: clip.playback, bpm: media.bpm)
-//        } catch {
-//            return
-//        }
-//        
-//        controller = SinglePlayerController(
-//            bpm: media.bpm,
-//            clipStartSeconds: clip.startSeconds,
-//             sequencer: sequencer
-//        )
-//        
-//        controller?.attachVideoPlayer(player)
-        controller?.start()
+
+        controller?.start() {
+            exit()
+        }
     }
 
     private func selectMedia() throws {
@@ -294,38 +271,41 @@ struct SinglePlayerView: View {
     
     private func resolveURL() throws {
         guard let media else { throw AppError.noMedia }
-        guard let bookmark = media.bookmark else { return }
-        
-        var isStale = false
-        
-        do {
-            let url = try URL(
-                resolvingBookmarkData: bookmark,
-                options: [.withoutUI, .withSecurityScope],
-                relativeTo: nil,
-                bookmarkDataIsStale: &isStale
-            )
-            
-            if isStale {
-                print("⚠️ Stale bookmark for media")
-                // TODO: trigger re-bookmark flow
-                return
-            }
-            
-            let ok = url.startAccessingSecurityScopedResource()
-            print("startAccessingSecurityScopedResource = \(ok) for \(url.path)")
-            
-            guard ok else {
-                print("❌ Failed to start security-scoped access for \(url.path)")
-                return
-            }
-            
-            resolvedURL = url
-            print("✅ resolvedURL - \(url.absoluteString)")
-        } catch {
-            print("❌ resolveURL error: \(error)")
-        }
+        guard let url = try media.resolveURL() else { return }
+        resolvedURL = url
     }
+//        guard let bookmark = media.bookmark else { return }
+//        
+//        var isStale = false
+//        
+//        do {
+//            let url = try URL(
+//                resolvingBookmarkData: bookmark,
+//                options: [.withoutUI, .withSecurityScope],
+//                relativeTo: nil,
+//                bookmarkDataIsStale: &isStale
+//            )
+//            
+//            if isStale {
+//                print("⚠️ Stale bookmark for media")
+//                // TODO: trigger re-bookmark flow
+//                return
+//            }
+//            
+//            let ok = url.startAccessingSecurityScopedResource()
+//            print("startAccessingSecurityScopedResource = \(ok) for \(url.path)")
+//            
+//            guard ok else {
+//                print("❌ Failed to start security-scoped access for \(url.path)")
+//                return
+//            }
+//            
+//            resolvedURL = url
+//            print("✅ resolvedURL - \(url.absoluteString)")
+//        } catch {
+//            print("❌ resolveURL error: \(error)")
+//        }
+//    }
 }
 
 //#Preview {

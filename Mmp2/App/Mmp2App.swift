@@ -41,8 +41,8 @@ struct Mmp2App: App {
                         SplashView() // fallback, shouldn't normally happen
                     }
                 case .playlistPlayer:
-                    if let playlist = appRootManager.selectedPlaylist {
-                        PlaylistPlayerView(playlist: playlist)
+                    if appRootManager.selectedPlaylist != nil {
+                        PlaylistPlayerView()
                     }
                 case .playlistEditor:
                     SplashView()
