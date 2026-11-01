@@ -21,9 +21,9 @@ struct PlaybackEditView: View {
         
         switch vm.mode {
         case .constant:
-            PlaybackConstantView(vm: vm.constantVM)
+            PlaybackConstantView(vm: vm.constantVM, isBPM: vm.bpm != nil)
         case .stepwise:
-            PlaybackStepwiseView(vm: vm.stepwiseVM)
+            PlaybackStepwiseView(vm: vm.stepwiseVM, isBPM: vm.bpm != nil)
         case .bounce:
             PlaybackBounceView(vm: vm.bounceVM)
         }

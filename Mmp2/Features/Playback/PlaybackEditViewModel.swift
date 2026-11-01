@@ -10,7 +10,19 @@ import SwiftData
 
 @Observable
 final class PlaybackEditViewModel {
-    var bpm: Int?
+    var bpm: Int? {
+        didSet {
+            guard oldValue != bpm else { return }
+            let previousBpm = oldValue ?? 100
+            let currentBpm = bpm ?? 100
+            guard previousBpm > 0, currentBpm > 0 else { return }
+
+            let factor = Double(currentBpm) / Double(previousBpm)
+            constantVM.scaleRate(by: factor)
+            stepwiseVM.scaleRates(by: factor)
+            bounceVM.scaleTempos(by: factor)
+        }
+    }
     var context: ModelContext
     
     var mode: PlaybackMode
@@ -48,7 +60,7 @@ final class PlaybackEditViewModel {
             self.bounceVM = PlaybackBounceViewModel.default()
         }
     }
-        
+
     func apply(to playback: Playback, context: ModelContext) throws {
         // 1. Switch mode (handles deletion + creation)
         playback.switchMode(to: mode, context: context)
@@ -63,4 +75,11 @@ final class PlaybackEditViewModel {
             try bounceVM.apply(to: playback.playbackBounce!)
         }
     }
+}
+
+func scaledPlaybackValue(_ value: Double) -> Int {
+    let scaledValue = value.rounded()
+    guard scaledValue.isFinite else { return value }
+    if scaledValue >= Double(Int.max) { return Int.max }
+    return max(1, Int(scaledValue))
 }

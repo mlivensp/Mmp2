@@ -9,10 +9,11 @@ import SwiftUI
 
 struct PlaybackStepwiseView: View {
     @Bindable var vm: PlaybackStepwiseViewModel
+    var isBPM: Bool
     
     var body: some View {
         Group {
-            Section("Start") {
+            Section(isBPM ? "Starting BPM" : "Starting % of Speed") {
                 ErrorFieldContainer(
                     hasError: vm.startError != nil,
                     errorMessage: vm.startError

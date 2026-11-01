@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PlaybackConstantView: View {
     @Bindable var vm: PlaybackConstantViewModel
+    var isBPM: Bool
     
     var body: some View {
         Group {
@@ -17,7 +18,7 @@ struct PlaybackConstantView: View {
                 errorMessage: vm.rateError
             ) {
                 HStack {
-                    Text("Rate")
+                    Text(isBPM ? "BPM" : "% of Speed")
                     TextField("", text: $vm.rateString)
                         .frame(width: numericFieldWidth)
                         .multilineTextAlignment(.trailing)

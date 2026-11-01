@@ -223,10 +223,10 @@ struct SourceEditViewModelTests {
         #expect(vm.bpmError == nil)
     }
 
-    @Test("bpm rejects non-numeric string")
-    func bpmRejectsInvalidString() throws {
+    @Test("bpm rejects invalid values", arguments: ["abc", "0", "-1"])
+    func bpmRejectsInvalidString(input: String) throws {
         let vm = try makeViewModel()
-        vm.bpmString = "abc"
+        vm.bpmString = input
 
         #expect(vm.bpmError == "BPM must be a valid whole number.")
         #expect(!vm.isValid)

@@ -12,10 +12,13 @@ import SwiftData
 @Observable
 final class PlaybackBounceViewModel {
     internal var slowTempo: Int
+    private var preciseSlowTempo: Double
     internal var slowTempoTimesToPlay: Int
     internal var midTempo: Int
+    private var preciseMidTempo: Double
     internal var midTempoTimesToPlay: Int
     internal var fastTempo: Int
+    private var preciseFastTempo: Double
     internal var fastTempoTimesToPlay: Int
     internal var numberOfBounces: Int
     
@@ -43,10 +46,13 @@ final class PlaybackBounceViewModel {
     
     init(slowTempo: Int, slowTempoTimesToPlay: Int, midTempo: Int, midTempoTimesToPlay: Int, fastTempo: Int, fastTempoTimesToPlay: Int, numberOfBounces: Int, playOrder: PlayOrder? = nil) {
         self.slowTempo = slowTempo
+        self.preciseSlowTempo = Double(slowTempo)
         self.slowTempoTimesToPlay = slowTempoTimesToPlay
         self.midTempo = midTempo
+        self.preciseMidTempo = Double(midTempo)
         self.midTempoTimesToPlay = midTempoTimesToPlay
         self.fastTempo = fastTempo
+        self.preciseFastTempo = Double(fastTempo)
         self.fastTempoTimesToPlay = fastTempoTimesToPlay
         self.numberOfBounces = numberOfBounces
         self.storedPlayOrder = playOrder
@@ -61,6 +67,25 @@ final class PlaybackBounceViewModel {
         
         validate()
     }
+
+    func scaleTempos(by factor: Double) {
+        if case .success = validateTempo(storedSlowTempoString, fieldName: "Slow Tempo") {
+            preciseSlowTempo *= factor
+            slowTempo = scaledPlaybackValue(preciseSlowTempo)
+            storedSlowTempoString = String(slowTempo)
+        }
+        if case .success = validateTempo(storedMidTempoString, fieldName: "Mid Tempo") {
+            preciseMidTempo *= factor
+            midTempo = scaledPlaybackValue(preciseMidTempo)
+            storedMidTempoString = String(midTempo)
+        }
+        if case .success = validateTempo(storedFastTempoString, fieldName: "Fast Tempo") {
+            preciseFastTempo *= factor
+            fastTempo = scaledPlaybackValue(preciseFastTempo)
+            storedFastTempoString = String(fastTempo)
+        }
+        validate()
+    }
     
     var slowTempoString: String {
         get { storedSlowTempoString }
@@ -68,6 +93,9 @@ final class PlaybackBounceViewModel {
             storedSlowTempoString = newValue
             let result = validateTempo(storedSlowTempoString, fieldName: "Slow Tempo")
             applySlowTempoValidationResult(result)
+            if case .success(let value) = result {
+                preciseSlowTempo = Double(value)
+            }
             validateRelationships()
         }
     }
@@ -88,6 +116,9 @@ final class PlaybackBounceViewModel {
             storedMidTempoString = newValue
             let result = validateTempo(storedMidTempoString, fieldName: "Mid Tempo")
             applyMidTempoValidationResult(result)
+            if case .success(let value) = result {
+                preciseMidTempo = Double(value)
+            }
             validateRelationships()
         }
     }
@@ -108,6 +139,9 @@ final class PlaybackBounceViewModel {
             storedFastTempoString = newValue
             let result = validateTempo(storedFastTempoString, fieldName: "Fast Tempo")
             applyFastTempoValidationResult(result)
+            if case .success(let value) = result {
+                preciseFastTempo = Double(value)
+            }
             validateRelationships()
         }
     }

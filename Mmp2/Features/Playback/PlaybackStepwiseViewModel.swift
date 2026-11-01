@@ -10,8 +10,10 @@ import Foundation
 @Observable
 final class PlaybackStepwiseViewModel {
     var start: Int
+    private var preciseStart: Double
     var step: Int
     var max: Int
+    private var preciseMax: Double
     var timesToPlay: Int
     
     var storedStartString: String
@@ -30,8 +32,10 @@ final class PlaybackStepwiseViewModel {
 
     init(start: Int, step: Int, max: Int, timesToPlay: Int) {
         self.start = start
+        self.preciseStart = Double(start)
         self.step = step
         self.max = max
+        self.preciseMax = Double(max)
         self.timesToPlay = timesToPlay
         
         storedStartString = String(start)
@@ -41,12 +45,30 @@ final class PlaybackStepwiseViewModel {
         
         validate()
     }
+
+    func scaleRates(by factor: Double) {
+        if case .success = validateStart(storedStartString) {
+            preciseStart *= factor
+            start = scaledPlaybackValue(preciseStart)
+            storedStartString = String(start)
+        }
+        if case .success = validateMax(storedMaxString) {
+            preciseMax *= factor
+            max = scaledPlaybackValue(preciseMax)
+            storedMaxString = String(max)
+        }
+        validate()
+    }
     
     var startString: String {
         get { storedStartString }
         set {
             storedStartString = newValue
-            applyStartValidationResult(validateStart(storedStartString))
+            let result = validateStart(storedStartString)
+            applyStartValidationResult(result)
+            if case .success(let value) = result {
+                preciseStart = Double(value)
+            }
             validateRelationships()
         }
     }
@@ -64,7 +86,11 @@ final class PlaybackStepwiseViewModel {
         get { storedMaxString }
         set {
             storedMaxString = newValue
-            applyMaxValidationResult(validateMax(storedMaxString))
+            let result = validateMax(storedMaxString)
+            applyMaxValidationResult(result)
+            if case .success(let value) = result {
+                preciseMax = Double(value)
+            }
             validateRelationships()
         }
     }

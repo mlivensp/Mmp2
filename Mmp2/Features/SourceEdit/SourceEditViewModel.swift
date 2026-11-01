@@ -203,7 +203,9 @@ extension SourceEditView {
                 return .success(nil)
             } else {
                 if let bpm = Int(bpmValue) {
-                    return .success(bpm)
+                    if bpm > 0 {
+                        return .success(bpm)
+                    }
                 }
             }
             

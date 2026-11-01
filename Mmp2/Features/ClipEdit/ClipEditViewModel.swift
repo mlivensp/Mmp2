@@ -83,6 +83,7 @@ extension ClipEditView {
             self.notes = clip.notes ?? ""
             
             measureMode = determineMeasureMode()
+            playbackVM.bpm = clip.media.bpm
             _ = validate()
         }
         
@@ -192,7 +193,9 @@ extension ClipEditView {
                 return .success(nil)
             } else {
                 if let bpm = Int(bpmValue) {
-                    return .success(bpm)
+                    if bpm > 0 {
+                        return .success(bpm)
+                    }
                 }
             }
             
@@ -346,6 +349,7 @@ extension ClipEditView {
         func validate() -> Bool {
             let validateNameResult = validateName(storedNameString)
             applyNameValidationResult(validateNameResult)
+            applyBpmValidationResult(validateBpm(storedBpmString))
             
             if measureMode == false {
                 firstMeasureError = nil
@@ -368,6 +372,7 @@ extension ClipEditView {
             
             clip.isFavorite = isFavorite
             clip.notes = notes.isEmpty ? nil : notes
+            clip.media.bpm = bpm
             
             if measureMode {
                 clip.firstMeasure = firstMeasure

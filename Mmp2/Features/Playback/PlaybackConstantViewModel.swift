@@ -10,6 +10,7 @@ import Foundation
 @Observable
 final class PlaybackConstantViewModel {
     private var rate: Int
+    private var preciseRate: Double
     private var timesToPlay: Int?
 
     private var storedRateString: String
@@ -20,6 +21,7 @@ final class PlaybackConstantViewModel {
     
     init(rate: Int, timesToPlay: Int?) {
         self.rate = rate
+        self.preciseRate = Double(rate)
         self.timesToPlay = timesToPlay
         
         self.storedRateString = String(rate)
@@ -37,12 +39,23 @@ final class PlaybackConstantViewModel {
         PlaybackConstantViewModel(rate: 100, timesToPlay: 1)
     }
 
+    func scaleRate(by factor: Double) {
+        guard case .success = validateRate(storedRateString) else { return }
+        preciseRate *= factor
+        rate = scaledPlaybackValue(preciseRate)
+        storedRateString = String(rate)
+        validate()
+    }
+
     var rateString: String {
         get { return storedRateString }
         set {
             storedRateString = newValue
             let result = validateRate(storedRateString)
             applyRateValidationResult(result)
+            if case .success(let value) = result {
+                preciseRate = Double(value)
+            }
         }
     }
         

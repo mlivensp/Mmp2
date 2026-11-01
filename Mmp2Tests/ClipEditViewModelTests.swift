@@ -36,6 +36,18 @@ struct ClipEditViewModelTests {
         #expect(f.vm.bpmString == "")
     }
 
+    @Test("new clip forwards its inherited source BPM to playback")
+    func newClipForwardsInheritedBPM() throws {
+        let f = try Fixture()
+        f.source.media.bpm = 90
+        let clip = Clip.makeDraft()
+        let vm = ClipEditView.ViewModel(clip: clip, source: f.source, context: f.context)
+
+        #expect(vm.bpmString == "90")
+        #expect(vm.playbackVM.bpm == 90)
+        #expect(vm.playbackVM.constantVM.rateString == "90")
+    }
+
     // MARK: - Name
 
     @Test("name rejects blank input", arguments: ["", "   "])
@@ -100,7 +112,7 @@ struct ClipEditViewModelTests {
         #expect(f.vm.playbackVM.bpm == nil)
     }
 
-    @Test("bpm rejects non-integer input", arguments: ["abc", "1.5", "12x"])
+    @Test("bpm rejects invalid input", arguments: ["abc", "1.5", "12x", "0", "-1"])
     func bpmRejectsInvalid(input: String) throws {
         let f = try Fixture(bpm: 100)
         f.vm.bpmString = input
@@ -276,6 +288,7 @@ struct ClipEditViewModelTests {
         let f = try Fixture(name: "Original", startSeconds: 10, endSeconds: 20)
         f.vm.measureMode = false
         f.vm.name = "Updated"
+        f.vm.bpmString = "90"
         f.vm.startTimeString = TimeFormatter.shared.string(from: 3)
         f.vm.endTimeString = TimeFormatter.shared.string(from: 9)
         f.vm.isFavorite = true
@@ -285,6 +298,7 @@ struct ClipEditViewModelTests {
 
         #expect(saved)
         #expect(f.clip.primitiveName == "Updated")
+        #expect(f.clip.media.bpm == 90)
         #expect(f.clip.startSeconds == 3)
         #expect(f.clip.endSeconds == 9)
         #expect(f.clip.isFavorite)
