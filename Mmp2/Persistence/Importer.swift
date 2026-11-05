@@ -258,13 +258,26 @@ struct Importer {
         return nil
     }
     
-    private func importBounce(_ bounceJson: JSON, midTempo: Int, playOrderMap: [Int:PlayOrder]) -> PlaybackBounce {
-        let timesToPlayMidTempo = bounceJson.timesAtMidTempo.int
-        let slowTempo = bounceJson.slowTempo.int
-        let timesToPlaySlowTempo = bounceJson.timesAtSlowTempo.int
-        let fastTempo = bounceJson.fastTempo.int
-        let timesToPlayFastTempo = bounceJson.timesAtFastTempo.int
-        let numberOfBounces = bounceJson.numberOfBounces.int
+    private func importConstant(_ constantJson: JSON) -> PlaybackConstant {
+        let value = constantJson["value"].int
+        return PlaybackConstant(value: value)
+    }
+    
+    private func importStepwise(_ stepwiseJson: JSON) -> PlaybackStepwise {
+        let start = stepwiseJson.start.int
+        let step = stepwiseJson.step.int
+        let max = stepwiseJson["max"].int
+        let timesToPlayStep = stepwiseJson.timesToPlayStep.int
+        return PlaybackStepwise(start: start, step: step, max: max, timesToPlayStep: timesToPlayStep)
+    }
+    
+    private func importBounce(_ bounceJson: JSON, playOrderMap: [Int:PlayOrder]) -> PlaybackBounce {
+        let slow = bounceJson.slow.int
+        let timesToPlaySlow = bounceJson.timesToPlaySlow.int
+        let mid = bounceJson.mid.int
+        let timesToPlayMid = bounceJson.timesToPlayMid.int
+        let fast = bounceJson.fast.int
+        let timesToPlayFast = bounceJson.timesToPlayFast.int
         let playOrderId = bounceJson.playOrderId.int
         var playOrder = playOrderMap[playOrderId]
         
@@ -273,32 +286,34 @@ struct Importer {
             playOrder = playOrderMap.first?.value
         }
         
-        let playbackBounce = PlaybackBounce(slowTempo: slowTempo, timesToPlaySlowTempo: timesToPlaySlowTempo, midTempo: midTempo, timesToPlayMidTempo: timesToPlayMidTempo, fastTempo: fastTempo, timesToPlayFastTempo: timesToPlayFastTempo, numberOfBounces: numberOfBounces, playOrder: playOrder)
+        let playbackBounce = PlaybackBounce(slow: slow, timesToPlaySlow: timesToPlaySlow, mid: mid, timesToPlayMid: timesToPlayMid, fast: fast, timesToPlayFast: timesToPlayFast, playOrder: playOrder)
         return playbackBounce
     }
     
     func importPlayback(modelContext: ModelContext, _ playbackJson: JSON, playOrderMap: [Int:PlayOrder]) -> Playback {
-        let playback = Playback()
-        modelContext.insert(playback)
         
         let playbackData = playbackJson.playback
-        let start = playbackData.startPlaybackRate.int
-        let timesToPlay = playbackData.timesToPlayAtRate.optionalInt
+        let timesToPlay = playbackData.timesToPlay.optionalInt
         
-        if playbackJson.bounce.value is NSNull {
-            if let step = playbackData.step.optionalInt {
-                let max = playbackData.maxRate.optionalInt
-                let playbackStepwise = PlaybackStepwise(start: start, step: step, max: max ?? 100, timesToPlay: timesToPlay ?? 1, playback: playback)
-                playback.playbackStepwise = playbackStepwise
-            } else {
-                let playbackConstant = PlaybackConstant(rate: start, timesToPlay: timesToPlay, playback: playback)
-                playback.playbackConstant = playbackConstant
-            }
+        var constant: PlaybackConstant?
+        var stepwise: PlaybackStepwise?
+        var bounce: PlaybackBounce?
+        
+        if !(playbackJson.playbackConstant.value is NSNull) {
+            constant = importConstant(playbackJson.playbackConstant)
+        } else if !(playbackJson.playbackStepwise.value is NSNull) {
+            stepwise = importStepwise(playbackJson.playbackStepwise)
+        } else if !(playbackJson.playbackBounce.value is NSNull) {
+            bounce = importBounce(playbackJson.playbackBounce, playOrderMap: playOrderMap)
         } else {
-            let bounce = importBounce(playbackJson.bounce, midTempo: start, playOrderMap: playOrderMap)
-            playback.playbackBounce = bounce
+            Logger.data.warning("missing Playback subrecord")
         }
         
+        let playback = Playback(timesToPlay: timesToPlay)
+        playback.playbackConstant = constant
+        playback.playbackStepwise = stepwise
+        playback.playbackBounce = bounce
+        modelContext.insert(playback)
         return playback
     }
     
@@ -571,8 +586,6 @@ func timeSpan(from components: DateComponents) -> TimeInterval? {
 }
 
 func +<K, V>(lhs: [K: V], rhs: [K: V]) -> [K: V] {
-    let l = lhs.keys
-    let r = rhs.keys
     return lhs.merging(rhs) { _, _ in
         fatalError("Duplicate key")
     }

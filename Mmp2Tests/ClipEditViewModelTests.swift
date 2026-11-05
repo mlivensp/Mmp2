@@ -320,6 +320,7 @@ struct ClipEditViewModelTests {
     @Test("save writes measures in measure mode")
     func saveMeasureMode() throws {
         let f = try Fixture()
+        f.vm.bpmString = "72"
         f.vm.measureMode = true
         f.vm.startMeasureString = "2"
         f.vm.endMeasureString = "6"
@@ -355,7 +356,7 @@ private final class Fixture {
             configurations: config
         )
         context = ModelContext(container)
-        let sourcePlayback = Playback()
+        let sourcePlayback = Playback(timesToPlay: 1)
         let sourceMedia = Media(bpm: nil, path: "source.mp3", duration: 60)
         context.insert(sourcePlayback)
         context.insert(sourceMedia)
@@ -365,6 +366,7 @@ private final class Fixture {
             sortOrder: 1,
             measure1Start: 0,
             isFavorite: false,
+            isExpanded: false,
             notes: nil,
             media: sourceMedia,
             playback: sourcePlayback,
@@ -407,7 +409,7 @@ private final class Fixture {
         source: Source,
         context: ModelContext
     ) -> Clip {
-        let clipPlayback = Playback()
+        let clipPlayback = Playback(timesToPlay: 1)
         let clipMedia = Media(bpm: bpm, path: "clip.mp3", duration: end - start)
         context.insert(clipPlayback)
         context.insert(clipMedia)

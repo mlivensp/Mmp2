@@ -21,7 +21,7 @@ struct SequencerFactory {
                 guard let playbackConstant = playback.playbackConstant else {
                     throw AppError.invalidPlayback
                 }
-                var timesToPlay = playbackConstant.timesToPlay
+                var timesToPlay = playback.timesToPlay
                 
                 if forPlaylist {
                     if timesToPlay == nil {
@@ -29,7 +29,7 @@ struct SequencerFactory {
                     }
                 }
                 
-                return ConstantPlayRateSequencer(rate: playbackConstant.rate, bpm: bpm, timesToPlay: timesToPlay)
+                return ConstantPlayRateSequencer(rate: playbackConstant.value, bpm: bpm, timesToPlay: timesToPlay)
             } else {
                 guard let playbackStepwise = playback.playbackStepwise else {
                     throw AppError.invalidPlayback

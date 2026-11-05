@@ -27,289 +27,248 @@ struct PlaybackBounceViewModelTests {
     @Test("init maps values to strings and internal numeric state")
     func initMapsValuesToStringsAndState() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 2,
-            midTempo: 80,
-            midTempoTimesToPlay: 3,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 4,
-            numberOfBounces: 5
+            slow: 60,
+            slowTimesToPlay: 2,
+            mid: 80,
+            midTimesToPlay: 3,
+            fast: 100,
+            fastTimesToPlay: 4,
         )
 
-        #expect(vm.slowTempoString == "60")
-        #expect(vm.slowTempoTimesToPlayString == "2")
-        #expect(vm.midTempoString == "80")
-        #expect(vm.midTempoTimesToPlayString == "3")
-        #expect(vm.fastTempoString == "100")
-        #expect(vm.fastTempoTimesToPlayString == "4")
-        #expect(vm.numberOfBouncesString == "5")
+        #expect(vm.slowString == "60")
+        #expect(vm.slowTimesToPlayString == "2")
+        #expect(vm.midString == "80")
+        #expect(vm.midTimesToPlayString == "3")
+        #expect(vm.fastString == "100")
+        #expect(vm.fastTimesToPlayString == "4")
 
-        #expect(vm.slowTempo == 60)
-        #expect(vm.slowTempoTimesToPlay == 2)
-        #expect(vm.midTempo == 80)
-        #expect(vm.midTempoTimesToPlay == 3)
-        #expect(vm.fastTempo == 100)
-        #expect(vm.fastTempoTimesToPlay == 4)
-        #expect(vm.numberOfBounces == 5)
+        #expect(vm.slow == 60)
+        #expect(vm.slowTimesToPlay == 2)
+        #expect(vm.mid == 80)
+        #expect(vm.midTimesToPlay == 3)
+        #expect(vm.fast == 100)
+        #expect(vm.fastTimesToPlay == 4)
     }
 
-    @Test("slow tempo accepts positive numeric input")
-    func slowTempoAcceptsPositiveNumericInput() {
+    @Test("slow accepts positive numeric input")
+    func slowAcceptsPositiveNumericInput() {
         let vm = makeDefaultVM()
 
-        vm.slowTempoString = "72"
+        vm.slowString = "72"
 
-        #expect(vm.slowTempoString == "72")
-        #expect(vm.slowTempo == 72)
+        #expect(vm.slowString == "72")
+        #expect(vm.slow == 72)
     }
 
-    @Test("slow tempo rejects zero and preserves previous numeric state")
-    func slowTempoRejectsZero() {
+    @Test("slow rejects zero and preserves previous numeric state")
+    func slowRejectsZero() {
         let vm = makeDefaultVM()
-        let original = vm.slowTempo
+        let original = vm.slow
 
-        vm.slowTempoString = "0"
+        vm.slowString = "0"
 
-        #expect(vm.slowTempoString == "0")
-        #expect(vm.slowTempo == original)
+        #expect(vm.slowString == "0")
+        #expect(vm.slow == original)
     }
 
-    @Test("slow tempo rejects negative number and preserves previous numeric state")
-    func slowTempoRejectsNegative() {
+    @Test("slow rejects negative number and preserves previous numeric state")
+    func slowRejectsNegative() {
         let vm = makeDefaultVM()
-        let original = vm.slowTempo
+        let original = vm.slow
 
-        vm.slowTempoString = "-10"
+        vm.slowString = "-10"
 
-        #expect(vm.slowTempoString == "-10")
-        #expect(vm.slowTempo == original)
+        #expect(vm.slowString == "-10")
+        #expect(vm.slow == original)
     }
 
-    @Test("slow tempo rejects non-numeric and preserves previous numeric state")
-    func slowTempoRejectsNonNumeric() {
+    @Test("slow rejects non-numeric and preserves previous numeric state")
+    func slowRejectsNonNumeric() {
         let vm = makeDefaultVM()
-        let original = vm.slowTempo
+        let original = vm.slow
 
-        vm.slowTempoString = "abc"
+        vm.slowString = "abc"
 
-        #expect(vm.slowTempoString == "abc")
-        #expect(vm.slowTempo == original)
+        #expect(vm.slowString == "abc")
+        #expect(vm.slow == original)
     }
 
-    @Test("mid tempo accepts positive numeric input")
-    func midTempoAcceptsPositiveNumericInput() {
+    @Test("mid accepts positive numeric input")
+    func midAcceptsPositiveNumericInput() {
         let vm = makeDefaultVM()
 
-        vm.midTempoString = "88"
+        vm.midString = "88"
 
-        #expect(vm.midTempoString == "88")
-        #expect(vm.midTempo == 88)
+        #expect(vm.midString == "88")
+        #expect(vm.mid == 88)
     }
 
-    @Test("mid tempo rejects zero and preserves previous numeric state")
-    func midTempoRejectsZero() {
+    @Test("mid rejects zero and preserves previous numeric state")
+    func midRejectsZero() {
         let vm = makeDefaultVM()
-        let original = vm.midTempo
+        let original = vm.mid
 
-        vm.midTempoString = "0"
+        vm.midString = "0"
 
-        #expect(vm.midTempoString == "0")
-        #expect(vm.midTempo == original)
+        #expect(vm.midString == "0")
+        #expect(vm.mid == original)
     }
 
-    @Test("fast tempo accepts positive numeric input")
-    func fastTempoAcceptsPositiveNumericInput() {
+    @Test("fast accepts positive numeric input")
+    func fastAcceptsPositiveNumericInput() {
         let vm = makeDefaultVM()
 
-        vm.fastTempoString = "144"
+        vm.fastString = "144"
 
-        #expect(vm.fastTempoString == "144")
-        #expect(vm.fastTempo == 144)
+        #expect(vm.fastString == "144")
+        #expect(vm.fast == 144)
     }
 
-    @Test("fast tempo rejects empty input and preserves previous numeric state")
-    func fastTempoRejectsEmptyInput() {
+    @Test("fast rejects empty input and preserves previous numeric state")
+    func fastRejectsEmptyInput() {
         let vm = makeDefaultVM()
-        let original = vm.fastTempo
+        let original = vm.fast
 
-        vm.fastTempoString = ""
+        vm.fastString = ""
 
-        #expect(vm.fastTempoString == "")
-        #expect(vm.fastTempo == original)
+        #expect(vm.fastString == "")
+        #expect(vm.fast == original)
     }
 
     @Test("slow times-to-play accepts empty and sets value to zero")
     func slowTimesToPlayAcceptsEmptyAndSetsZero() {
         let vm = makeDefaultVM()
 
-        vm.slowTempoTimesToPlayString = ""
+        vm.slowTimesToPlayString = ""
 
-        #expect(vm.slowTempoTimesToPlayString == "")
-        #expect(vm.slowTempoTimesToPlay == 0)
+        #expect(vm.slowTimesToPlayString == "")
+        #expect(vm.slowTimesToPlay == 0)
     }
 
     @Test("slow times-to-play accepts numeric input")
     func slowTimesToPlayAcceptsNumericInput() {
         let vm = makeDefaultVM()
 
-        vm.slowTempoTimesToPlayString = "7"
+        vm.slowTimesToPlayString = "7"
 
-        #expect(vm.slowTempoTimesToPlayString == "7")
-        #expect(vm.slowTempoTimesToPlay == 7)
+        #expect(vm.slowTimesToPlayString == "7")
+        #expect(vm.slowTimesToPlay == 7)
     }
 
     @Test("slow times-to-play rejects non-numeric and preserves previous numeric state")
     func slowTimesToPlayRejectsNonNumeric() {
         let vm = makeDefaultVM()
-        let original = vm.slowTempoTimesToPlay
+        let original = vm.slowTimesToPlay
 
-        vm.slowTempoTimesToPlayString = "x"
+        vm.slowTimesToPlayString = "x"
 
-        #expect(vm.slowTempoTimesToPlayString == "x")
-        #expect(vm.slowTempoTimesToPlay == original)
+        #expect(vm.slowTimesToPlayString == "x")
+        #expect(vm.slowTimesToPlay == original)
     }
 
     @Test("mid times-to-play accepts numeric input")
     func midTimesToPlayAcceptsNumericInput() {
         let vm = makeDefaultVM()
 
-        vm.midTempoTimesToPlayString = "6"
+        vm.midTimesToPlayString = "6"
 
-        #expect(vm.midTempoTimesToPlayString == "6")
-        #expect(vm.midTempoTimesToPlay == 6)
+        #expect(vm.midTimesToPlayString == "6")
+        #expect(vm.midTimesToPlay == 6)
     }
 
     @Test("fast times-to-play accepts numeric input")
     func fastTimesToPlayAcceptsNumericInput() {
         let vm = makeDefaultVM()
 
-        vm.fastTempoTimesToPlayString = "8"
+        vm.fastTimesToPlayString = "8"
 
-        #expect(vm.fastTempoTimesToPlayString == "8")
-        #expect(vm.fastTempoTimesToPlay == 8)
+        #expect(vm.fastTimesToPlayString == "8")
+        #expect(vm.fastTimesToPlay == 8)
     }
-
-    @Test("number of bounces accepts positive numeric input")
-    func numberOfBouncesAcceptsPositiveNumericInput() {
-        let vm = makeDefaultVM()
-
-        vm.numberOfBouncesString = "9"
-
-        #expect(vm.numberOfBouncesString == "9")
-        #expect(vm.numberOfBounces == 9)
-    }
-
-    @Test("number of bounces rejects zero and preserves previous numeric state")
-    func numberOfBouncesRejectsZero() {
-        let vm = makeDefaultVM()
-        let original = vm.numberOfBounces
-
-        vm.numberOfBouncesString = "0"
-
-        #expect(vm.numberOfBouncesString == "0")
-        #expect(vm.numberOfBounces == original)
-    }
-
-    @Test("number of bounces rejects non-numeric and preserves previous numeric state")
-    func numberOfBouncesRejectsNonNumeric() {
-        let vm = makeDefaultVM()
-        let original = vm.numberOfBounces
-
-        vm.numberOfBouncesString = "bad"
-
-        #expect(vm.numberOfBouncesString == "bad")
-        #expect(vm.numberOfBounces == original)
-    }
+    // MARK: - Cross-field validation: slow < mid < fast
     
-    // MARK: - Cross-field validation: slowTempo < midTempo < fastTempo
-    
-    @Test("tempos: valid when slowTempo < midTempo < fastTempo")
+    @Test("tempos: valid when slow < mid < fast")
     func tempoOrderingValid() {
         let playOrder = PlayOrder(name: "Test", slowOrder: 1, midOrder: 2, fastOrder: 3, sortOrder: 1)
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 1,
-            midTempo: 80,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4,
+            slow: 60,
+            slowTimesToPlay: 1,
+            mid: 80,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3,
             playOrder: playOrder
         )
         
         #expect(vm.isValid)
-        #expect(vm.slowTempoError == nil)
-        #expect(vm.midTempoError == nil)
-        #expect(vm.fastTempoError == nil)
+        #expect(vm.slowError == nil)
+        #expect(vm.midError == nil)
+        #expect(vm.fastError == nil)
     }
     
-    @Test("tempos: invalid when slowTempo >= midTempo")
+    @Test("tempos: invalid when slow >= mid")
     func tempoOrderingInvalidSlowGeMid() {
         let vm = makeVM(
-            slowTempo: 80,
-            slowTempoTimesToPlay: 1,
-            midTempo: 80,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 80,
+            slowTimesToPlay: 1,
+            mid: 80,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3
         )
         
         #expect(!vm.isValid)
-        #expect(vm.midTempoError == "Mid Tempo must be greater than Slow Tempo.")
+        #expect(vm.midError == "Mid must be greater than Slow.")
     }
     
-    @Test("tempos: invalid when midTempo >= fastTempo")
+    @Test("tempos: invalid when mid >= fast")
     func tempoOrderingInvalidMidGeFast() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 1,
-            midTempo: 100,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60,
+            slowTimesToPlay: 1,
+            mid: 100,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3
         )
         
         #expect(!vm.isValid)
-        #expect(vm.fastTempoError == "Fast Tempo must be greater than Mid Tempo.")
+        #expect(vm.fastError == "Fast must be greater than Mid.")
     }
     
-    @Test("tempos: error clears when slowTempo is increased")
+    @Test("tempos: error clears when slow is increased")
     func tempoOrderingErrorClearsViaSlow() {
         let vm = makeVM(
-            slowTempo: 80,
-            slowTempoTimesToPlay: 1,
-            midTempo: 80,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 80,
+            slowTimesToPlay: 1,
+            mid: 80,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3
         )
-        #expect(vm.midTempoError != nil)
+        #expect(vm.midError != nil)
         
-        vm.slowTempoString = "60"
+        vm.slowString = "60"
         
-        #expect(vm.midTempoError == nil)
+        #expect(vm.midError == nil)
         #expect(vm.isValid)
     }
     
-    @Test("tempos: error clears when midTempo is increased")
+    @Test("tempos: error clears when mid is increased")
     func tempoOrderingErrorClearViaMid() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 1,
-            midTempo: 100,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60,
+            slowTimesToPlay: 1,
+            mid: 100,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3
         )
-        #expect(vm.fastTempoError != nil)
+        #expect(vm.fastError != nil)
         
-        vm.midTempoString = "80"
+        vm.midString = "80"
         
-        #expect(vm.fastTempoError == nil)
+        #expect(vm.fastError == nil)
         #expect(vm.isValid)
     }
     
@@ -317,145 +276,138 @@ struct PlaybackBounceViewModelTests {
     func tempoOrderingSkippedWhenFieldInvalid() {
         let vm = makeDefaultVM()
         
-        vm.slowTempoString = "abc"
+        vm.slowString = "abc"
         
-        #expect(vm.slowTempoError != nil)
-        #expect(vm.midTempoError == nil)
-        #expect(vm.fastTempoError == nil)
+        #expect(vm.slowError != nil)
+        #expect(vm.midError == nil)
+        #expect(vm.fastError == nil)
         #expect(!vm.isValid)
     }
     
     // MARK: - Cross-field validation: Tempo optional only if its timesToPlay is 0/empty
     
-    @Test("tempo optional: slowTempo can be empty if slowTempoTimesToPlay is empty")
+    @Test("tempo optional: slow can be empty if slowTimesToPlay is empty")
     func slowTempoOptionalWhenTimesToPlayEmpty() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 1,
-            midTempo: 80,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60,
+            slowTimesToPlay: 1,
+            mid: 80,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3
         )
         
-        vm.slowTempoString = ""
-        vm.slowTempoTimesToPlayString = ""
+        vm.slowString = ""
+        vm.slowTimesToPlayString = ""
         
-        #expect(vm.slowTempoError == nil)
+        #expect(vm.slowError == nil)
         #expect(vm.isValid)
     }
     
-    @Test("tempo optional: midTempo can be empty if midTempoTimesToPlay is empty")
+    @Test("tempo optional: mid can be empty if midTimesToPlay is empty")
     func midTempoOptionalWhenTimesToPlayEmpty() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 1,
-            midTempo: 80,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60,
+            slowTimesToPlay: 1,
+            mid: 80,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3
         )
         
-        vm.midTempoString = ""
-        vm.midTempoTimesToPlayString = ""
+        vm.midString = ""
+        vm.midTimesToPlayString = ""
         
-        #expect(vm.midTempoError == nil)
+        #expect(vm.midError == nil)
         #expect(vm.isValid)
     }
     
-    @Test("tempo optional: fastTempo can be empty if fastTempoTimesToPlay is empty")
+    @Test("tempo optional: fast can be empty if fastTimesToPlay is empty")
     func fastTempoOptionalWhenTimesToPlayEmpty() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 1,
-            midTempo: 80,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60,
+            slowTimesToPlay: 1,
+            mid: 80,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3
         )
         
-        vm.fastTempoString = ""
-        vm.fastTempoTimesToPlayString = ""
+        vm.fastString = ""
+        vm.fastTimesToPlayString = ""
         
-        #expect(vm.fastTempoError == nil)
+        #expect(vm.fastError == nil)
         #expect(vm.isValid)
     }
     
-    @Test("tempo optional: slowTempo invalid if empty but slowTempoTimesToPlay is not 0/empty")
+    @Test("tempo optional: slow invalid if empty but slowTimesToPlay is not 0/empty")
     func slowTempoRequiredWhenTimesToPlayHasValue() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 1,
-            midTempo: 80,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60,
+            slowTimesToPlay: 1,
+            mid: 80,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3
         )
         
-        vm.slowTempoString = ""
+        vm.slowString = ""
         
-        #expect(vm.slowTempoError == "Slow Tempo can only be empty if Slow Tempo Times To Play is empty or zero.")
+        #expect(vm.slowError == "Slow can only be empty if Slow Times To Play is empty or zero.")
         #expect(!vm.isValid)
     }
     
-    @Test("tempo optional: midTempo invalid if empty but midTempoTimesToPlay is not 0/empty")
+    @Test("tempo optional: mid invalid if empty but midTimesToPlay is not 0/empty")
     func midTempoRequiredWhenTimesToPlayHasValue() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 1,
-            midTempo: 80,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60,
+            slowTimesToPlay: 1,
+            mid: 80,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3
         )
         
-        vm.midTempoString = ""
+        vm.midString = ""
         
-        #expect(vm.midTempoError == "Mid Tempo can only be empty if Mid Tempo Times To Play is empty or zero.")
+        #expect(vm.midError == "Mid can only be empty if Mid Times To Play is empty or zero.")
         #expect(!vm.isValid)
     }
     
-    @Test("tempo optional: fastTempo invalid if empty but fastTempoTimesToPlay is not 0/empty")
+    @Test("tempo optional: fast invalid if empty but fastTimesToPlay is not 0/empty")
     func fastTempoRequiredWhenTimesToPlayHasValue() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 1,
-            midTempo: 80,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60,
+            slowTimesToPlay: 1,
+            mid: 80,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3
         )
         
-        vm.fastTempoString = ""
+        vm.fastString = ""
         
-        #expect(vm.fastTempoError == "Fast Tempo can only be empty if Fast Tempo Times To Play is empty or zero.")
+        #expect(vm.fastError == "Fast can only be empty if Fast Times To Play is empty or zero.")
         #expect(!vm.isValid)
     }
     
     @Test("tempo optional: error clears when timesToPlay is set to empty")
     func tempoOptionalErrorClearsWhenTimesToPlayEmpty() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 1,
-            midTempo: 80,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60,
+            slowTimesToPlay: 1,
+            mid: 80,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3
         )
         
-        vm.slowTempoString = ""
-        #expect(vm.slowTempoError != nil)
+        vm.slowString = ""
+        #expect(vm.slowError != nil)
         
-        vm.slowTempoTimesToPlayString = ""
+        vm.slowTimesToPlayString = ""
         
-        #expect(vm.slowTempoError == nil)
+        #expect(vm.slowError == nil)
         #expect(vm.isValid)
     }
     
@@ -464,93 +416,88 @@ struct PlaybackBounceViewModelTests {
     @Test("timesToPlay count: valid when exactly one is 0/empty")
     func timesToPlayCountValidOneEmpty() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 0,
-            midTempo: 80,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60,
+            slowTimesToPlay: 0,
+            mid: 80,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3
         )
         
         #expect(vm.isValid)
-        #expect(vm.slowTempoTimesToPlayError == nil)
-        #expect(vm.midTempoTimesToPlayError == nil)
-        #expect(vm.fastTempoTimesToPlayError == nil)
+        #expect(vm.slowTimesToPlayError == nil)
+        #expect(vm.midTimesToPlayError == nil)
+        #expect(vm.fastTimesToPlayError == nil)
     }
     
     @Test("timesToPlay count: valid when none are 0/empty")
     func timesToPlayCountValidNoneEmpty() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 1,
-            midTempo: 80,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60,
+            slowTimesToPlay: 1,
+            mid: 80,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3
         )
         
         #expect(vm.isValid)
-        #expect(vm.slowTempoTimesToPlayError == nil)
-        #expect(vm.midTempoTimesToPlayError == nil)
-        #expect(vm.fastTempoTimesToPlayError == nil)
+        #expect(vm.slowTimesToPlayError == nil)
+        #expect(vm.midTimesToPlayError == nil)
+        #expect(vm.fastTimesToPlayError == nil)
     }
     
     @Test("timesToPlay count: invalid when two are 0/empty")
     func timesToPlayCountInvalidTwoEmpty() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 0,
-            midTempo: 80,
-            midTempoTimesToPlay: 0,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60,
+            slowTimesToPlay: 0,
+            mid: 80,
+            midTimesToPlay: 0,
+            fast: 100,
+            fastTimesToPlay: 3
         )
         
         #expect(!vm.isValid)
-        #expect(vm.slowTempoTimesToPlayError == "Only one tempo can have empty or zero Times To Play.")
-        #expect(vm.midTempoTimesToPlayError == "Only one tempo can have empty or zero Times To Play.")
-        #expect(vm.fastTempoTimesToPlayError == nil)
+        #expect(vm.slowTimesToPlayError == "Only one tempo can have empty or zero Times To Play.")
+        #expect(vm.midTimesToPlayError == "Only one tempo can have empty or zero Times To Play.")
+        #expect(vm.fastTimesToPlayError == nil)
     }
     
     @Test("timesToPlay count: invalid when all three are 0/empty")
     func timesToPlayCountInvalidAllEmpty() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 0,
-            midTempo: 80,
-            midTempoTimesToPlay: 0,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 0,
-            numberOfBounces: 4
+            slow: 60,
+            slowTimesToPlay: 0,
+            mid: 80,
+            midTimesToPlay: 0,
+            fast: 100,
+            fastTimesToPlay: 0
         )
         
         #expect(!vm.isValid)
-        #expect(vm.slowTempoTimesToPlayError == "Only one tempo can have empty or zero Times To Play.")
-        #expect(vm.midTempoTimesToPlayError == "Only one tempo can have empty or zero Times To Play.")
-        #expect(vm.fastTempoTimesToPlayError == "Only one tempo can have empty or zero Times To Play.")
+        #expect(vm.slowTimesToPlayError == "Only one tempo can have empty or zero Times To Play.")
+        #expect(vm.midTimesToPlayError == "Only one tempo can have empty or zero Times To Play.")
+        #expect(vm.fastTimesToPlayError == "Only one tempo can have empty or zero Times To Play.")
     }
     
     @Test("timesToPlay count: error clears when extra empty is set to value")
     func timesToPlayCountErrorClearsWhenValueSet() {
         let vm = makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 0,
-            midTempo: 80,
-            midTempoTimesToPlay: 0,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60,
+            slowTimesToPlay: 0,
+            mid: 80,
+            midTimesToPlay: 0,
+            fast: 100,
+            fastTimesToPlay: 3
         )
-        #expect(vm.slowTempoTimesToPlayError != nil)
-        #expect(vm.midTempoTimesToPlayError != nil)
+        #expect(vm.slowTimesToPlayError != nil)
+        #expect(vm.midTimesToPlayError != nil)
         
-        vm.slowTempoTimesToPlayString = "1"
+        vm.slowTimesToPlayString = "1"
         
-        #expect(vm.slowTempoTimesToPlayError == nil)
-        #expect(vm.midTempoTimesToPlayError == nil)
+        #expect(vm.slowTimesToPlayError == nil)
+        #expect(vm.midTimesToPlayError == nil)
         #expect(vm.isValid)
     }
     
@@ -559,83 +506,79 @@ struct PlaybackBounceViewModelTests {
         let vm = makeDefaultVM()
         #expect(vm.isValid)
         
-        vm.slowTempoString = "bad"
+        vm.slowString = "bad"
         #expect(!vm.isValid)
         
-        vm.slowTempoString = "60"
+        vm.slowString = "60"
         #expect(vm.isValid)
     }
     
-    @Test("tempo optional: slowTempoError fully clears when timesToPlay becomes empty")
-    func slowTempoErrorClearsAfterTimesToPlayEmptied() {
+    @Test("tempo optional: slowError fully clears when timesToPlay becomes empty")
+    func slowErrorClearsAfterTimesToPlayEmptied() {
         let vm = makeDefaultVM()   // slow 60 / ttp 1
         
-        vm.slowTempoString = ""
-        #expect(vm.slowTempoError == "Slow Tempo can only be empty if Slow Tempo Times To Play is empty or zero.")
+        vm.slowString = ""
+        #expect(vm.slowError == "Slow can only be empty if Slow Times To Play is empty or zero.")
         
-        vm.slowTempoTimesToPlayString = ""
+        vm.slowTimesToPlayString = ""
         
-        #expect(vm.slowTempoError == nil)
-        #expect(vm.slowTempo == 0)
+        #expect(vm.slowError == nil)
+        #expect(vm.slow == 0)
         #expect(vm.isValid)
     }
     
     @Test("tempo optional: invalid text keeps field-level error even when timesToPlay is empty")
     func invalidTempoTextKeepsFieldError() {
         let vm = makeDefaultVM()
-        vm.slowTempoTimesToPlayString = ""
+        vm.slowTimesToPlayString = ""
         
-        vm.slowTempoString = "abc"
+        vm.slowString = "abc"
         
-        #expect(vm.slowTempoError == "Slow Tempo must be a number greater than zero.")
+        #expect(vm.slowError == "Slow must be a number greater than zero.")
     }
     
     @Test("tempo ordering: skips empty mid and compares slow to fast")
     func orderingSkipsEmptyMid() {
         let vm = makeVM(
-            slowTempo: 100, slowTempoTimesToPlay: 1,
-            midTempo: 80, midTempoTimesToPlay: 0,
-            fastTempo: 60, fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 100, slowTimesToPlay: 1,
+            mid: 80, midTimesToPlay: 0,
+            fast: 60, fastTimesToPlay: 3
         )
-        vm.midTempoString = ""
+        vm.midString = ""
         
-        #expect(vm.midTempoError == nil)
-        #expect(vm.fastTempoError == "Fast Tempo must be greater than Slow Tempo.")
+        #expect(vm.midError == nil)
+        #expect(vm.fastError == "Fast must be greater than Slow.")
     }
 
     // MARK: - Helpers
 
     private func makeDefaultVM() -> PlaybackBounceViewModel {
         makeVM(
-            slowTempo: 60,
-            slowTempoTimesToPlay: 1,
-            midTempo: 80,
-            midTempoTimesToPlay: 2,
-            fastTempo: 100,
-            fastTempoTimesToPlay: 3,
-            numberOfBounces: 4,
+            slow: 60,
+            slowTimesToPlay: 1,
+            mid: 80,
+            midTimesToPlay: 2,
+            fast: 100,
+            fastTimesToPlay: 3
         )
     }
 
     private func makeVM(
-        slowTempo: Int,
-        slowTempoTimesToPlay: Int,
-        midTempo: Int,
-        midTempoTimesToPlay: Int,
-        fastTempo: Int,
-        fastTempoTimesToPlay: Int,
-        numberOfBounces: Int,
+        slow: Int,
+        slowTimesToPlay: Int,
+        mid: Int,
+        midTimesToPlay: Int,
+        fast: Int,
+        fastTimesToPlay: Int,
         playOrder: PlayOrder? = nil
     ) -> PlaybackBounceViewModel {
         PlaybackBounceViewModel(
-            slowTempo: slowTempo,
-            slowTempoTimesToPlay: slowTempoTimesToPlay,
-            midTempo: midTempo,
-            midTempoTimesToPlay: midTempoTimesToPlay,
-            fastTempo: fastTempo,
-            fastTempoTimesToPlay: fastTempoTimesToPlay,
-            numberOfBounces: numberOfBounces,
+            slow: slow,
+            slowTimesToPlay: slowTimesToPlay,
+            mid: mid,
+            midTimesToPlay: midTimesToPlay,
+            fast: fast,
+            fastTimesToPlay: fastTimesToPlay,
             playOrder: playOrder == nil ? makePlayOrder() : playOrder
         )
     }
@@ -649,37 +592,33 @@ struct PlaybackBounceViewModelTests {
     @Test("apply copies values to PlaybackBounce when valid")
     func applyCopiesValues() throws {
         let vm = makeVM(
-            slowTempo: 60, slowTempoTimesToPlay: 1,
-            midTempo: 80, midTempoTimesToPlay: 2,
-            fastTempo: 100, fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60, slowTimesToPlay: 1,
+            mid: 80, midTimesToPlay: 2,
+            fast: 100, fastTimesToPlay: 3
         )
         let playOrder = makePlayOrder()
         let model = PlaybackBounce(
-            slowTempo: 1, timesToPlaySlowTempo: 2,
-            midTempo: 3, timesToPlayMidTempo: 4,
-            fastTempo: 5, timesToPlayFastTempo: 6,
-            numberOfBounces: 7,
+            slow: 1, timesToPlaySlow: 2,
+            mid: 3, timesToPlayMid: 4,
+            fast: 5, timesToPlayFast: 6,
             playOrder: playOrder
         )
 
-        vm.slowTempoString = "70"
-        vm.slowTempoTimesToPlayString = "8"
-        vm.midTempoString = "90"
-        vm.midTempoTimesToPlayString = "6"
-        vm.fastTempoString = "110"
-        vm.fastTempoTimesToPlayString = "5"
-        vm.numberOfBouncesString = "12"
+        vm.slowString = "70"
+        vm.slowTimesToPlayString = "8"
+        vm.midString = "90"
+        vm.midTimesToPlayString = "6"
+        vm.fastString = "110"
+        vm.fastTimesToPlayString = "5"
         vm.playOrder = playOrder
 
         try vm.apply(to: model)
-        #expect(model.slowTempo == 70)
-        #expect(model.timesToPlaySlowTempo == 8)
-        #expect(model.midTempo == 90)
-        #expect(model.timesToPlayMidTempo == 6)
-        #expect(model.fastTempo == 110)
-        #expect(model.timesToPlayFastTempo == 5)
-        #expect(model.numberOfBounces == 12)
+        #expect(model.slow == 70)
+        #expect(model.timesToPlaySlow == 8)
+        #expect(model.mid == 90)
+        #expect(model.timesToPlayMid == 6)
+        #expect(model.fast == 110)
+        #expect(model.timesToPlayFast == 5)
         #expect(model.playOrder === playOrder)
     }
 
@@ -688,83 +627,76 @@ struct PlaybackBounceViewModelTests {
         let vm = makeDefaultVM()
         let playOrder = makePlayOrder()
         let model = PlaybackBounce(
-            slowTempo: 10, timesToPlaySlowTempo: 2,
-            midTempo: 15, timesToPlayMidTempo: 3,
-            fastTempo: 20, timesToPlayFastTempo: 4,
-            numberOfBounces: 5,
+            slow: 10, timesToPlaySlow: 2,
+            mid: 15, timesToPlayMid: 3,
+            fast: 20, timesToPlayFast: 4,
             playOrder: playOrder
         )
-        vm.slowTempoString = "bad" // invalid input
+        vm.slowString = "bad" // invalid input
 
         #expect(throws: Error.self) {
             try vm.apply(to: model)
         }
         // Model should be unchanged
-        #expect(model.slowTempo == 10)
-        #expect(model.timesToPlaySlowTempo == 2)
-        #expect(model.midTempo == 15)
-        #expect(model.timesToPlayMidTempo == 3)
-        #expect(model.fastTempo == 20)
-        #expect(model.timesToPlayFastTempo == 4)
-        #expect(model.numberOfBounces == 5)
+        #expect(model.slow == 10)
+        #expect(model.timesToPlaySlow == 2)
+        #expect(model.mid == 15)
+        #expect(model.timesToPlayMid == 3)
+        #expect(model.fast == 20)
+        #expect(model.timesToPlayFast == 4)
         #expect(model.playOrder === playOrder)
     }
 
     @Test("apply allows empty tempo when timesToPlay is zero")
     func applyAllowsEmptyTempoIfTimesToPlayZero() throws {
         let vm = makeVM(
-            slowTempo: 60, slowTempoTimesToPlay: 1,
-            midTempo: 80, midTempoTimesToPlay: 2,
-            fastTempo: 100, fastTempoTimesToPlay: 0,
-            numberOfBounces: 4
+            slow: 60, slowTimesToPlay: 1,
+            mid: 80, midTimesToPlay: 2,
+            fast: 100, fastTimesToPlay: 0
         )
         let playOrder = makePlayOrder()
         let model = PlaybackBounce(
-            slowTempo: 1, timesToPlaySlowTempo: 2,
-            midTempo: 3, timesToPlayMidTempo: 4,
-            fastTempo: 5, timesToPlayFastTempo: 6,
-            numberOfBounces: 7,
+            slow: 1, timesToPlaySlow: 2,
+            mid: 3, timesToPlayMid: 4,
+            fast: 5, timesToPlayFast: 6,
             playOrder: playOrder
         )
-        vm.fastTempoString = ""
-        vm.fastTempoTimesToPlayString = "0"
+        vm.fastString = ""
+        vm.fastTimesToPlayString = "0"
 
         try vm.apply(to: model)
-        #expect(model.fastTempo == 0)
-        #expect(model.timesToPlayFastTempo == 0)
+        #expect(model.fast == 0)
+        #expect(model.timesToPlayFast == 0)
     }
 
     @Test("apply throws and does not modify model if more than one timesToPlay is zero")
     func applyThrowsIfMultipleTimesToPlayZero() {
         let vm = makeVM(
-            slowTempo: 60, slowTempoTimesToPlay: 0,
-            midTempo: 80, midTempoTimesToPlay: 0,
-            fastTempo: 100, fastTempoTimesToPlay: 3,
-            numberOfBounces: 4
+            slow: 60, slowTimesToPlay: 0,
+            mid: 80, midTimesToPlay: 0,
+            fast: 100, fastTimesToPlay: 3
         )
         let playOrder = makePlayOrder()
         let model = PlaybackBounce(
-            slowTempo: 1, timesToPlaySlowTempo: 2,
-            midTempo: 3, timesToPlayMidTempo: 4,
-            fastTempo: 5, timesToPlayFastTempo: 6,
-            numberOfBounces: 7,
+            slow: 1, timesToPlaySlow: 2,
+            mid: 3, timesToPlayMid: 4,
+            fast: 5, timesToPlayFast: 6,
             playOrder: playOrder
         )
-        vm.slowTempoString = ""
-        vm.slowTempoTimesToPlayString = "0"
-        vm.midTempoString = ""
-        vm.midTempoTimesToPlayString = "0"
+        vm.slowString = ""
+        vm.slowTimesToPlayString = "0"
+        vm.midString = ""
+        vm.midTimesToPlayString = "0"
 
         #expect(throws: Error.self) {
             try vm.apply(to: model)
         }
-        #expect(model.slowTempo == 1)
-        #expect(model.timesToPlaySlowTempo == 2)
-        #expect(model.midTempo == 3)
-        #expect(model.timesToPlayMidTempo == 4)
-        #expect(model.fastTempo == 5)
-        #expect(model.timesToPlayFastTempo == 6)
-        #expect(model.numberOfBounces == 7)
+        #expect(model.slow == 1)
+        #expect(model.timesToPlaySlow == 2)
+        #expect(model.mid == 3)
+        #expect(model.timesToPlayMid == 4)
+        #expect(model.fast == 5)
+        #expect(model.timesToPlayFast == 6)
         #expect(model.playOrder === playOrder)
     }
 }

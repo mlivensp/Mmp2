@@ -165,11 +165,11 @@ struct ClipEditForm: View {
 #Preview {
     // Dummy clip for preview
     let dummyMedia = Media(bpm: 120, path: "", duration: 60)
-    let dummyPlayback = Playback()
+    let dummyPlayback = Playback(timesToPlay: 1)
     let dummyClip = Clip(source: nil, name: "Sample Clip", startSeconds: 10, endSeconds: 20, startMeasure: 1, endMeasure: 4, isFavorite: false, notes: "Sample", media: dummyMedia, playback: dummyPlayback)
     
     let dummySourceMedia = Media(bpm: 90, path: "", duration: 62)
-    let dummySourcePlayback = Playback()
+    let dummySourcePlayback = Playback(timesToPlay: 1)
     let dummySource = Source(name: "Sample Source", sortOrder: 0, measure1Start: nil, isFavorite: false, isExpanded: false, notes: nil, media: dummySourceMedia, playback: dummySourcePlayback, sourceGroup: nil)
     return ClipEditView(clip: dummyClip, source: dummySource)
 }

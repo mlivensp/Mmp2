@@ -15,78 +15,67 @@ struct PlaybackBounceView: View {
     var body: some View {
         Group {
             ErrorFieldContainer(
-                hasError: vm.slowTempoError != nil,
-                errorMessage: vm.slowTempoError
+                hasError: vm.slowError != nil,
+                errorMessage: vm.slowError
             ) {
                 HStack {
-                    Text("Slow Tempo")
-                    TextField("", text: $vm.slowTempoString)
+                    Text("Slow")
+                    TextField("", text: $vm.slowString)
                         .frame(maxWidth: 60)
                 }
             }
 
             ErrorFieldContainer(
-                hasError: vm.slowTempoTimesToPlayError != nil,
-                errorMessage: vm.slowTempoTimesToPlayError
+                hasError: vm.slowTimesToPlayError != nil,
+                errorMessage: vm.slowTimesToPlayError
             ) {
                 HStack {
-                    Text("Slow Tempo Times To Play")
-                    TextField("", text: $vm.slowTempoTimesToPlayString)
+                    Text("Slow Times To Play")
+                    TextField("", text: $vm.slowTimesToPlayString)
                         .frame(maxWidth: 60)
                 }
             }
 
             ErrorFieldContainer(
-                hasError: vm.midTempoError != nil,
-                errorMessage: vm.midTempoError
+                hasError: vm.midError != nil,
+                errorMessage: vm.midError
             ) {
                 HStack {
-                    Text("Mid Tempo")
-                    TextField("", text: $vm.midTempoString)
+                    Text("Mid")
+                    TextField("", text: $vm.midString)
                         .frame(maxWidth: 60)
                 }
             }
 
             ErrorFieldContainer(
-                hasError: vm.midTempoTimesToPlayError != nil,
-                errorMessage: vm.midTempoTimesToPlayError
+                hasError: vm.midTimesToPlayError != nil,
+                errorMessage: vm.midTimesToPlayError
             ) {
                 HStack {
-                    Text("Mid Tempo Times To Play")
-                    TextField("", text: $vm.midTempoTimesToPlayString)
+                    Text("Mid Times To Play")
+                    TextField("", text: $vm.midTimesToPlayString)
                         .frame(maxWidth: 60)
                 }
             }
 
             ErrorFieldContainer(
-                hasError: vm.fastTempoError != nil,
-                errorMessage: vm.fastTempoError
+                hasError: vm.fastError != nil,
+                errorMessage: vm.fastError
             ) {
                 HStack {
-                    Text("Fast Tempo")
-                    TextField("", text: $vm.fastTempoString)
+                    Text("Fast ")
+                    TextField("", text: $vm.fastString)
                         .frame(maxWidth: 60)
                 }
             }
 
             ErrorFieldContainer(
-                hasError: vm.fastTempoTimesToPlayError != nil,
-                errorMessage: vm.fastTempoTimesToPlayError
+                hasError: vm.fastTimesToPlayError != nil,
+                errorMessage: vm.fastTimesToPlayError
             ) {
                 HStack {
-                    Text("Fast Tempo Times To Play")
-                    TextField("", text: $vm.fastTempoTimesToPlayString)
-                        .frame(maxWidth: 60)
-                }
-            }
-
-            ErrorFieldContainer(
-                hasError: vm.numberOfBouncesError != nil,
-                errorMessage: vm.numberOfBouncesError
-            ) {
-                HStack {
-                    Text("Number Of Bounces")
-                    TextField("", text: $vm.numberOfBouncesString)
+                    Text("Fast Times To Play")
+                    TextField("", text: $vm.fastTimesToPlayString)
                         .frame(maxWidth: 60)
                 }
             }

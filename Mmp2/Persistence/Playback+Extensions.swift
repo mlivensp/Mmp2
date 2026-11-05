@@ -54,25 +54,25 @@ extension Playback {
 
 extension Playback {
     static func makeDraft() -> Playback {
-        let playback = Playback()
+        let playback = Playback(timesToPlay: 1)
         return playback
     }
 }
 
 extension PlaybackConstant {
     static func makeDraft() -> PlaybackConstant {
-        PlaybackConstant(rate: 100, timesToPlay: nil)
+        PlaybackConstant(value: 100)
     }
 }
 
 extension PlaybackStepwise {
     static func makeDraft() -> PlaybackStepwise {
-        PlaybackStepwise(start: 80, step: 2, max: 100, timesToPlay: 1)
+        PlaybackStepwise(start: 80, step: 2, max: 100, timesToPlayStep: 1)
     }
 }
 
 extension PlaybackBounce {
     static func makeDraft() -> PlaybackBounce {
-        PlaybackBounce(slowTempo: 90, timesToPlaySlowTempo: 1, midTempo: 100, timesToPlayMidTempo: 1, fastTempo: 110, timesToPlayFastTempo: 1, numberOfBounces: 1)
+        PlaybackBounce(slow: 90, timesToPlaySlow: 1, mid: 100, timesToPlayMid: 1, fast: 110, timesToPlayFast: 1)
     }
 }

@@ -12,8 +12,8 @@ import SwiftData
 struct ConstantSequencerTests {
 
     @Test func play10Times() async throws {
-        let playback = Playback()
-        let playbackConstant = PlaybackConstant(rate: 100, timesToPlay: 10, playback: playback)
+        let playback = Playback(timesToPlay: 10)
+        let playbackConstant = PlaybackConstant(value: 100)
         playback.playbackConstant = playbackConstant
         let sequencer = try? await SequencerFactory.createSequencer(from: playback, bpm: nil)
         var actual: [Float] = []
@@ -26,8 +26,8 @@ struct ConstantSequencerTests {
     }
     
     @Test func loop() async throws {
-        let playback = Playback()
-        let playbackConstant = PlaybackConstant(rate: 1, timesToPlay: nil, playback: playback)
+        let playback = Playback(timesToPlay: nil)
+        let playbackConstant = PlaybackConstant(value: 1)
         playback.playbackConstant = playbackConstant
         let sequencer = try? await SequencerFactory.createSequencer(from: playback, bpm: nil)
         var actual = 0
@@ -43,8 +43,8 @@ struct ConstantSequencerTests {
     }
     
     @Test func bpmOnceNormalSpeed() async throws {
-        let playback = Playback()
-        let playbackConstant = PlaybackConstant(rate: 72, timesToPlay: 1, playback: playback)
+        let playback = Playback(timesToPlay: 1)
+        let playbackConstant = PlaybackConstant(value: 72)
         playback.playbackConstant = playbackConstant
         let sequencer = try? await SequencerFactory.createSequencer(from: playback, bpm: 72)
         var actual: [Float] = []

@@ -30,6 +30,9 @@ final class AppRootManager {
     
     var editingClip: Clip?
     
+    var showImportCatalog = false
+    var showLocateSources = false
+    
     enum AppRoot {
         case splash
         case home

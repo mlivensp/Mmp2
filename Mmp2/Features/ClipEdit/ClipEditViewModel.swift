@@ -366,7 +366,7 @@ extension ClipEditView {
         
         func save() throws -> Bool {
             guard validate() else { return false }
-            
+
             clip.primitiveName = name
             clip.name_normalized = name.normalizedForSearch
             
@@ -377,7 +377,7 @@ extension ClipEditView {
             if measureMode {
                 clip.firstMeasure = firstMeasure
                 clip.lastMeasure = lastMeasure
-                let (start, end) = try guardedConvertMeasuresToTimes(startMeasure: firstMeasure, endMeasure: lastMeasure, measure1Start: source.measure1Start, bpm: source.media.bpm)
+                let (start, end) = try guardedConvertMeasuresToTimes(startMeasure: firstMeasure, endMeasure: lastMeasure, measure1Start: source.measure1Start, bpm: bpm)
                 clip.startSeconds = start
                 clip.endSeconds = end
             } else {

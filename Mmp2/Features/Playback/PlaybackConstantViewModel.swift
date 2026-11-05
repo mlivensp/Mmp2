@@ -9,41 +9,31 @@ import Foundation
 
 @Observable
 final class PlaybackConstantViewModel {
-    private var rate: Int
-    private var preciseRate: Double
-    private var timesToPlay: Int?
+    private var value: Int
+    private var preciseValue: Double
 
     private var storedRateString: String
-    private var storedTimesToPlayString: String
     
     var rateError: String? = nil
-    var timesToPlayError: String? = nil
     
-    init(rate: Int, timesToPlay: Int?) {
-        self.rate = rate
-        self.preciseRate = Double(rate)
-        self.timesToPlay = timesToPlay
+    init(value: Int) {
+        self.value = value
+        self.preciseValue = Double(value)
         
-        self.storedRateString = String(rate)
-        
-        if let timesToPlay {
-            storedTimesToPlayString = String(timesToPlay)
-        } else {
-            storedTimesToPlayString = ""
-        }
+        self.storedRateString = String(value)
         
         validate()
     }
     
     static func `default`() -> PlaybackConstantViewModel {
-        PlaybackConstantViewModel(rate: 100, timesToPlay: 1)
+        PlaybackConstantViewModel(value: 100)
     }
 
     func scaleRate(by factor: Double) {
         guard case .success = validateRate(storedRateString) else { return }
-        preciseRate *= factor
-        rate = scaledPlaybackValue(preciseRate)
-        storedRateString = String(rate)
+        preciseValue *= factor
+        value = scaledPlaybackValue(preciseValue)
+        storedRateString = String(value)
         validate()
     }
 
@@ -54,46 +44,27 @@ final class PlaybackConstantViewModel {
             let result = validateRate(storedRateString)
             applyRateValidationResult(result)
             if case .success(let value) = result {
-                preciseRate = Double(value)
+                preciseValue = Double(value)
             }
         }
     }
         
     
-    var timesToPlayString: String {
-        get { return storedTimesToPlayString }
-        set {
-            self.storedTimesToPlayString = newValue
-            let result = validateTimesToPlay(storedTimesToPlayString)
-            applyTimesToPlayValidationResult(result)
-        }
-    }
-    
     private func applyRateValidationResult(_ result: ValidationResult<Int>) {
         switch result {
-        case .success(let value):
+        case .success(let resultValue):
             rateError = nil
-            rate = value
+            value = resultValue
         case .failure(let message):
             rateError = message
         }
     }
 
-    private func applyTimesToPlayValidationResult(_ result: ValidationResult<Int?>) {
-        switch result {
-        case .success(let value):
-            timesToPlayError = nil
-            timesToPlay = value
-        case .failure(let message):
-            timesToPlayError = message
-        }
-    }
-
-    fileprivate func validateRate(_ rateValue: String) -> ValidationResult<Int> {
-        if rateValue.isEmpty {
+    fileprivate func validateRate(_ value: String) -> ValidationResult<Int> {
+        if value.isEmpty {
             return .failure("Rate is required.")
         } else {
-            if let rate = Int(rateValue) {
+            if let rate = Int(value) {
                 if rate > 0 {
                     return .success(rate)
                 }
@@ -119,16 +90,13 @@ final class PlaybackConstantViewModel {
     
     func validate() {
         rateError = nil
-        timesToPlayError = nil
         
         let rateResult = validateRate(storedRateString)
         applyRateValidationResult(rateResult)
-        let timesToPlayResult = validateTimesToPlay(storedTimesToPlayString)
-        applyTimesToPlayValidationResult(timesToPlayResult)
     }
     
     var isValid: Bool {
-        rateError == nil && timesToPlayError == nil
+        rateError == nil 
     }
     
     func apply(to playbackConstant: PlaybackConstant) throws {
@@ -138,7 +106,6 @@ final class PlaybackConstantViewModel {
             throw AppError.attemptToSaveInvalidState("PlaybackConstant")
         }
         
-        playbackConstant.rate = rate
-        playbackConstant.timesToPlay = timesToPlay
+        playbackConstant.value = value
     }
 }

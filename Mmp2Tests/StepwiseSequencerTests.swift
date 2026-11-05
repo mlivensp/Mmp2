@@ -12,8 +12,8 @@ import Testing
 struct StepwiseSequencerTests {
 
     @Test func rateStepsOncePerRate() async throws {
-        let playback = Playback()
-        let playbackStepwise = PlaybackStepwise(start: 90, step: 2, max: 100, timesToPlay: 1, playback: playback)
+        let playback = Playback(timesToPlay: 1)
+        let playbackStepwise = PlaybackStepwise(start: 90, step: 2, max: 100, timesToPlayStep: 1, playback: playback)
         playback.playbackStepwise = playbackStepwise
         let sequencer = try SequencerFactory.createSequencer(from: playback, bpm: nil)
         var actual: [Float] = []
@@ -27,8 +27,8 @@ struct StepwiseSequencerTests {
     }
 
     @Test func rateStepsTwicePerRate() async throws {
-        let playback = Playback()
-        let playbackStepwise = PlaybackStepwise(start: 90, step: 2, max: 100, timesToPlay: 2, playback: playback)
+        let playback = Playback(timesToPlay: 1)
+        let playbackStepwise = PlaybackStepwise(start: 90, step: 2, max: 100, timesToPlayStep: 2, playback: playback)
         playback.playbackStepwise = playbackStepwise
         let sequencer = try SequencerFactory.createSequencer(from: playback, bpm: nil)
         var actual: [Float] = []

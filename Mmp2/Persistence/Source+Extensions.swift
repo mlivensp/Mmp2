@@ -31,7 +31,7 @@ extension Source {
             isExpanded: false,
             notes: nil,
             media: Media.makeDraft(),
-            playback: Playback(),
+            playback: Playback(timesToPlay: 1),
             sourceGroup: nil
         )
     }

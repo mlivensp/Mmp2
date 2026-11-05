@@ -28,12 +28,12 @@ class StepwisePlayRateSequencer: PlayRateSequencer {
         var current = stepwise.start
         var rate: Float
         rate = Float(current) / divisor
-        appendRate(rate: rate, count: stepwise.timesToPlay)
+        appendRate(rate: rate, count: stepwise.timesToPlayStep)
         
         while current < stepwise.max {
             current = min(current + stepwise.step, stepwise.max)
             rate = Float(current) / divisor
-            appendRate(rate: rate, count: stepwise.timesToPlay)
+            appendRate(rate: rate, count: stepwise.timesToPlayStep)
         }
         
         currentRate = rates[0]

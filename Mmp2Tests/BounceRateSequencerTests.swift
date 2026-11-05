@@ -21,14 +21,12 @@ struct BounceRateSequencerTests {
         slow: Int = 60, slowTimes: Int = 2,
         mid: Int = 80, midTimes: Int = 3,
         fast: Int = 100, fastTimes: Int = 1,
-        bounces: Int = 1,
         order: PlayOrder? = nil
     ) -> PlaybackBounce {
         PlaybackBounce(
-            slowTempo: slow, timesToPlaySlowTempo: slowTimes,
-            midTempo: mid, timesToPlayMidTempo: midTimes,
-            fastTempo: fast, timesToPlayFastTempo: fastTimes,
-            numberOfBounces: bounces,
+            slow: slow, timesToPlaySlow: slowTimes,
+            mid: mid, timesToPlayMid: midTimes,
+            fast: fast, timesToPlayFast: fastTimes,
             playOrder: order ?? makeOrder(),
             playback: nil
         )
@@ -54,13 +52,6 @@ struct BounceRateSequencerTests {
     func defaultOrder() throws {
         let sut = try BouncePlayRateSequencer(bounce: makeBounce(), bpm: nil)
         #expect(drain(sut) == pct([60, 60, 80, 80, 80, 100]))
-    }
-
-    @Test("number of bounces repeats the whole pattern")
-    func multipleBounces() throws {
-        let sut = try BouncePlayRateSequencer(bounce: makeBounce(bounces: 3), bpm: nil)
-        let one = pct([60, 60, 80, 80, 80, 100])
-        #expect(drain(sut) == one + one + one)
     }
 
     @Test("custom play order reorders segments")
@@ -100,13 +91,13 @@ struct BounceRateSequencerTests {
         let sut = try BouncePlayRateSequencer(bounce: bounce, bpm: nil)
         #expect(drain(sut) == pct([60, 60, 80, 80, 80]))
     }
-
-    @Test("zero slow count with multiple bounces repeats remaining segments")
-    func slowZeroMultipleBounces() throws {
-        let bounce = makeBounce(slowTimes: 0, midTimes: 1, fastTimes: 2, bounces: 2)
-        let sut = try BouncePlayRateSequencer(bounce: bounce, bpm: nil)
-        #expect(drain(sut) == pct([80, 100, 100, 80, 100, 100]))
-    }
+// TODO: this is a decent test but needs playback.timesToPlay
+//    @Test("zero slow count with multiple bounces repeats remaining segments")
+//    func slowZeroMultipleBounces() throws {
+//        let bounce = makeBounce(slowTimes: 0, midTimes: 1, fastTimes: 2, bounces: 2)
+//        let sut = try BouncePlayRateSequencer(bounce: bounce, bpm: nil)
+//        #expect(drain(sut) == pct([80, 100, 100, 80, 100, 100]))
+//    }
 
     @Test("zero count segment is skipped regardless of play order")
     func zeroWithCustomOrder() throws {
@@ -116,15 +107,16 @@ struct BounceRateSequencerTests {
         let sut = try BouncePlayRateSequencer(bounce: bounce, bpm: nil)
         #expect(drain(sut) == pct([100, 60, 60]))
     }
-
-    @Test("each single zero position yields correct total count",
-          arguments: [(0, 2, 3), (2, 0, 3), (2, 3, 0)])
-    func zeroPositionsTotalCount(times: (Int, Int, Int)) throws {
-        let bounce = makeBounce(slowTimes: times.0, midTimes: times.1, fastTimes: times.2, bounces: 4)
-        let sut = try BouncePlayRateSequencer(bounce: bounce, bpm: nil)
-        let nonZeroSum = times.0 + times.1 + times.2
-        #expect(drain(sut).count == nonZeroSum * 4)
-    }
+    
+    // TODO: this is a decent test but needs playback.timesToPlay
+//    @Test("each single zero position yields correct total count",
+//          arguments: [(0, 2, 3), (2, 0, 3), (2, 3, 0)])
+//    func zeroPositionsTotalCount(times: (Int, Int, Int)) throws {
+//        let bounce = makeBounce(slowTimes: times.0, midTimes: times.1, fastTimes: times.2, bounces: 4)
+//        let sut = try BouncePlayRateSequencer(bounce: bounce, bpm: nil)
+//        let nonZeroSum = times.0 + times.1 + times.2
+//        #expect(drain(sut).count == nonZeroSum * 4)
+//    }
 
     // MARK: - BPM
 

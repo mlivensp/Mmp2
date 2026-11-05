@@ -18,7 +18,7 @@ struct SinglePlayerView: View {
     @State private var appeared = false
     
     var body: some View {
-        HStack {
+        HSplitView {
             Group {
                 VStack {
                     Button(action: switchToSource, label: {

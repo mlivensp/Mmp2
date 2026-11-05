@@ -11,157 +11,143 @@ import SwiftData
 
 @Observable
 final class PlaybackBounceViewModel {
-    internal var slowTempo: Int
-    private var preciseSlowTempo: Double
-    internal var slowTempoTimesToPlay: Int
-    internal var midTempo: Int
-    private var preciseMidTempo: Double
-    internal var midTempoTimesToPlay: Int
-    internal var fastTempo: Int
-    private var preciseFastTempo: Double
-    internal var fastTempoTimesToPlay: Int
-    internal var numberOfBounces: Int
+    internal var slow: Int
+    private var preciseSlow: Double
+    internal var slowTimesToPlay: Int
+    internal var mid: Int
+    private var preciseMid: Double
+    internal var midTimesToPlay: Int
+    internal var fast: Int
+    private var preciseFast: Double
+    internal var fastTimesToPlay: Int
     
-    private var storedSlowTempoString: String
-    private var storedSlowTempoTimesToPlayString: String
-    private var storedMidTempoString: String
-    private var storedMidTempoTimesToPlayString: String
-    private var storedFastTempoString: String
-    private var storedFastTempoTimesToPlayString: String
-    private var storedNumberOfBouncesString: String
+    private var storedSlowString: String
+    private var storedSlowTimesToPlayString: String
+    private var storedMidString: String
+    private var storedMidTimesToPlayString: String
+    private var storedFastString: String
+    private var storedFastTimesToPlayString: String
     private var storedPlayOrder: PlayOrder?
     
-    var slowTempoError: String?
-    var slowTempoTimesToPlayError: String?
-    var midTempoError: String?
-    var midTempoTimesToPlayError: String?
-    var fastTempoError: String?
-    var fastTempoTimesToPlayError: String?
-    var numberOfBouncesError: String?
+    var slowError: String?
+    var slowTimesToPlayError: String?
+    var midError: String?
+    var midTimesToPlayError: String?
+    var fastError: String?
+    var fastTimesToPlayError: String?
     var playOrderError: String?
     
     static func `default`() -> PlaybackBounceViewModel {
-        PlaybackBounceViewModel(slowTempo: 90, slowTempoTimesToPlay: 1, midTempo: 100, midTempoTimesToPlay: 1, fastTempo: 110, fastTempoTimesToPlay: 1, numberOfBounces: 1)
+        PlaybackBounceViewModel(slow: 90, slowTimesToPlay: 1, mid: 100, midTimesToPlay: 1, fast: 110, fastTimesToPlay: 1)
     }
     
-    init(slowTempo: Int, slowTempoTimesToPlay: Int, midTempo: Int, midTempoTimesToPlay: Int, fastTempo: Int, fastTempoTimesToPlay: Int, numberOfBounces: Int, playOrder: PlayOrder? = nil) {
-        self.slowTempo = slowTempo
-        self.preciseSlowTempo = Double(slowTempo)
-        self.slowTempoTimesToPlay = slowTempoTimesToPlay
-        self.midTempo = midTempo
-        self.preciseMidTempo = Double(midTempo)
-        self.midTempoTimesToPlay = midTempoTimesToPlay
-        self.fastTempo = fastTempo
-        self.preciseFastTempo = Double(fastTempo)
-        self.fastTempoTimesToPlay = fastTempoTimesToPlay
-        self.numberOfBounces = numberOfBounces
+    init(slow: Int, slowTimesToPlay: Int, mid: Int, midTimesToPlay: Int, fast: Int, fastTimesToPlay: Int, playOrder: PlayOrder? = nil) {
+        self.slow = slow
+        self.preciseSlow = Double(slow)
+        self.slowTimesToPlay = slowTimesToPlay
+        self.mid = mid
+        self.preciseMid = Double(mid)
+        self.midTimesToPlay = midTimesToPlay
+        self.fast = fast
+        self.preciseFast = Double(fast)
+        self.fastTimesToPlay = fastTimesToPlay
         self.storedPlayOrder = playOrder
         
-        self.storedSlowTempoString = String(slowTempo)
-        self.storedSlowTempoTimesToPlayString = String(slowTempoTimesToPlay)
-        self.storedMidTempoString = String(midTempo)
-        self.storedMidTempoTimesToPlayString = String(midTempoTimesToPlay)
-        self.storedFastTempoString = String(fastTempo)
-        self.storedFastTempoTimesToPlayString = String(fastTempoTimesToPlay)
-        self.storedNumberOfBouncesString = String(numberOfBounces)
+        self.storedSlowString = String(slow)
+        self.storedSlowTimesToPlayString = String(slowTimesToPlay)
+        self.storedMidString = String(mid)
+        self.storedMidTimesToPlayString = String(midTimesToPlay)
+        self.storedFastString = String(fast)
+        self.storedFastTimesToPlayString = String(fastTimesToPlay)
         
         validate()
     }
 
     func scaleTempos(by factor: Double) {
-        if case .success = validateTempo(storedSlowTempoString, fieldName: "Slow Tempo") {
-            preciseSlowTempo *= factor
-            slowTempo = scaledPlaybackValue(preciseSlowTempo)
-            storedSlowTempoString = String(slowTempo)
+        if case .success = validateTempo(storedSlowString, fieldName: "Slow") {
+            preciseSlow *= factor
+            slow = scaledPlaybackValue(preciseSlow)
+            storedSlowString = String(slow)
         }
-        if case .success = validateTempo(storedMidTempoString, fieldName: "Mid Tempo") {
-            preciseMidTempo *= factor
-            midTempo = scaledPlaybackValue(preciseMidTempo)
-            storedMidTempoString = String(midTempo)
+        if case .success = validateTempo(storedMidString, fieldName: "Mid") {
+            preciseMid *= factor
+            mid = scaledPlaybackValue(preciseMid)
+            storedMidString = String(mid)
         }
-        if case .success = validateTempo(storedFastTempoString, fieldName: "Fast Tempo") {
-            preciseFastTempo *= factor
-            fastTempo = scaledPlaybackValue(preciseFastTempo)
-            storedFastTempoString = String(fastTempo)
+        if case .success = validateTempo(storedFastString, fieldName: "Fast") {
+            preciseFast *= factor
+            fast = scaledPlaybackValue(preciseFast)
+            storedFastString = String(fast)
         }
         validate()
     }
     
-    var slowTempoString: String {
-        get { storedSlowTempoString }
+    var slowString: String {
+        get { storedSlowString }
         set {
-            storedSlowTempoString = newValue
-            let result = validateTempo(storedSlowTempoString, fieldName: "Slow Tempo")
-            applySlowTempoValidationResult(result)
+            storedSlowString = newValue
+            let result = validateTempo(storedSlowString, fieldName: "Slow")
+            applySlowValidationResult(result)
             if case .success(let value) = result {
-                preciseSlowTempo = Double(value)
+                preciseSlow = Double(value)
             }
             validateRelationships()
         }
     }
     
-    var slowTempoTimesToPlayString: String {
-        get { storedSlowTempoTimesToPlayString }
+    var slowTimesToPlayString: String {
+        get { storedSlowTimesToPlayString }
         set {
-            storedSlowTempoTimesToPlayString = newValue
-            let result = validateTimesToPlay(storedSlowTempoTimesToPlayString, fieldName: "Slow Tempo")
-            applySlowTempoTimesToPlayValidationResult(result)
+            storedSlowTimesToPlayString = newValue
+            let result = validateTimesToPlay(storedSlowTimesToPlayString, fieldName: "Slow")
+            applySlowTimesToPlayValidationResult(result)
             validateRelationships()
         }
     }
     
-    var midTempoString: String {
-        get { storedMidTempoString }
+    var midString: String {
+        get { storedMidString }
         set {
-            storedMidTempoString = newValue
-            let result = validateTempo(storedMidTempoString, fieldName: "Mid Tempo")
-            applyMidTempoValidationResult(result)
+            storedMidString = newValue
+            let result = validateTempo(storedMidString, fieldName: "Mid ")
+            applyMidValidationResult(result)
             if case .success(let value) = result {
-                preciseMidTempo = Double(value)
+                preciseMid = Double(value)
             }
             validateRelationships()
         }
     }
     
-    var midTempoTimesToPlayString: String {
-        get { storedMidTempoTimesToPlayString }
+    var midTimesToPlayString: String {
+        get { storedMidTimesToPlayString }
         set {
-            storedMidTempoTimesToPlayString = newValue
-            let result = validateTimesToPlay(storedMidTempoTimesToPlayString, fieldName: "Mid Tempo")
-            applyMidTempoTimesToPlayValidationResult(result)
+            storedMidTimesToPlayString = newValue
+            let result = validateTimesToPlay(storedMidTimesToPlayString, fieldName: "Mid")
+            applyMidTimesToPlayValidationResult(result)
             validateRelationships()
         }
     }
     
-    var fastTempoString: String {
-        get { storedFastTempoString }
+    var fastString: String {
+        get { storedFastString }
         set {
-            storedFastTempoString = newValue
-            let result = validateTempo(storedFastTempoString, fieldName: "Fast Tempo")
-            applyFastTempoValidationResult(result)
+            storedFastString = newValue
+            let result = validateTempo(storedFastString, fieldName: "Fast ")
+            applyFastValidationResult(result)
             if case .success(let value) = result {
-                preciseFastTempo = Double(value)
+                preciseFast = Double(value)
             }
             validateRelationships()
         }
     }
     
-    var fastTempoTimesToPlayString: String {
-        get { storedFastTempoTimesToPlayString }
+    var fastTimesToPlayString: String {
+        get { storedFastTimesToPlayString }
         set {
-            storedFastTempoTimesToPlayString = newValue
-            let result = validateTimesToPlay(storedFastTempoTimesToPlayString, fieldName: "Fast Tempo")
-            applyFastTempoTimesToPlayValidationResult(result)
+            storedFastTimesToPlayString = newValue
+            let result = validateTimesToPlay(storedFastTimesToPlayString, fieldName: "Fast")
+            applyFastTimesToPlayValidationResult(result)
             validateRelationships()
-        }
-    }
-
-    var numberOfBouncesString: String {
-        get { storedNumberOfBouncesString }
-        set {
-            storedNumberOfBouncesString = newValue
-            let result = validateNumberOfBounces(storedNumberOfBouncesString)
-            applyNumberOfBouncesValidationResult(result)
         }
     }
     
@@ -201,21 +187,6 @@ final class PlaybackBounceViewModel {
         return .failure("\(fieldName) Times To Play must be a number or empty.")
     }
     
-    private func validateNumberOfBounces(_ text: String) -> ValidationResult<Int> {
-        if text.isEmpty {
-            return .failure("Number Of Bounces is required.")
-        } else {
-            if let tempo = Int(text) {
-                
-                if tempo > 0 {
-                    return .success(tempo)
-                }
-            }
-        }
-        
-        return .failure("Number Of Bounces must be a number greater than zero.")
-    }
-    
     private func validatePlayOrder(_ playOrder: PlayOrder?) -> ValidationResult<PlayOrder> {
         guard let playOrder else {
             return .failure("Play Order is required.")
@@ -225,49 +196,49 @@ final class PlaybackBounceViewModel {
     }
 
     private func validateRelationships() {
-        let slowTTP = successValue(validateTimesToPlay(storedSlowTempoTimesToPlayString, fieldName: "Slow Tempo"))
-        let midTTP = successValue(validateTimesToPlay(storedMidTempoTimesToPlayString, fieldName: "Mid Tempo"))
-        let fastTTP = successValue(validateTimesToPlay(storedFastTempoTimesToPlayString, fieldName: "Fast Tempo"))
+        let slowTTP = successValue(validateTimesToPlay(storedSlowTimesToPlayString, fieldName: "Slow"))
+        let midTTP = successValue(validateTimesToPlay(storedMidTimesToPlayString, fieldName: "Mid"))
+        let fastTTP = successValue(validateTimesToPlay(storedFastTimesToPlayString, fieldName: "Fast"))
         
         // Reset times-to-play errors to field-level state
-        applySlowTempoTimesToPlayValidationResult(validateTimesToPlay(storedSlowTempoTimesToPlayString, fieldName: "Slow Tempo"))
-        applyMidTempoTimesToPlayValidationResult(validateTimesToPlay(storedMidTempoTimesToPlayString, fieldName: "Mid Tempo"))
-        applyFastTempoTimesToPlayValidationResult(validateTimesToPlay(storedFastTempoTimesToPlayString, fieldName: "Fast Tempo"))
+        applySlowTimesToPlayValidationResult(validateTimesToPlay(storedSlowTimesToPlayString, fieldName: "Slow"))
+        applyMidTimesToPlayValidationResult(validateTimesToPlay(storedMidTimesToPlayString, fieldName: "Mid"))
+        applyFastTimesToPlayValidationResult(validateTimesToPlay(storedFastTimesToPlayString, fieldName: "Fast"))
         
-        // Rule 2: resolve each tempo (empty allowed only when its timesToPlay is 0/empty)
-        let slow = resolveTempo(storedSlowTempoString, timesToPlay: slowTTP, fieldName: "Slow Tempo")
-        let mid = resolveTempo(storedMidTempoString, timesToPlay: midTTP, fieldName: "Mid Tempo")
-        let fast = resolveTempo(storedFastTempoString, timesToPlay: fastTTP, fieldName: "Fast Tempo")
+        // Rule 2: resolve each  (empty allowed only when its timesToPlay is 0/empty)
+        let slowX = resolveTempo(storedSlowString, timesToPlay: slowTTP, fieldName: "Slow")
+        let midX = resolveTempo(storedMidString, timesToPlay: midTTP, fieldName: "Mid")
+        let fastX = resolveTempo(storedFastString, timesToPlay: fastTTP, fieldName: "Fast")
         
-        slowTempoError = slow.error
-        if let v = slow.value { slowTempo = v }
-        midTempoError = mid.error
-        if let v = mid.value { midTempo = v }
-        fastTempoError = fast.error
-        if let v = fast.value { fastTempo = v }
+        slowError = slowX.error
+        if let v = slowX.value { slow = v }
+        midError = midX.error
+        if let v = midX.value { mid = v }
+        fastError = fastX.error
+        if let v = fastX.value { fast = v }
         
         // Rule 1: only one timesToPlay can be 0/empty
         let zeroCount = [slowTTP, midTTP, fastTTP].filter { $0 == 0 }.count
         if zeroCount > 1 {
             let message = "Only one tempo can have empty or zero Times To Play."
-            if slowTTP == 0 { slowTempoTimesToPlayError = message }
-            if midTTP == 0 { midTempoTimesToPlayError = message }
-            if fastTTP == 0 { fastTempoTimesToPlayError = message }
+            if slowTTP == 0 { slowTimesToPlayError = message }
+            if midTTP == 0 { midTimesToPlayError = message }
+            if fastTTP == 0 { fastTimesToPlayError = message }
         }
         
         // Rule 3: slow < mid < fast, comparing only tempos that are present (non-empty and valid)
-        let slowPresent = slow.isPresent ? slow.value : nil
-        let midPresent = mid.isPresent ? mid.value : nil
-        let fastPresent = fast.isPresent ? fast.value : nil
+        let slowPresent = slowX.isPresent ? slowX.value : nil
+        let midPresent = midX.isPresent ? midX.value : nil
+        let fastPresent = fastX.isPresent ? fastX.value : nil
         
-        if let s = slowPresent, let m = midPresent, s >= m, midTempoError == nil {
-            midTempoError = "Mid Tempo must be greater than Slow Tempo."
+        if let s = slowPresent, let m = midPresent, s >= m, midError == nil {
+            midError = "Mid must be greater than Slow."
         }
-        if let m = midPresent, let f = fastPresent, m >= f, fastTempoError == nil {
-            fastTempoError = "Fast Tempo must be greater than Mid Tempo."
+        if let m = midPresent, let f = fastPresent, m >= f, fastError == nil {
+            fastError = "Fast must be greater than Mid."
         }
-        if midPresent == nil, let s = slowPresent, let f = fastPresent, s >= f, fastTempoError == nil {
-            fastTempoError = "Fast Tempo must be greater than Slow Tempo."
+        if midPresent == nil, let s = slowPresent, let f = fastPresent, s >= f, fastError == nil {
+            fastError = "Fast must be greater than Slow."
         }
     }
     
@@ -296,73 +267,63 @@ final class PlaybackBounceViewModel {
     }
     // MARK: apply validation results
 
-    private func applySlowTempoValidationResult(_ result: ValidationResult<Int>) {
+    private func applySlowValidationResult(_ result: ValidationResult<Int>) {
         switch result {
         case .success(let value):
-            slowTempoError = nil
-            slowTempo = value
+            slowError = nil
+            slow = value
         case .failure(let message):
-            slowTempoError = message
+            slowError = message
         }
     }
     
-    private func applySlowTempoTimesToPlayValidationResult(_ result: ValidationResult<Int>) {
+    private func applySlowTimesToPlayValidationResult(_ result: ValidationResult<Int>) {
         switch result {
         case .success(let value):
-            slowTempoTimesToPlayError = nil
-            slowTempoTimesToPlay = value
+            slowTimesToPlayError = nil
+            slowTimesToPlay = value
         case .failure(let message):
-            slowTempoTimesToPlayError = message
+            slowTimesToPlayError = message
         }
     }
     
-    private func applyMidTempoValidationResult(_ result: ValidationResult<Int>) {
+    private func applyMidValidationResult(_ result: ValidationResult<Int>) {
         switch result {
         case .success(let value):
-            midTempoError = nil
-            midTempo = value
+            midError = nil
+            mid = value
         case .failure(let message):
-            midTempoError = message
+            midError = message
         }
     }
     
-    private func applyMidTempoTimesToPlayValidationResult(_ result: ValidationResult<Int>) {
+    private func applyMidTimesToPlayValidationResult(_ result: ValidationResult<Int>) {
         switch result {
         case .success(let value):
-            midTempoTimesToPlayError = nil
-            midTempoTimesToPlay = value
+            midTimesToPlayError = nil
+            midTimesToPlay = value
         case .failure(let message):
-            midTempoTimesToPlayError = message
+            midTimesToPlayError = message
         }
     }
     
-    private func applyFastTempoValidationResult(_ result: ValidationResult<Int>) {
+    private func applyFastValidationResult(_ result: ValidationResult<Int>) {
         switch result {
         case .success(let value):
-            fastTempoError = nil
-            fastTempo = value
+            fastError = nil
+            fast = value
         case .failure(let message):
-            fastTempoError = message
+            fastError = message
         }
     }
     
-    private func applyFastTempoTimesToPlayValidationResult(_ result: ValidationResult<Int>) {
+    private func applyFastTimesToPlayValidationResult(_ result: ValidationResult<Int>) {
         switch result {
         case .success(let value):
-            fastTempoTimesToPlayError = nil
-            fastTempoTimesToPlay = value
+            fastTimesToPlayError = nil
+            fastTimesToPlay = value
         case .failure(let message):
-            fastTempoTimesToPlayError = message
-        }
-    }
-    
-    private func applyNumberOfBouncesValidationResult(_ result: ValidationResult<Int>) {
-        switch result {
-        case .success(let value):
-            numberOfBouncesError = nil
-            numberOfBounces = value
-        case .failure(let message):
-            numberOfBouncesError = message
+            fastTimesToPlayError = message
         }
     }
     
@@ -376,20 +337,19 @@ final class PlaybackBounceViewModel {
     }
     
     var isValid: Bool {
-        slowTempoError == nil && slowTempoTimesToPlayError == nil &&
-        midTempoError == nil && midTempoTimesToPlayError == nil &&
-        fastTempoError == nil && fastTempoTimesToPlayError == nil &&
-        numberOfBouncesError == nil && playOrderError == nil
+        slowError == nil && slowTimesToPlayError == nil &&
+        midError == nil && midTimesToPlayError == nil &&
+        fastError == nil && fastTimesToPlayError == nil &&
+        playOrderError == nil
     }
 
     func validate() {
-        applySlowTempoValidationResult(validateTempo(storedSlowTempoString, fieldName: "Slow Tempo"))
-        applySlowTempoTimesToPlayValidationResult(validateTimesToPlay(storedSlowTempoTimesToPlayString, fieldName: "Slow Tempo"))
-        applyMidTempoValidationResult(validateTempo(storedMidTempoString, fieldName: "Mid Tempo"))
-        applyMidTempoTimesToPlayValidationResult(validateTimesToPlay(storedMidTempoTimesToPlayString, fieldName: "Mid Tempo"))
-        applyFastTempoValidationResult(validateTempo(storedFastTempoString, fieldName: "Fast Tempo"))
-        applyFastTempoTimesToPlayValidationResult(validateTimesToPlay(storedFastTempoTimesToPlayString, fieldName: "Fast Tempo"))
-        applyNumberOfBouncesValidationResult(validateNumberOfBounces(storedNumberOfBouncesString))
+        applySlowValidationResult(validateTempo(storedSlowString, fieldName: "Slow "))
+        applySlowTimesToPlayValidationResult(validateTimesToPlay(storedSlowTimesToPlayString, fieldName: "Slow "))
+        applyMidValidationResult(validateTempo(storedMidString, fieldName: "Mid "))
+        applyMidTimesToPlayValidationResult(validateTimesToPlay(storedMidTimesToPlayString, fieldName: "Mid "))
+        applyFastValidationResult(validateTempo(storedFastString, fieldName: "Fast "))
+        applyFastTimesToPlayValidationResult(validateTimesToPlay(storedFastTimesToPlayString, fieldName: "Fast "))
         applyPlayOrderValidationResult(validatePlayOrder(storedPlayOrder))
         validateRelationships()
     }
@@ -410,13 +370,12 @@ final class PlaybackBounceViewModel {
             throw AppError.attemptToSaveInvalidState("PlaybackBounce")
         }
         
-        bounce.slowTempo = slowTempo
-        bounce.timesToPlaySlowTempo = slowTempoTimesToPlay
-        bounce.midTempo = midTempo
-        bounce.timesToPlayMidTempo = midTempoTimesToPlay
-        bounce.fastTempo = fastTempo
-        bounce.timesToPlayFastTempo = fastTempoTimesToPlay
-        bounce.numberOfBounces = numberOfBounces
+        bounce.slow = slow
+        bounce.timesToPlaySlow = slowTimesToPlay
+        bounce.mid = mid
+        bounce.timesToPlayMid = midTimesToPlay
+        bounce.fast = fast
+        bounce.timesToPlayFast = fastTimesToPlay
         bounce.playOrder = storedPlayOrder
     }
     

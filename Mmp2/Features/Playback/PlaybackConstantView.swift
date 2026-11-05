@@ -24,18 +24,6 @@ struct PlaybackConstantView: View {
                         .multilineTextAlignment(.trailing)
                 }
             }
-            
-            ErrorFieldContainer(
-                hasError: vm.timesToPlayError != nil,
-                errorMessage: vm.timesToPlayError
-            ) {
-                HStack {
-                    Text("Times To Play")
-                    TextField("", text: $vm.timesToPlayString)
-                        .frame(width: numericFieldWidth)
-                        .multilineTextAlignment(.trailing)
-                }
-            }
         }
     }
 }

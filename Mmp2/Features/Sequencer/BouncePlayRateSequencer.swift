@@ -25,20 +25,22 @@ final class BouncePlayRateSequencer: PlayRateSequencer {
             divisor = Float(100)
         }
         
-        let slowTempos = (bounce.playOrder?.slowOrder ?? 1, Array(repeating: bounce.slowTempo, count: bounce.timesToPlaySlowTempo))
-        let midTempos = (bounce.playOrder?.midOrder ?? 2, Array(repeating: bounce.midTempo, count: bounce.timesToPlayMidTempo))
-        let fastTempos = (bounce.playOrder?.fastOrder ?? 3, Array(repeating: bounce.fastTempo, count: bounce.timesToPlayFastTempo))
+        let slowTempos = (bounce.playOrder?.slowOrder ?? 1, Array(repeating: bounce.slow, count: bounce.timesToPlaySlow))
+        let midTempos = (bounce.playOrder?.midOrder ?? 2, Array(repeating: bounce.mid, count: bounce.timesToPlayMid))
+        let fastTempos = (bounce.playOrder?.fastOrder ?? 3, Array(repeating: bounce.fast, count: bounce.timesToPlayFast))
         
         let oneBounce = [slowTempos, midTempos, fastTempos]
             .sorted(by: { $0.0 < $1.0 } )
             .map(\.1)
             .flatMap{ $0 }
-        rates = Array(repeating: oneBounce, count: bounce.numberOfBounces)
-            .flatMap { $0 }
-            .map { Float($0) / divisor }
+//        rates = Array(repeating: oneBounce, count: bounce.numberOfBounces)
+//            .flatMap { $0 }
+//            .map { Float($0) / divisor }
         
-        currentRate = rates[0]
-        
+//        currentRate = rates[0]
+        // TODO: the previous line is what was here. the following line is just to get thisto compile
+        currentRate = Float(oneBounce[0]) / divisor
+
         for rate in rates {
             Logger.data.info("Bounce rate: \(rate)")
         }

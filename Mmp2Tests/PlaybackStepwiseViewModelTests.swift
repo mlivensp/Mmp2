@@ -25,7 +25,7 @@ struct PlaybackStepwiseViewModelTests {
         #expect(vm.start == 60)
         #expect(vm.step == 5)
         #expect(vm.max == 120)
-        #expect(vm.timesToPlay == 3)
+        #expect(vm.timesToPlayStep == 3)
 
         #expect(vm.isValid)
         #expect(vm.startError == nil)
@@ -138,7 +138,7 @@ struct PlaybackStepwiseViewModelTests {
         let vm = makeDefaultVM()
         vm.timesToPlayString = "4"
 
-        #expect(vm.timesToPlay == 4)
+        #expect(vm.timesToPlayStep == 4)
         #expect(vm.timesToPlayError == nil)
     }
 
@@ -146,11 +146,11 @@ struct PlaybackStepwiseViewModelTests {
           arguments: ["", "0", "-1", "x"])
     func timesToPlayRejectsInvalid(input: String) {
         let vm = makeDefaultVM()
-        let original = vm.timesToPlay
+        let original = vm.timesToPlayStep
 
         vm.timesToPlayString = input
 
-        #expect(vm.timesToPlay == original)
+        #expect(vm.timesToPlayStep == original)
         #expect(vm.timesToPlayError != nil)
         #expect(!vm.isValid)
     }
@@ -343,7 +343,7 @@ struct PlaybackStepwiseViewModelTests {
     @Test("apply copies values to PlaybackStepwise when valid")
     func applyCopiesValues() throws {
         let vm = makeVM(start: 60, step: 5, max: 120, timesToPlay: 3)
-        let model = Mmp2.PlaybackStepwise(start: 1, step: 1, max: 1, timesToPlay: 1, playback: nil)
+        let model = Mmp2.PlaybackStepwise(start: 1, step: 1, max: 1, timesToPlayStep: 1, playback: nil)
 
         vm.startString = "70"
         vm.stepString = "10"
@@ -355,13 +355,13 @@ struct PlaybackStepwiseViewModelTests {
         #expect(model.start == 70)
         #expect(model.step == 10)
         #expect(model.max == 150)
-        #expect(model.timesToPlay == 6)
+        #expect(model.timesToPlayStep == 6)
     }
 
     @Test("apply throws and leaves model untouched when state is invalid")
     func applyThrowsWhenInvalid() {
         let vm = makeVM(start: 60, step: 5, max: 120, timesToPlay: 3)
-        let model = Mmp2.PlaybackStepwise(start: 1, step: 2, max: 3, timesToPlay: 4, playback: nil)
+        let model = Mmp2.PlaybackStepwise(start: 1, step: 2, max: 3, timesToPlayStep: 4, playback: nil)
 
         vm.maxString = "nope"
 
@@ -371,7 +371,7 @@ struct PlaybackStepwiseViewModelTests {
         #expect(model.start == 1)
         #expect(model.step == 2)
         #expect(model.max == 3)
-        #expect(model.timesToPlay == 4)
+        #expect(model.timesToPlayStep == 4)
     }
 
     // MARK: - Helpers
@@ -381,7 +381,7 @@ struct PlaybackStepwiseViewModelTests {
     }
 
     private func makeVM(start: Int, step: Int, max: Int, timesToPlay: Int) -> PlaybackStepwiseViewModel {
-        PlaybackStepwiseViewModel(start: start, step: step, max: max, timesToPlay: timesToPlay)
+        PlaybackStepwiseViewModel(start: start, step: step, max: max, timesToPlayStep: timesToPlay)
     }
 
     private func successValue(_ result: ValidationResult<Int>) -> Int? {

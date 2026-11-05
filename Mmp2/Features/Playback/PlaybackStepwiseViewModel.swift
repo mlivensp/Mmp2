@@ -14,7 +14,7 @@ final class PlaybackStepwiseViewModel {
     var step: Int
     var max: Int
     private var preciseMax: Double
-    var timesToPlay: Int
+    var timesToPlayStep: Int
     
     var storedStartString: String
     var storedStepString: String
@@ -27,21 +27,21 @@ final class PlaybackStepwiseViewModel {
     var timesToPlayError: String?
     
     static func `default`() -> PlaybackStepwiseViewModel {
-        PlaybackStepwiseViewModel(start: 100, step: 2, max: 110, timesToPlay: 1)
+        PlaybackStepwiseViewModel(start: 100, step: 2, max: 110, timesToPlayStep: 1)
     }
 
-    init(start: Int, step: Int, max: Int, timesToPlay: Int) {
+    init(start: Int, step: Int, max: Int, timesToPlayStep: Int) {
         self.start = start
         self.preciseStart = Double(start)
         self.step = step
         self.max = max
         self.preciseMax = Double(max)
-        self.timesToPlay = timesToPlay
+        self.timesToPlayStep = timesToPlayStep
         
         storedStartString = String(start)
         storedStepString = String(step)
         storedMaxString = String(max)
-        storedTimesToPlayString = String(timesToPlay)
+        storedTimesToPlayString = String(timesToPlayStep)
         
         validate()
     }
@@ -224,7 +224,7 @@ final class PlaybackStepwiseViewModel {
         switch result {
         case .success(let value):
             timesToPlayError = nil
-            timesToPlay = value
+            timesToPlayStep = value
         case .failure(let message):
             timesToPlayError = message
         }
@@ -251,6 +251,6 @@ final class PlaybackStepwiseViewModel {
         stepwise.start = start
         stepwise.step = step
         stepwise.max = max
-        stepwise.timesToPlay = timesToPlay
+        stepwise.timesToPlayStep = timesToPlayStep
     }
 }

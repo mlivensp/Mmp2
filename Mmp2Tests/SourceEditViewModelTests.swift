@@ -44,7 +44,7 @@ struct SourceEditViewModelTests {
 
         var sourceGroup: SourceGroup?
         if let sourceGroupName {
-            sourceGroup = SourceGroup(name: sourceGroupName, sortOrder: 1, mediaCollection: collection)
+            sourceGroup = SourceGroup(name: sourceGroupName, sortOrder: 1, isExpanded: false, mediaCollection: collection)
             context.insert(sourceGroup!)
             collection.sourceGroups.append(sourceGroup!)
         }
@@ -60,7 +60,7 @@ struct SourceEditViewModelTests {
         )
         context.insert(media)
 
-        let playback = Playback()
+        let playback = Playback(timesToPlay: 1)
         context.insert(playback)
 
         let source = Source(
@@ -68,6 +68,7 @@ struct SourceEditViewModelTests {
             sortOrder: sortOrder,
             measure1Start: measure1Start,
             isFavorite: isFavorite,
+            isExpanded: false,
             notes: notes,
             media: media,
             playback: playback,
@@ -86,7 +87,7 @@ struct SourceEditViewModelTests {
                 isArchived: false,
                 pathIsValid: true
             )
-            let existingPlayback = Playback()
+            let existingPlayback = Playback(timesToPlay: 1)
             context.insert(existingMedia)
             context.insert(existingPlayback)
 
@@ -95,6 +96,7 @@ struct SourceEditViewModelTests {
                 sortOrder: 0,
                 measure1Start: nil,
                 isFavorite: false,
+                isExpanded: false,
                 notes: nil,
                 media: existingMedia,
                 playback: existingPlayback,

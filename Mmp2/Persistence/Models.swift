@@ -126,6 +126,7 @@ import SwiftData
 }
 
 @Model public class Playback {
+    var timesToPlay: Int?
     var source: Source?
     var clip: Clip?
     var playlistItem: PlaylistItem?
@@ -140,20 +141,17 @@ import SwiftData
     var playbackBounce: PlaybackBounce?
 //        @Relationship(inverse: \PlaylistItem.playback) var playlistMember: PlaylistItem?
 //        @Relationship(inverse: \Source.playback) var source: Source?
-    public init() {
-
+    public init(timesToPlay: Int?) {
+        self.timesToPlay = timesToPlay
     }
 }
 
 @Model public class PlaybackConstant {
-    var rate: Int
-    var timesToPlay: Int?
+    var value: Int
     var playback: Playback?
     
-    init(rate: Int, timesToPlay: Int? = nil, playback: Playback? = nil) {
-        self.rate = rate
-        self.timesToPlay = timesToPlay
-        self.playback = playback
+    init(value: Int) {
+        self.value = value
     }
 }
 
@@ -161,38 +159,36 @@ import SwiftData
     var start: Int
     var step: Int
     var max: Int
-    var timesToPlay: Int
+    var timesToPlayStep: Int
     var playback: Playback?
     
-    init(start: Int, step: Int, max: Int, timesToPlay: Int, playback: Playback? = nil) {
+    init(start: Int, step: Int, max: Int, timesToPlayStep: Int, playback: Playback? = nil) {
         self.start = start
         self.step = step
         self.max = max
-        self.timesToPlay = timesToPlay
+        self.timesToPlayStep = timesToPlayStep
         self.playback = playback
     }
 }
 
 @Model public class PlaybackBounce {
-    var slowTempo: Int
-    var timesToPlaySlowTempo: Int
-    var midTempo: Int
-    var timesToPlayMidTempo: Int
-    var fastTempo: Int
-    var timesToPlayFastTempo: Int
-    var numberOfBounces: Int
+    var slow: Int
+    var timesToPlaySlow: Int
+    var mid: Int
+    var timesToPlayMid: Int
+    var fast: Int
+    var timesToPlayFast: Int
     var playback: Playback?
     
     var playOrder: PlayOrder?
     
-    init(slowTempo: Int, timesToPlaySlowTempo: Int, midTempo: Int, timesToPlayMidTempo: Int, fastTempo: Int, timesToPlayFastTempo: Int, numberOfBounces: Int, playOrder: PlayOrder? = nil, playback: Playback? = nil) {
-        self.slowTempo = slowTempo
-        self.timesToPlaySlowTempo = timesToPlaySlowTempo
-        self.midTempo = midTempo
-        self.timesToPlayMidTempo = timesToPlayMidTempo
-        self.fastTempo = fastTempo
-        self.timesToPlayFastTempo = timesToPlayFastTempo
-        self.numberOfBounces = numberOfBounces
+    init(slow: Int, timesToPlaySlow: Int, mid: Int, timesToPlayMid: Int, fast: Int, timesToPlayFast: Int, playOrder: PlayOrder? = nil, playback: Playback? = nil) {
+        self.slow = slow
+        self.timesToPlaySlow = timesToPlaySlow
+        self.mid = mid
+        self.timesToPlayMid = timesToPlayMid
+        self.fast = fast
+        self.timesToPlayFast = timesToPlayFast
         self.playback = playback
         self.playOrder = playOrder
     }
