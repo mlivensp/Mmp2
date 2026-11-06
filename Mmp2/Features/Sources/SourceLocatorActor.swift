@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import OSLog
 import SwiftData
 
 @ModelActor
@@ -30,7 +31,7 @@ actor SourceLocatorActor {
         print("URL is file URL:", directoryURL.isFileURL)
         print("Path:", directoryURL.path)
         // … then try the bookmark
-//        let canAccess = directoryURL.startAccessingSecurityScopedResource()
+        let _ = directoryURL.startAccessingSecurityScopedResource()
         defer { directoryURL.stopAccessingSecurityScopedResource() }
 
         for (index, media) in mediaItems.enumerated() {

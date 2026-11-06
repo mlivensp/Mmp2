@@ -10,47 +10,76 @@ import Foundation
 extension URL {
 
     static func rebaseCrossPlatform(_ rawPath: String, on root: URL) -> URL? {
-        // Normalize Windows → POSIX
+
+        // Normalize incoming path
         let posix = rawPath
             .replacingOccurrences(of: "\\", with: "/")
-            .replacingOccurrences(of: "C:/", with: "")
-            .replacingOccurrences(of: "c:/", with: "")
+            .replacingOccurrences(of: "C:/", with: "", options: .caseInsensitive)
             .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
 
-        let rawComponents = posix.split(separator: "/").map(String.init)
-        let rootComponents = root.path.split(separator: "/").map(String.init)
+        let rawComponents = posix
+            .split(separator: "/")
+            .map(String.init)
 
-        // Find overlap (prefix of raw vs suffix of root)
-        let overlap = overlapComponents(raw: rawComponents, root: rootComponents)
+        let rootComponents = root.path
+            .split(separator: "/")
+            .map(String.init)
 
-        // Remove overlap from raw path
-        let trimmed = Array(rawComponents.dropFirst(overlap.count))
-
-        // Build final URL
-        var finalURL = root
-        for component in trimmed {
-            finalURL.appendPathComponent(component)
+        guard let overlapRange = longestRootSuffixMatch(
+            raw: rawComponents,
+            root: rootComponents
+        ) else {
+            return nil
         }
 
-        return finalURL.standardizedFileURL
+        // Everything after the matched suffix becomes relative
+        let relativeComponents = rawComponents.dropFirst(overlapRange.upperBound)
+
+        var result = root
+
+        for component in relativeComponents {
+            result.appendPathComponent(component)
+        }
+
+        return result.standardizedFileURL
     }
 
-    private static func overlapComponents(raw: [String], root: [String]) -> [String] {
-        var overlap: [String] = []
+    /// Finds the longest suffix of `root` that appears as a contiguous
+    /// sequence anywhere within `raw`.
+    private static func longestRootSuffixMatch(
+        raw: [String],
+        root: [String]
+    ) -> Range<Int>? {
 
-        var rawIndex = 0
-        var rootIndex = root.count - 1
+        let normalizedRaw = raw.map(normalizeComponent)
+        let normalizedRoot = root.map(normalizeComponent)
 
-        while rawIndex < raw.count && rootIndex >= 0 {
-            if raw[rawIndex] == root[rootIndex] {
-                overlap.append(raw[rawIndex])
-                rawIndex += 1
-                rootIndex -= 1
-            } else {
-                break
+        // Try longest suffix first.
+        for suffixStart in normalizedRoot.indices {
+
+            let suffix = Array(normalizedRoot[suffixStart...])
+
+            guard suffix.count <= normalizedRaw.count else {
+                continue
+            }
+
+            for rawStart in 0...(normalizedRaw.count - suffix.count) {
+
+                let rawEnd = rawStart + suffix.count
+
+                if Array(normalizedRaw[rawStart..<rawEnd]) == suffix {
+                    return rawStart..<rawEnd
+                }
             }
         }
 
-        return overlap
+        return nil
+    }
+
+    private static func normalizeComponent(_ component: String) -> String {
+        component
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .folding(options: [.caseInsensitive, .diacriticInsensitive],
+                     locale: .current)
     }
 }
