@@ -6,7 +6,7 @@ final class MediaPlayerController {
     let player = AVPlayer()
     
     private(set) var playableItem: PlayableItem?
-    private var sequencer: PlayRateSequencer?
+    private var sequencer: StepSequencer?
     
     private var playbackTask: Task<Void, Never>?
     
@@ -14,7 +14,7 @@ final class MediaPlayerController {
 
     func load(_ playableItem: PlayableItem, forPlaylist: Bool = false) throws {
         stop()
-        sequencer = try SequencerFactory.createSequencer(
+        sequencer = try SequencerFactory.createStepSequencer(
             from: playableItem.playback,
             bpm: playableItem.bpm,
             forPlaylist: forPlaylist
@@ -38,10 +38,10 @@ final class MediaPlayerController {
     }
     
     var playRate: Float {
-        get { return sequencer?.currentRate ?? 1 }
+        get { return sequencer?.current ?? 1 }
         set {
-            sequencer = SequencerFactory.createConstantPlayRateSequencer(rate: newValue, bpm: playableItem?.bpm)
-            player.defaultRate = sequencer?.currentRate ?? 1
+            sequencer = SequencerFactory.createConstantStepSequencer(value: newValue, bpm: playableItem?.bpm)
+            player.defaultRate = sequencer?.current ?? 1
             player.rate = player.defaultRate
         }
     }
@@ -104,7 +104,7 @@ final class MediaPlayerController {
             .makeAsyncIterator()
         
         while !Task.isCancelled {
-            guard let rate = sequencer?.nextRate() else {
+            guard let rate = sequencer?.next() else {
                 player.pause()
                 return
             }

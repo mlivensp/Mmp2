@@ -15,12 +15,12 @@ struct StepwiseSequencerTests {
         let playback = Playback(timesToPlay: 1)
         let playbackStepwise = PlaybackStepwise(start: 90, step: 2, max: 100, timesToPlayStep: 1, playback: playback)
         playback.playbackStepwise = playbackStepwise
-        let sequencer = try SequencerFactory.createSequencer(from: playback, bpm: nil)
+        var sequencer = try SequencerFactory.createStepSequencer(from: playback, bpm: nil)
         var actual: [Float] = []
-        var rate = sequencer.nextRate()
+        var rate = sequencer.next()
         while rate != nil {
             actual.append(rate!)
-            rate = sequencer.nextRate()
+            rate = sequencer.next()
         }
         let expected: [Float] = [0.9, 0.92, 0.94, 0.96, 0.98, 1.0]
         #expect(actual == expected)
@@ -30,12 +30,12 @@ struct StepwiseSequencerTests {
         let playback = Playback(timesToPlay: 1)
         let playbackStepwise = PlaybackStepwise(start: 90, step: 2, max: 100, timesToPlayStep: 2, playback: playback)
         playback.playbackStepwise = playbackStepwise
-        let sequencer = try SequencerFactory.createSequencer(from: playback, bpm: nil)
+        var sequencer = try SequencerFactory.createStepSequencer(from: playback, bpm: nil)
         var actual: [Float] = []
-        var rate = sequencer.nextRate()
+        var rate = sequencer.next()
         while rate != nil {
             actual.append(rate!)
-            rate = sequencer.nextRate()
+            rate = sequencer.next()
         }
         let expected: [Float] = [0.9, 0.9, 0.92, 0.92, 0.94, 0.94, 0.96, 0.96, 0.98, 0.98, 1.0, 1.0]
         #expect(actual == expected)

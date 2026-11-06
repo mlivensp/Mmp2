@@ -15,9 +15,9 @@ struct ConstantSequencerTests {
         let playback = Playback(timesToPlay: 10)
         let playbackConstant = PlaybackConstant(value: 100)
         playback.playbackConstant = playbackConstant
-        let sequencer = try? await SequencerFactory.createSequencer(from: playback, bpm: nil)
+        var sequencer = try? await SequencerFactory.createStepSequencer(from: playback, bpm: nil)
         var actual: [Float] = []
-        while let nextRate = await sequencer!.nextRate() {
+        while let nextRate = await sequencer!.next() {
             actual.append(nextRate)
         }
         
@@ -29,11 +29,11 @@ struct ConstantSequencerTests {
         let playback = Playback(timesToPlay: nil)
         let playbackConstant = PlaybackConstant(value: 1)
         playback.playbackConstant = playbackConstant
-        let sequencer = try? await SequencerFactory.createSequencer(from: playback, bpm: nil)
+        var sequencer = try? await SequencerFactory.createStepSequencer(from: playback, bpm: nil)
         var actual = 0
         let timesToLoop = 100
         for _ in 0..<100 {
-            if let _ = await sequencer!.nextRate() {
+            if let _ = await sequencer!.next() {
                 actual += 1
             }
         }
@@ -46,9 +46,9 @@ struct ConstantSequencerTests {
         let playback = Playback(timesToPlay: 1)
         let playbackConstant = PlaybackConstant(value: 72)
         playback.playbackConstant = playbackConstant
-        let sequencer = try? await SequencerFactory.createSequencer(from: playback, bpm: 72)
+        var sequencer = try? await SequencerFactory.createStepSequencer(from: playback, bpm: 72)
         var actual: [Float] = []
-        while let nextRate = await sequencer!.nextRate() {
+        while let nextRate = await sequencer!.next() {
             actual.append(nextRate)
         }
         
