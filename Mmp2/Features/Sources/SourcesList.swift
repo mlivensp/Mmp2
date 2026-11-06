@@ -24,6 +24,7 @@ struct SourcesList: View {
             TopLevelSourceGroup(
                 sourceGroup: $0,
                 sources: topLevelSources($0.sources)
+                    .sorted(by: { $0.sortOrder < $1.sortOrder })
             )
         }
         items += groups.map { .group($0) }

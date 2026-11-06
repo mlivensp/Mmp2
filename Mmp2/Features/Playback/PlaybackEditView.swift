@@ -19,6 +19,17 @@ struct PlaybackEditView: View {
         }
         .pickerStyle(.menu)   // This makes it behave like a dropdown
         
+        ErrorFieldContainer(
+            hasError: vm.timesToPlayError != nil,
+            errorMessage: vm.timesToPlayError
+        ) {
+            HStack {
+                Text("Times To Repeat")
+                TextField("", text: $vm.timesToPlayString, prompt: Text("∞"))
+                    .frame(maxWidth: 60)
+            }
+        }
+
         switch vm.mode {
         case .constant:
             PlaybackConstantView(vm: vm.constantVM, isBPM: vm.bpm != nil)
