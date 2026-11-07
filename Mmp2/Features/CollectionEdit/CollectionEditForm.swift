@@ -38,7 +38,7 @@ struct CollectionEditForm: View {
             .scrollContentBackground(.hidden)   // optional, but recommended
             .padding(formPadding)
             
-            CollectionEditSourceListView(collection: vm.collection, sources: vm.sources) { source in
+            CollectionEditSourceListView(vm: vm) { source in
                 appRootManager.editSource(source, in: vm.collection)
             }
             .padding([.leading, .trailing, .bottom], formPadding)

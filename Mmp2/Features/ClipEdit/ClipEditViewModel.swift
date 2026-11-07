@@ -378,13 +378,13 @@ extension ClipEditView {
                 clip.firstMeasure = firstMeasure
                 clip.lastMeasure = lastMeasure
                 let (start, end) = try guardedConvertMeasuresToTimes(startMeasure: firstMeasure, endMeasure: lastMeasure, measure1Start: source.measure1Start, bpm: bpm)
-                clip.startSeconds = start
-                clip.endSeconds = end
+                clip.startSeconds = start.roundedTo2Places()
+                clip.endSeconds = end.roundedTo2Places()
             } else {
                 clip.firstMeasure = nil
                 clip.lastMeasure = nil
-                clip.startSeconds = startSeconds
-                clip.endSeconds = endSeconds
+                clip.startSeconds = startSeconds.roundedTo2Places()
+                clip.endSeconds = endSeconds.roundedTo2Places()
             }
             
             if clip.source == nil {

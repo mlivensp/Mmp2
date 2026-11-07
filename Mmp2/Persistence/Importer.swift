@@ -141,7 +141,6 @@ struct Importer {
             let (collectionSourceMap, sourceClipMap) = importSources(modelContext: modelContext, sources: collectionData.sources.array, mediaCollection: mediaCollection, sourceGroups: sourceGroups, playOrderMap: playOrderMap)
             sourceMap = sourceMap + collectionSourceMap
             clipMap = clipMap + sourceClipMap
-            print("Collection \(name) includes \(mediaCollection.sources.count) sources")
         }
         
         return (sourceMap, clipMap)

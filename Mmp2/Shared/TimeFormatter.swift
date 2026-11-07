@@ -16,13 +16,13 @@ final class TimeFormatter {
     // MARK: - Formatting
 
     func string(from seconds: Double) -> String {
-        guard seconds.isFinite else { return "0:00.0" }
+        guard seconds.isFinite else { return "0:00.00" }
 
         let totalMilliseconds = Int((seconds * 1000).rounded())
         let hours = totalMilliseconds / 3_600_000
         let minutes = (totalMilliseconds % 3_600_000) / 60_000
         let secs = (totalMilliseconds % 60_000) / 1000
-        let tenths = (totalMilliseconds % 1000) / 100
+        let tenths = (totalMilliseconds % 1000) / 10
 
         if hours > 0 {
             return String(format: "%d:%02d:%02d.%d", hours, minutes, secs, tenths)
@@ -54,7 +54,7 @@ final class TimeFormatter {
                 throw AppError.invalidTimeFormat
             }
             
-            seconds = value
+            seconds = value.roundedTo2Places()
 
         case 2:
             // "1:23.4"
@@ -66,7 +66,7 @@ final class TimeFormatter {
                 throw AppError.invalidTimeFormat
             }
             
-            seconds = minutes * 60 + sec
+            seconds = (minutes * 60 + sec).roundedTo2Places()
 
         case 3:
             // "00:12:04.25"
@@ -79,12 +79,12 @@ final class TimeFormatter {
             guard let sec = Double(parts[2]) else {
                 throw AppError.invalidTimeFormat
             }
-            seconds = hours * 3600 + minutes * 60 + sec
+            seconds = (hours * 3600 + minutes * 60 + sec).roundedTo2Places()
 
         default:
             throw AppError.invalidTimeFormat
         }
 
-        return seconds
+        return seconds.roundedTo2Places()
     }
 }
