@@ -8,6 +8,7 @@
 import Testing
 @testable import Mmp2
 
+@MainActor
 struct TimeFormatterTests {
 
     @Test func testSecondsFraction() async throws {

@@ -46,6 +46,7 @@ extension URL {
 
     /// Finds the longest suffix of `root` that appears as a contiguous
     /// sequence anywhere within `raw`.
+    @MainActor
     private static func longestRootSuffixMatch(
         raw: [String],
         root: [String]

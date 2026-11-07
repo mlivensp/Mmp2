@@ -15,7 +15,7 @@ struct StepwiseSequencerTests {
         let playback = Playback(timesToPlay: 1)
         let playbackStepwise = PlaybackStepwise(start: 90, step: 2, max: 100, timesToPlayStep: 1, playback: playback)
         playback.playbackStepwise = playbackStepwise
-        var sequencer = try SequencerFactory.createStepSequencer(from: playback, bpm: nil)
+        let sequencer = try SequencerFactory.createStepSequencer(from: playback, bpm: nil)
         var actual: [Float] = []
         var rate = sequencer.next()
         while rate != nil {
@@ -30,7 +30,7 @@ struct StepwiseSequencerTests {
         let playback = Playback(timesToPlay: 1)
         let playbackStepwise = PlaybackStepwise(start: 90, step: 2, max: 100, timesToPlayStep: 2, playback: playback)
         playback.playbackStepwise = playbackStepwise
-        var sequencer = try SequencerFactory.createStepSequencer(from: playback, bpm: nil)
+        let sequencer = try SequencerFactory.createStepSequencer(from: playback, bpm: nil)
         var actual: [Float] = []
         var rate = sequencer.next()
         while rate != nil {

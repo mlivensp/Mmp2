@@ -340,7 +340,7 @@ import SwiftData
     
     var mediaCollection: MediaCollection?
     
-    public init(name: String, sortOrder: Int, isExpanded: Bool, mediaCollection: MediaCollection?) {
+    public init(name: String, sortOrder: Int, isExpanded: Bool = false, mediaCollection: MediaCollection? = nil) {
         self.primitiveName = name
         self.name_normalized = name.normalizedForSearch
         self.sortOrder = sortOrder

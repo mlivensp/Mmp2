@@ -20,54 +20,63 @@ struct CollectionEditForm: View {
 
     var body: some View {
         let _ = print("CollectionEditForm - \(vm.collection.primitiveName)")
-        ScrollView {
+
+        VStack(spacing: 0) {
+
             Form {
                 Section("Name") {
                     ErrorFieldContainer(
                         hasError: vm.nameError != nil,
-                        errorMessage: vm.nameError,
+                        errorMessage: vm.nameError
                     ) {
                         TextField("", text: $vm.nameString)
                     }
                 }
-                
+
                 Section("Notes") {
                     TextField("", text: $vm.notes)
                 }
             }
-            .scrollContentBackground(.hidden)   // optional, but recommended
-            .padding(formPadding)
-            
-            CollectionEditSourceListView(vm: vm) { source in
-                appRootManager.editSource(source, in: vm.collection)
+            .frame(height: 180)
+
+            CollectionEditSourceListView(
+                vm: vm
+            ) { source in
+                appRootManager.editSource(
+                    source,
+                    in: vm.collection
+                )
             }
-            .padding([.leading, .trailing, .bottom], formPadding)
-            
-            Section {
-                HStack {
-                    Spacer()
-                    Button("Save") {
-                        do {
-                            if try vm.save() {
-                                dismiss()
-                            }
-                        } catch {
-                            let _ = print(error.localizedDescription)
-                            // TODO: notify user
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding([.leading, .trailing], formPadding)
+
+            Divider()
+
+            HStack {
+                Spacer()
+
+                Button("Save") {
+                    do {
+                        if try vm.save() {
+                            dismiss()
                         }
+                    } catch {
+                        let _ = print(error.localizedDescription)
+                        // TODO: notify user
                     }
-                    .buttonStyle(.borderedProminent)
-                    
-                    Spacer()
-                    
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(.secondary)
-                    
-                    Spacer()
                 }
+                .buttonStyle(.borderedProminent)
+
+                Spacer()
+
+                Button("Cancel") {
+                    dismiss()
+                }
+                .foregroundColor(.secondary)
+
+                Spacer()
             }
+            .padding()
         }
     }
 }

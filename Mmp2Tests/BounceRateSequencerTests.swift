@@ -39,7 +39,7 @@ struct BounceRateSequencerTests {
     /// Drains the sequencer until nextRate() returns nil.
     private func drain(_ stepSequencer: StepSequencer) -> [Float] {
         var result: [Float] = []
-        var sequencer = stepSequencer
+        let sequencer = stepSequencer
         while let rate = sequencer.next() {
             result.append(rate)
             if result.count > 10_000 { break } // safety
