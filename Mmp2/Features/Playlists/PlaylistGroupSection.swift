@@ -14,8 +14,8 @@ struct PlaylistGroupSection: View {
     
     var body: some View {
         DisclosureGroup(isExpanded: Binding(
-            get: { wrapper.isExpanded },
-            set: { wrapper.isExpanded = $0 }
+            get: { wrapper.playlistGroup.isExpanded },
+            set: { wrapper.playlistGroup.isExpanded = $0 }
         )) {
             ForEach(wrapper.playlists) { playlistWrapper in
                 PlaylistSection(

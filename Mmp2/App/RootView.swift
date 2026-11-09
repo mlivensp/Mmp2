@@ -63,8 +63,8 @@ struct RootView: View {
                                 let _ = print("navigationDestination - ClipEditView")
                                 ClipEditView(clip: clip, source: source)
                             case .playlistEdit(let playlist):
-                                // TODO: PlaylistEdit
-                                EmptyView()
+                                let _ = print("navigationDestination - PlaylistEditView")
+                                PlaylistEditView(playlist: playlist)
                             }
                         }
                     }

@@ -19,10 +19,7 @@ struct CollectionEditForm: View {
     }
 
     var body: some View {
-        let _ = print("CollectionEditForm - \(vm.collection.primitiveName)")
-
         VStack(spacing: 0) {
-
             Form {
                 Section("Name") {
                     ErrorFieldContainer(

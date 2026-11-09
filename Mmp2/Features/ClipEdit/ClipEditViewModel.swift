@@ -104,6 +104,7 @@ extension ClipEditView {
         }
 
         // MARK: Editable fields
+        
         var name: String {
             get { return storedNameString }
             set {

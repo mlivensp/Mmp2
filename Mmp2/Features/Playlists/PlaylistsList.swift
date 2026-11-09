@@ -11,19 +11,25 @@ import SwiftUI
 struct PlaylistsList: View {
     @Environment(AppRootManager.self) var appRootManager
     @Environment(\.modelContext) private var modelContext
+    
     @Query private var playlistGroups: [PlaylistGroup]
     @Query(sort: \Playlist.name_normalized) private var playlists: [Playlist]
-
+    @Query private var groupItems: [PlaylistGroupItem]
+    
     let onPlaylistTapped: (Playlist) -> Void
 
     private var topLevelItems: [TopLevelPlaylistItem] {
         var items: [TopLevelPlaylistItem] = []
         
         // 1. Groups
-        let groups = playlistGroups.map {
-            TopLevelPlaylistGroup(
-                playlistGroup: $0,
-                playlists: topLevelPlaylists($0.groupItems)
+        let groups = playlistGroups.map { group in
+            let memberships = groupItems.filter {
+                $0.playlistGroup.id == group.id
+            }
+            
+            return TopLevelPlaylistGroup(
+                playlistGroup: group,
+                playlists: topLevelPlaylists(memberships)
                     .sorted(by: { $0.playlist.primitiveName < $1.playlist.primitiveName })
             )
         }
@@ -47,6 +53,11 @@ struct PlaylistsList: View {
     
     var body: some View {
         VStack {
+            // the following line establishes a view dependeny on groupItems,
+            // forcing the view to redraw when groupItems changes. This happens
+            // when a playlist is added to or removed from a playlist group
+            let _ = groupItems.count
+            
             List {
                 ForEach(topLevelItems) { item in
                     switch item {
@@ -55,11 +66,13 @@ struct PlaylistsList: View {
                             wrapper: wrapper,
                             onPlaylistTapped: onPlaylistTapped,
                             appRootManager: appRootManager)
+                        .id("\(wrapper.id)-\(wrapper.playlists.count)")
                     case .playlist(let wrapper):
                         PlaylistSection(
                             wrapper: wrapper,
                             onPlaylistTapped: onPlaylistTapped,
                             appRootManager: appRootManager)
+                        .id("\(wrapper.id)-\(wrapper.playlist.id)")
                     }
                 }
             }

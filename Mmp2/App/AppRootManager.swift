@@ -89,6 +89,7 @@ final class AppRootManager {
     }
     
     func editPlaylist(_ playlist: Playlist) {
+        resetDetailPath()
         detailPath.append(DetailRoute.playlistEdit(playlist))
     }
     

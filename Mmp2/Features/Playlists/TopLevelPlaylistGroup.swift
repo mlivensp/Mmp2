@@ -9,7 +9,7 @@ import Foundation
 import OSLog
 import SwiftData
 
-final class TopLevelPlaylistGroup: Identifiable {
+struct TopLevelPlaylistGroup: Identifiable {
     let playlistGroup: PlaylistGroup
     let playlists: [TopLevelPlaylist]
     
@@ -30,7 +30,7 @@ final class TopLevelPlaylistGroup: Identifiable {
         get { playlistGroup.isExpanded }
         set {
             playlistGroup.isExpanded = newValue
-            Task {
+            Task { [playlistGroup] in
                 do {
                     try playlistGroup.modelContext?.save()
                 } catch {

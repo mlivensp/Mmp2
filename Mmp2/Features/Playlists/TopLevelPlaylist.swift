@@ -8,7 +8,7 @@
 import Foundation
 import SwiftData
 
-final class TopLevelPlaylist: Identifiable {
+struct TopLevelPlaylist: Identifiable {
     let playlist: Playlist
     
     init(playlist: Playlist) {
