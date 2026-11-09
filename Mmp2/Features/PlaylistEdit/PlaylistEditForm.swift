@@ -16,6 +16,7 @@ struct PlaylistEditForm: View {
     
     @State private var selectedPlaylistItem: PlaylistItemViewModel?
     @State private var selectedPlaylistGroupItem: PlaylistGroupItem?
+    @State private var showingAddItemSheet = false
     @State private var showingAddGroupSheet = false
     @State private var showingDeleteMembershipConfirmation = false
     
@@ -164,11 +165,14 @@ struct PlaylistEditForm: View {
                 Spacer()
                 
                 Button {
-                    addPlaylistItem()
+                    showingAddItemSheet = true
                 } label: {
                     Label("", systemImage: "plus")
                 }
                 .buttonStyle(.automatic)
+                .sheet(isPresented: $showingAddItemSheet) {
+                    PlaylistItemPickerSheet(playlist: vm.playlist)
+                }
             }
             .padding([.leading, .trailing], formPadding)
             
