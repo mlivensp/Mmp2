@@ -135,6 +135,8 @@ extension CollectionEditView {
             return true
         }
         
+        // MARK: Source list ordering
+        
         func moveUp(_ selectedRow: CollectionRow) {
             let service = CollectionReorderingService()
             service.moveUp(selectedRow, topLevelRows: topLevelRows)

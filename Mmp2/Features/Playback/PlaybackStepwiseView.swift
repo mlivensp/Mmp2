@@ -13,46 +13,51 @@ struct PlaybackStepwiseView: View {
     
     var body: some View {
         Group {
-            Section(isBPM ? "Starting BPM" : "Starting % of Speed") {
-                ErrorFieldContainer(
-                    hasError: vm.startError != nil,
-                    errorMessage: vm.startError
-                ) {
+            ErrorFieldContainer(
+                hasError: vm.startError != nil,
+                errorMessage: vm.startError
+            ) {
+                HStack {
+                    Text(isBPM ? "Starting BPM" : "Starting % of Speed")
                     TextField("", text: $vm.startString)
                         .frame(maxWidth: 60)
                 }
             }
             
-            Section("Step") {
-                ErrorFieldContainer(
-                    hasError: vm.stepError != nil,
-                    errorMessage: vm.stepError
-                ) {
+            ErrorFieldContainer(
+                hasError: vm.stepError != nil,
+                errorMessage: vm.stepError
+            ) {
+                HStack {
+                    Text("Step")
                     TextField("", text: $vm.stepString)
                         .frame(maxWidth: 60)
                 }
             }
             
-            Section("Max") {
-                ErrorFieldContainer(
-                    hasError: vm.maxError != nil,
-                    errorMessage: vm.maxError
-                ) {
+            ErrorFieldContainer(
+                hasError: vm.maxError != nil,
+                errorMessage: vm.maxError
+            ) {
+                HStack {
+                    Text("Max")
                     TextField("", text: $vm.maxString)
                         .frame(maxWidth: 60)
                 }
             }
             
-            Section("Times To Play") {
-                ErrorFieldContainer(
-                    hasError: vm.timesToPlayError != nil,
-                    errorMessage: vm.timesToPlayError
-                ) {
+            ErrorFieldContainer(
+                hasError: vm.timesToPlayError != nil,
+                errorMessage: vm.timesToPlayError
+            ) {
+                HStack {
+                    Text("Times To Play Each Tempo")
+                        .frame(maxWidth: 100)
                     TextField("", text: $vm.timesToPlayString)
                         .frame(maxWidth: 60)
                 }
             }
-       }
+        }
     }
 }
 

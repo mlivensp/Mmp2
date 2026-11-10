@@ -35,6 +35,7 @@ struct PlaylistPickerGroupSection: View {
             Text(wrapper.sourceGroup.primitiveName)
                 .font(.headline)
         }
+        .padding(.leading, 24)
     }
 }
 

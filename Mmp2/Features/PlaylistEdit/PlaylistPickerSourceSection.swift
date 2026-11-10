@@ -35,7 +35,8 @@ struct PlaylistPickerSourceSection: View {
                     Text(clip.primitiveName)
                 }
                 .contentShape(Rectangle())
-                .padding(.leading, 24)
+                .padding(.leading, 42)
+                .padding(.bottom, 8)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .onTapGesture {
 
@@ -62,6 +63,7 @@ struct PlaylistPickerSourceSection: View {
                 Text(wrapper.source.primitiveName)
             }
             .contentShape(Rectangle())
+            .padding(.leading, 12)
             .onTapGesture {
 
                 let id = wrapper.source.persistentModelID

@@ -13,8 +13,14 @@ struct CollectionEditView: View {
     
     @State var collection: MediaCollection
     var body: some View {
-        let _ = print("CollectionEditView - \(collection.primitiveName)")
-        CollectionEditForm(collection: collection, context: context)
+        VStack(spacing: 0) {
+            Text("Edit Collection")
+                .font(.largeTitle)
+                .fontWeight(.semibold)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            CollectionEditForm(collection: collection, context: context)
+        }
+        .padding(formPadding)
     }
 }
 

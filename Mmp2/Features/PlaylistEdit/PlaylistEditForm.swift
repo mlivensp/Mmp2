@@ -142,9 +142,10 @@ struct PlaylistEditForm: View {
             HStack {
                 Text("Media To Play")
                     .font(.headline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding([.leading, .trailing], formPadding)
+                    .frame(minWidth: 50, alignment: .leading)
                 
+                Spacer()
+
                 Button {
                     if let selectedPlaylistItem {
                         vm.moveItemUp(selectedPlaylistItem)
@@ -162,12 +163,11 @@ struct PlaylistEditForm: View {
                     Image(systemName: "arrow.down")
                 }
                 .buttonStyle(.bordered)
-                Spacer()
                 
                 Button {
                     showingAddItemSheet = true
                 } label: {
-                    Label("", systemImage: "plus")
+                    Label("Select Media", systemImage: "checklist")
                 }
                 .buttonStyle(.automatic)
                 .sheet(isPresented: $showingAddItemSheet) {
@@ -201,6 +201,11 @@ struct PlaylistEditForm: View {
             HStack {
                 Spacer()
                 
+                Button("Cancel") {
+                    dismiss()
+                }
+                .foregroundColor(.secondary)
+                
                 Button("Save") {
                     do {
                         if try vm.save() {
@@ -212,15 +217,6 @@ struct PlaylistEditForm: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                
-                Spacer()
-                
-                Button("Cancel") {
-                    dismiss()
-                }
-                .foregroundColor(.secondary)
-                
-                Spacer()
             }
             .padding()
         }

@@ -117,7 +117,13 @@ struct SourceEditForm: View {
                 Section {
                     HStack {
                         Spacer()
-                        Button("Save") {
+                        
+                        Button("Cancel") {
+                            dismiss()
+                        }
+                        .foregroundColor(.secondary)
+
+                        Button("Done") {
                             do {
                                 if try vm.save() {
                                     dismiss()
@@ -128,20 +134,10 @@ struct SourceEditForm: View {
                             }
                         }
                         .buttonStyle(.borderedProminent)
-                        
-                        Spacer()
-                        
-                        Button("Cancel") {
-                            dismiss()
-                        }
-                        .foregroundColor(.secondary)
-                        
-                        Spacer()
                     }
                 }
             }
             .scrollContentBackground(.hidden)   // optional, but recommended
-            .padding(formPadding)
             .fileImporter(isPresented: $presentSourcePicker,
                           allowedContentTypes: [.audio, .video]) { result in
                 switch result {

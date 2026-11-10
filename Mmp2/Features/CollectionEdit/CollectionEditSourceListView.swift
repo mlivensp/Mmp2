@@ -14,21 +14,18 @@ struct CollectionEditSourceListView: View {
     @State private var selectedRow: CollectionRow?
     
     let vm: CollectionEditView.ViewModel
-    //    let collection: MediaCollection
-    //    let sources: [Source]
     let onEdit: (Source) -> Void
-    
-    private var columns: [GridItem] = [
-        GridItem(.flexible(), alignment: .leading),  // source name column
-        GridItem(.flexible(), alignment: .leading),  // group name column
-        GridItem(.flexible(), alignment: .leading),  // sort order
-        GridItem(.flexible(), alignment: .leading)   // sort order
-    ]
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             
             HStack {
+                
+                Text("Sources")
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                
+                Spacer()
                 
                 Button {
                     if let selectedRow {
@@ -47,15 +44,7 @@ struct CollectionEditSourceListView: View {
                     Image(systemName: "arrow.down")
                 }
                 .buttonStyle(.bordered)
-                
-                Spacer()
-                
-                Text("Sources")
-                    .font(.title3)
-                    .fontWeight(.semibold)
-                
-                Spacer()
-                
+
                 Button {
                     let sortOrder =
                     (vm.collection.sources.map(\.sortOrder).max() ?? 0) + 1
@@ -90,8 +79,6 @@ struct CollectionEditSourceListView: View {
                                     VStack(alignment: .leading, spacing: 4) {
                                         
                                         HStack {
-                                            Text("\(group.sortOrder)")
-                                                .padding(.trailing, 4)
                                             Text(group.primitiveName)
                                                 .font(.headline)
                                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -112,8 +99,6 @@ struct CollectionEditSourceListView: View {
                                             }
                                         ) { source in
                                             HStack {
-                                                Text("\(source.sortOrder)")
-                                                    .padding(.trailing, 4)
                                                 Text(source.primitiveName)
                                                     .padding(.leading, 24)
                                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -132,8 +117,6 @@ struct CollectionEditSourceListView: View {
                                     
                                 case .ungroupedSource(let source):
                                     HStack {
-                                        Text("\(source.sortOrder)")
-                                            .padding(.trailing, 4)
                                         Text(source.primitiveName)
                                             .padding(.leading, 4)
                                             .frame(maxWidth: .infinity, alignment: .leading)

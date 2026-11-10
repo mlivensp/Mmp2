@@ -13,7 +13,14 @@ struct PlaylistEditView: View {
     let playlist: Playlist
     
     var body: some View {
-        PlaylistEditForm(playlist: playlist, context: context)
+        VStack(spacing: 0) {
+            Text("Edit Playlist")
+                .font(.largeTitle)
+                .fontWeight(.semibold)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            PlaylistEditForm(playlist: playlist, context: context)
+        }
+        .padding(formPadding)
     }
 }
 

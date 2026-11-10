@@ -15,7 +15,14 @@ struct ClipEditView: View {
     let source: Source
     
    var body: some View {
-       ClipEditForm(clip: clip, source: source, context: context)
+       VStack(spacing: 0) {
+           Text("Edit Clip")
+               .font(.largeTitle)
+               .fontWeight(.semibold)
+               .frame(maxWidth: .infinity, alignment: .leading)
+           ClipEditForm(clip: clip, source: source, context: context)
+       }
+       .padding(formPadding)
     }
 }
 

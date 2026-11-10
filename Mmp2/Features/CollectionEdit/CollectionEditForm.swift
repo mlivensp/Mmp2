@@ -34,7 +34,9 @@ struct CollectionEditForm: View {
                     TextField("", text: $vm.notes)
                 }
             }
-            .frame(height: 180)
+            .padding(.bottom, 8)
+            
+            Divider()
 
             CollectionEditSourceListView(
                 vm: vm
@@ -45,14 +47,18 @@ struct CollectionEditForm: View {
                 )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding([.leading, .trailing], formPadding)
+            .padding(.top, 8)
 
             Divider()
 
             HStack {
                 Spacer()
 
-                Button("Save") {
+                Button("Cancel") {
+                    dismiss()
+                }
+
+                Button("Done") {
                     do {
                         if try vm.save() {
                             dismiss()
@@ -63,15 +69,6 @@ struct CollectionEditForm: View {
                     }
                 }
                 .buttonStyle(.borderedProminent)
-
-                Spacer()
-
-                Button("Cancel") {
-                    dismiss()
-                }
-                .foregroundColor(.secondary)
-
-                Spacer()
             }
             .padding()
         }

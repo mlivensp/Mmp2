@@ -202,7 +202,9 @@ extension PlaylistEditView {
             
             playlist.primitiveName = name
             playlist.name_normalized = name.normalizedForSearch
-            
+            playlist.shuffle = shuffle
+            playlist.defaultSecondsToDelay = defaultDelay
+            playlist.timesToRepeat = timesToRepeat
             playlist.notes = notes.isEmpty ? nil : notes
             
             try context.save()

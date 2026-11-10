@@ -25,6 +25,19 @@ struct CollectionsView: View {
         )
 
         VStack {
+            HStack {
+                Spacer()
+                Button {
+                    let mediaCollection = MediaCollection.makeDraft();
+                    appRootManager.editCollection(mediaCollection)
+                } label: {
+                    Label("", systemImage: "plus")
+                }
+                .padding(.trailing, 4)
+            }
+            
+            Divider()
+            
             List(selection: selection) {
                 ForEach(mediaCollections) { mediaCollection in
                     NavigationLink(value: mediaCollection) {

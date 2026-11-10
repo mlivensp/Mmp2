@@ -14,25 +14,77 @@ struct PlaylistPlayerView: View {
 
     var body: some View {
         VStack {
-            if let controller, let current = controller.current {
-                VStack {
-                    Text(current.title)
-                        .font(.title)
-                    Text(controller.player.displayRate)
+            if let controller {
 
-                    VideoPlayerView(player: controller.player.player)
+                switch controller.playbackState {
+
+                case .countingDown(let upcoming, let secondsRemaining):
+
+                    VStack(spacing: 24) {
+
+                        Text("Coming Up")
+                            .font(.title2)
+
+                        Text(upcoming.title)
+                            .font(.largeTitle)
+                            .multilineTextAlignment(.center)
+
+                        Text("\(secondsRemaining)")
+                            .font(.system(size: 120, weight: .bold))
+
+                        Text(
+                            secondsRemaining == 1
+                            ? "second"
+                            : "seconds"
+                        )
+                        .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                case .playing(let current):
+
+                    VStack {
+                        Text(current.title)
+                            .font(.title)
+
+                        Text(controller.player.displayRate)
+
+                        VideoPlayerView(
+                            player: controller.player.player
+                        )
+                    }
+
+                case .finished:
+
+                    ProgressView()
+
+                case nil:
+
+                    ProgressView()
                 }
-            } else {
-                Text("Unable to load media")
-                    .foregroundColor(.secondary)
             }
         }
         .onAppear {
             guard controller == nil, let playlist = appRootManager.selectedPlaylist else { return }
             let items = playlist.playlistItems
                 .sorted { $0.sequence < $1.sequence }
-                .compactMap { $0.makePlayableItem() }
-            let controller = PlaylistController(items: items, repeatCount: playlist.timesToRepeat)
+                .compactMap { playlistItem -> PlaylistPlaybackItem? in
+
+                    guard let playable = playlistItem.makePlayableItem() else {
+                        return nil
+                    }
+
+                    return PlaylistPlaybackItem(
+                        playableItem: playable,
+                        delaySeconds:
+                            playlistItem.secondsToDelayOverride
+                            ?? playlist.defaultSecondsToDelay
+                    )
+                }
+            let controller = PlaylistController(
+                items: items,
+                repeatCount: playlist.timesToRepeat
+            )
             self.controller = controller
             controller.start { exit() }
         }

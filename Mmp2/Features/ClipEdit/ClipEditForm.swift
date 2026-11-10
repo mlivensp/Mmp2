@@ -100,7 +100,6 @@ struct ClipEditForm: View {
                     errorMessage: ""
                 ) {
                     HStack {
-                        Text("Favorite")
                         Toggle(isOn: $vm.isFavorite) {
                             Text("Favorite")
                         }
@@ -114,14 +113,21 @@ struct ClipEditForm: View {
                     }
                 }
                 
-                Section("Playback") {
-                    PlaybackEditView(vm: vm.playbackVM)
-                }
+                Text("Playback")
+                    .font(.headline)
                 
+                PlaybackEditView(vm: vm.playbackVM)
+
                 Section {
                     HStack {
                         Spacer()
-                        Button("Save") {
+                        
+                        Button("Cancel") {
+                            exit()
+                        }
+                        .foregroundColor(.secondary)
+
+                        Button("Done") {
                             do {
                                 if try vm.save() {
                                     exit()
@@ -132,19 +138,9 @@ struct ClipEditForm: View {
                             }
                         }
                         .buttonStyle(.borderedProminent)
-                        
-                        Spacer()
-                        
-                        Button("Cancel") {
-                            exit()
-                        }
-                        .foregroundColor(.secondary)
-                        
-                        Spacer()
                     }
                 }
             }
-            .padding(formPadding)
         }
     }
     /// Leaves the editor, whichever way we got here.

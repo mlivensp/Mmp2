@@ -27,6 +27,9 @@ struct PlaylistItemPickerSheet: View {
     
     var body: some View {
         VStack(spacing: 0) {
+            Text("Select Items For Playlist")
+                .font(.headline)
+            Divider()
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 0) {
                     ForEach(collections) { wrapper in

@@ -15,8 +15,15 @@ struct SourceEditView: View {
     let collection: MediaCollection
     
     var body: some View {
-        SourceEditForm(source: source, collection: collection, context: context)
-            .navigationTitle("Edit Source")
+        VStack(spacing: 0) {
+            Text("Edit Source")
+                .font(.largeTitle)
+                .fontWeight(.semibold)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            SourceEditForm(source: source, collection: collection, context: context)
+                .navigationTitle("Edit Source")
+        }
+        .padding(formPadding)
     }
 }
 
