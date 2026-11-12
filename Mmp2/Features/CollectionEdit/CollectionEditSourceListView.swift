@@ -47,10 +47,10 @@ struct CollectionEditSourceListView: View {
 
                 Button {
                     let sortOrder =
-                    (vm.collection.sources.map(\.sortOrder).max() ?? 0) + 1
+                    (vm.mediaCollection.sources.map(\.sortOrder).max() ?? 0) + 1
                     
                     let newSource =
-                    Source.makeDraft(sortOrder: sortOrder)
+                    Source.makeDraft(sortOrder: sortOrder, mediaCollection: vm.mediaCollection)
                     
                     onEdit(newSource)
                 } label: {

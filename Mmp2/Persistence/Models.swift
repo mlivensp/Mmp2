@@ -9,6 +9,23 @@ import CoreMedia
 import Foundation
 import SwiftData
 
+@Model public class AppSetting {
+    var deleteOrphansOnStartup: Bool
+    var fixInvalidPathErrors: Bool
+    var startupPage: String
+    var theme: String
+    var validateStorageLocationsOnStartup: Bool
+
+    public init(deleteOrphansOnStartup: Bool, fixInvalidPathErrors: Bool, startupPage: String, theme: String, validateStorageLocationsOnStartup: Bool) {
+        self.deleteOrphansOnStartup = deleteOrphansOnStartup
+        self.fixInvalidPathErrors = fixInvalidPathErrors
+        self.startupPage = startupPage
+        self.theme = theme
+        self.validateStorageLocationsOnStartup = validateStorageLocationsOnStartup
+
+    }
+}
+
 @Model public class Backup {
     var backupDateTime: Date
     var path: String
@@ -20,27 +37,6 @@ import SwiftData
     }
 }
 
-@Model public class MediaCollection {
-//    var clipFolderPath: String?
-    var primitiveName: String
-    var name_normalized: String
-    var notes: String?
-    var pathIsValid: Bool
-
-    @Relationship(deleteRule: .cascade, inverse: \SourceGroup.mediaCollection)
-    var sourceGroups: [SourceGroup] = []
-    
-    @Relationship(deleteRule: .cascade, inverse: \Source.mediaCollection)
-    var sources: [Source] = []
-    
-    public init(name: String, pathIsValid: Bool = true, notes: String? = nil) {
-        self.primitiveName = name
-        self.name_normalized = name.normalizedForSearch
-        self.pathIsValid = pathIsValid
-        self.notes = notes
-    }
-}
-
 @Model public class Clip {
     var primitiveName: String
     var name_normalized: String = ""
@@ -49,20 +45,32 @@ import SwiftData
     var firstMeasure: Int?
     var lastMeasure: Int?
     var isFavorite: Bool
-    var createClipFile: Bool? = false
-    var clipCreationInProgress: Bool
+    var bpm: Int?
+    var duration: Double
+    var lastPlayed: Date?
+    var numberTimesPlayed: Int
     var notes: String?
     
-    @Relationship(deleteRule: .cascade, inverse: \Media.clip)
-    var media: Media
-    
-    @Relationship(deleteRule: .cascade, inverse: \Playback.clip)
+    var source: Source
+
+    @Relationship(deleteRule: .cascade)
     var playback: Playback
     
-    var source: Source?
-    
-    public init(source: Source?, name: String, startSeconds: Double, endSeconds: Double, startMeasure: Int?, endMeasure: Int?, isFavorite: Bool, notes: String?, media: Media, playback: Playback) {
-        self.source = source
+    public init(
+        name: String,
+        startSeconds: Double,
+        endSeconds: Double,
+        startMeasure: Int?,
+        endMeasure: Int?,
+        isFavorite: Bool,
+        bpm: Int?,
+        duration: Double,
+        lastPlayed: Date?,
+        numberTimesPlayed: Int,
+        notes: String?,
+        source: Source,
+        playback: Playback
+    ) {
         self.primitiveName = name
         self.name_normalized = name.normalizedForSearch
         self.startSeconds = startSeconds
@@ -71,8 +79,11 @@ import SwiftData
         self.lastMeasure = endMeasure
         self.isFavorite = isFavorite
         self.notes = notes
-        self.clipCreationInProgress = false
-        self.media = media
+        self.bpm = bpm
+        self.duration = duration
+        self.lastPlayed = lastPlayed
+        self.numberTimesPlayed = numberTimesPlayed
+        self.source = source
         self.playback = playback
     }
     
@@ -93,123 +104,105 @@ import SwiftData
     }
 }
 
-@Model public class Media {
-    var source: Source?
-    var clip: Clip?
-    var bpm: Int?
-    var duration: Double
-    var path: String?
-    var pathIsValid: Bool
-    var lastPlayed: Date?
-    var numberTimesPlayed: Int
-    var isArchived: Bool
-    var bookmark: Data?
+//@Model public class Media {
+//    var source: Source?
+//    var clip: Clip?
+//    var bpm: Int?
+//    var duration: Double
+//    var path: String?
+//    var pathIsValid: Bool
+//    var lastPlayed: Date?
+//    var numberTimesPlayed: Int
+//    var isArchived: Bool
+//    var bookmark: Data?
+//
+//    public init(
+//        bpm: Int?,
+//        path: String,
+//        duration: Double = 0,
+//        isArchived: Bool = false,
+//        pathIsValid: Bool = true,
+//        numberTimesPlayed: Int = 0,
+//        lastPlayed: Date? = nil,
+//        
+//    ) {
+//        self.bpm = bpm
+//        self.path = path
+//        self.duration = duration
+//        self.isArchived = isArchived
+//        self.pathIsValid = pathIsValid
+//        self.numberTimesPlayed = numberTimesPlayed
+//        self.lastPlayed = lastPlayed
+//    }
+//}
 
-    public init(
-        bpm: Int?,
-        path: String,
-        duration: Double = 0,
-        isArchived: Bool = false,
-        pathIsValid: Bool = true,
-        numberTimesPlayed: Int = 0,
-        lastPlayed: Date? = nil,
-        
-    ) {
-        self.bpm = bpm
-        self.path = path
-        self.duration = duration
-        self.isArchived = isArchived
-        self.pathIsValid = pathIsValid
-        self.numberTimesPlayed = numberTimesPlayed
-        self.lastPlayed = lastPlayed
+@Model public class MediaCollection {
+    var primitiveName: String
+    var name_normalized: String
+    var notes: String?
+
+    @Relationship(deleteRule: .cascade, inverse: \SourceGroup.mediaCollection)
+    var sourceGroups: [SourceGroup] = []
+    
+    @Relationship(deleteRule: .cascade, inverse: \Source.mediaCollection)
+    var sources: [Source] = []
+    
+    public init(name: String, notes: String? = nil) {
+        self.primitiveName = name
+        self.name_normalized = name.normalizedForSearch
+        self.notes = notes
     }
 }
 
 @Model public class Playback {
     var timesToPlay: Int?
-    var source: Source?
-    var clip: Clip?
-    var playlistItem: PlaylistItem?
     
-    @Relationship(deleteRule: .cascade, inverse: \PlaybackConstant.playback)
+    @Relationship(deleteRule: .cascade)
     var playbackConstant: PlaybackConstant?
     
-    @Relationship(deleteRule: .cascade, inverse: \PlaybackStepwise.playback)
-    var playbackStepwise: PlaybackStepwise?
+    @Relationship(deleteRule: .cascade)
+    var playbackProgression: PlaybackProgression?
     
-    @Relationship(deleteRule: .cascade, inverse: \PlaybackBounce.playback)
-    var playbackBounce: PlaybackBounce?
-//        @Relationship(inverse: \PlaylistItem.playback) var playlistMember: PlaylistItem?
-//        @Relationship(inverse: \Source.playback) var source: Source?
+    @Relationship(deleteRule: .cascade)
+    var playbackSequences: [PlaybackSequence]?
+
     public init(timesToPlay: Int?) {
+        // TODO: add constant and progression parameters
         self.timesToPlay = timesToPlay
     }
 }
 
 @Model public class PlaybackConstant {
     var value: Int
-    var playback: Playback?
     
     init(value: Int) {
         self.value = value
     }
 }
 
-@Model public class PlaybackStepwise {
+@Model public class PlaybackProgression {
     var start: Int
-    var step: Int
+    var increment: Int
     var max: Int
-    var timesToPlayStep: Int
-    var playback: Playback?
+    var timesToPlayEach: Int
     
-    init(start: Int, step: Int, max: Int, timesToPlayStep: Int, playback: Playback? = nil) {
+    init(start: Int, increment: Int, max: Int, timesToPlayEach: Int) {
         self.start = start
-        self.step = step
+        self.increment = increment
         self.max = max
-        self.timesToPlayStep = timesToPlayStep
-        self.playback = playback
+        self.timesToPlayEach = timesToPlayEach
     }
 }
 
-@Model public class PlaybackBounce {
-    var slow: Int
-    var timesToPlaySlow: Int
-    var mid: Int
-    var timesToPlayMid: Int
-    var fast: Int
-    var timesToPlayFast: Int
-    var playback: Playback?
+@Model public class PlaybackSequence {
+    var sequence: Int
+    var value: Int
+    var timesToPlay: Int?
     
-    var playOrder: PlayOrder?
-    
-    init(slow: Int, timesToPlaySlow: Int, mid: Int, timesToPlayMid: Int, fast: Int, timesToPlayFast: Int, playOrder: PlayOrder? = nil, playback: Playback? = nil) {
-        self.slow = slow
-        self.timesToPlaySlow = timesToPlaySlow
-        self.mid = mid
-        self.timesToPlayMid = timesToPlayMid
-        self.fast = fast
-        self.timesToPlayFast = timesToPlayFast
-        self.playback = playback
-        self.playOrder = playOrder
-    }
-}
-
-@Model public class PlayOrder {
-    var name: String
-    var slowOrder: Int
-    var midOrder: Int
-    var fastOrder: Int
-    var sortOrder: Int
-    
-    @Relationship(deleteRule: .deny, inverse: \PlaybackBounce.playOrder)
-    var playbackBounce: [PlaybackBounce] = []
-    
-    init(name: String, slowOrder: Int, midOrder: Int, fastOrder: Int, sortOrder: Int) {
-        self.name = name
-        self.slowOrder = slowOrder
-        self.midOrder = midOrder
-        self.fastOrder = fastOrder
-        self.sortOrder = sortOrder
+    init(sequence: Int, value: Int, timesToPlay: Int? = nil) {
+        self.sequence = sequence
+        self.value = value
+        self.timesToPlay = timesToPlay
     }
 }
 
@@ -236,7 +229,8 @@ import SwiftData
     }
 }
 
-@Model public class PlaylistGroup {
+// TODO: unclear why Identifiable needs to be here
+@Model public class PlaylistGroup: Identifiable {
     var primitiveName: String
     var name_normalized: String
     var isExpanded: Bool
@@ -277,46 +271,51 @@ import SwiftData
     }
 }
 
-@Model public class AppSetting {
-    var deleteOrphansOnStartup: Bool
-    var fixInvalidPathErrors: Bool
-    var startupPage: String
-    var theme: String
-    var validateStorageLocationsOnStartup: Bool
-
-    public init(deleteOrphansOnStartup: Bool, fixInvalidPathErrors: Bool, startupPage: String, theme: String, validateStorageLocationsOnStartup: Bool) {
-        self.deleteOrphansOnStartup = deleteOrphansOnStartup
-        self.fixInvalidPathErrors = fixInvalidPathErrors
-        self.startupPage = startupPage
-        self.theme = theme
-        self.validateStorageLocationsOnStartup = validateStorageLocationsOnStartup
-
-    }
-}
-
 @Model public class Source {
     var primitiveName: String
     var name_normalized: String = ""
     var sortOrder: Int
     var measure1Start: Double?
     var isFavorite: Bool
+    var bpm: Int?
+    var duration: Double
+    var lastPlayed: Date?
+    var numberTimesPlayed: Int
+    var path: String?
+    var pathIsValid: Bool
+    var bookmark: Data?
     var isExpanded: Bool
     var notes: String?
     
     @Relationship(deleteRule: .cascade, inverse: \Clip.source)
     var clips: [Clip] = []
     
-    @Relationship(deleteRule: .cascade, inverse: \Media.source)
-    var media: Media
-    
-    @Relationship(deleteRule: .cascade, inverse: \Playback.source)
+    @Relationship(deleteRule: .cascade)
     var playback: Playback
     
-    var mediaCollection: MediaCollection?
+    var mediaCollection: MediaCollection
+    
     var sourceGroup: SourceGroup?
     
     
-    public init(name: String, sortOrder: Int, measure1Start: Double?, isFavorite: Bool, isExpanded: Bool, notes: String?, media: Media, playback: Playback, sourceGroup: SourceGroup?) {
+    public init(
+        name: String,
+        sortOrder: Int,
+        measure1Start: Double?,
+        isFavorite: Bool,
+        isExpanded: Bool,
+        notes: String?,
+        bpm: Int?,
+        duration: Double,
+        lastPlayed: Date?,
+        numberTimesPlayed: Int,
+        path: String,
+        pathIsValid: Bool,
+        bookmark: Data?,
+        mediaCollection: MediaCollection,
+        playback: Playback,
+        sourceGroup: SourceGroup?
+    ) {
         self.primitiveName = name
         self.name_normalized = name.normalizedForSearch
         self.sortOrder = sortOrder
@@ -324,7 +323,14 @@ import SwiftData
         self.isFavorite = isFavorite
         self.isExpanded = isExpanded
         self.notes = notes
-        self.media = media
+        self.bpm = bpm
+        self.duration = duration
+        self.lastPlayed = lastPlayed
+        self.numberTimesPlayed = numberTimesPlayed
+        self.path = path
+        self.pathIsValid = pathIsValid
+        self.bookmark = bookmark
+        self.mediaCollection = mediaCollection
         self.playback = playback
         self.sourceGroup = sourceGroup
     }
@@ -337,10 +343,9 @@ import SwiftData
     var isExpanded: Bool
     @Relationship(deleteRule: .nullify, inverse: \Source.sourceGroup)
     var sources: [Source] = []
+    var mediaCollection: MediaCollection
     
-    var mediaCollection: MediaCollection?
-    
-    public init(name: String, sortOrder: Int, isExpanded: Bool = false, mediaCollection: MediaCollection? = nil) {
+    public init(name: String, sortOrder: Int, isExpanded: Bool = false, mediaCollection: MediaCollection) {
         self.primitiveName = name
         self.name_normalized = name.normalizedForSearch
         self.sortOrder = sortOrder

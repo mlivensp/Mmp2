@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct PlaybackStepwiseView: View {
-    @Bindable var vm: PlaybackStepwiseViewModel
+struct PlaybackProgressionView: View {
+    @Bindable var vm: PlaybackProgressionViewModel
     var isBPM: Bool
     
     var body: some View {
@@ -25,12 +25,12 @@ struct PlaybackStepwiseView: View {
             }
             
             ErrorFieldContainer(
-                hasError: vm.stepError != nil,
-                errorMessage: vm.stepError
+                hasError: vm.incrementError != nil,
+                errorMessage: vm.incrementError
             ) {
                 HStack {
                     Text("Step")
-                    TextField("", text: $vm.stepString)
+                    TextField("", text: $vm.incrementString)
                         .frame(maxWidth: 60)
                 }
             }
@@ -47,13 +47,13 @@ struct PlaybackStepwiseView: View {
             }
             
             ErrorFieldContainer(
-                hasError: vm.timesToPlayError != nil,
-                errorMessage: vm.timesToPlayError
+                hasError: vm.timesToPlayEachError != nil,
+                errorMessage: vm.timesToPlayEachError
             ) {
                 HStack {
                     Text("Times To Play Each Tempo")
                         .frame(maxWidth: 100)
-                    TextField("", text: $vm.timesToPlayString)
+                    TextField("", text: $vm.timesToPlayEachString)
                         .frame(maxWidth: 60)
                 }
             }

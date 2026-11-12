@@ -18,7 +18,7 @@ struct SourceSection: View {
         
         if source.clips.isEmpty {
             SourceRow(source: source) { src in
-                appRootManager.editSource(src, in: src.mediaCollection!)
+                appRootManager.editSource(src, in: src.mediaCollection)
             }
             .onTapGesture { onSourceTapped(source) }
             
@@ -35,7 +35,7 @@ struct SourceSection: View {
                 )
             } label: {
                 SourceRow(source: source) { src in
-                    appRootManager.editSource(src, in: src.mediaCollection!)
+                    appRootManager.editSource(src, in: src.mediaCollection)
                 }
                 .onTapGesture { onSourceTapped(source) }
             }

@@ -39,8 +39,8 @@ struct ClipEditViewModelTests {
     @Test("new clip forwards its inherited source BPM to playback")
     func newClipForwardsInheritedBPM() throws {
         let f = try Fixture()
-        f.source.media.bpm = 90
-        let clip = Clip.makeDraft()
+        f.source.bpm = 90
+        let clip = Clip.makeDraft(source: f.source)
         let vm = ClipEditView.ViewModel(clip: clip, source: f.source, context: f.context)
 
         #expect(vm.bpmString == "90")
@@ -298,7 +298,7 @@ struct ClipEditViewModelTests {
 
         #expect(saved)
         #expect(f.clip.primitiveName == "Updated")
-        #expect(f.clip.media.bpm == 90)
+        #expect(f.clip.bpm == 90)
         #expect(f.clip.startSeconds == 3)
         #expect(f.clip.endSeconds == 9)
         #expect(f.clip.isFavorite)
@@ -320,6 +320,7 @@ struct ClipEditViewModelTests {
     @Test("save writes measures in measure mode")
     func saveMeasureMode() throws {
         let f = try Fixture()
+        f.source.measure1Start = 9
         f.vm.bpmString = "72"
         f.vm.measureMode = true
         f.vm.startMeasureString = "2"
@@ -355,22 +356,16 @@ private final class Fixture {
             for: SchemaV1.schema,          // the static let you already defined
             configurations: config
         )
+        
         context = ModelContext(container)
-        let sourcePlayback = Playback(timesToPlay: 1)
-        let sourceMedia = Media(bpm: nil, path: "source.mp3", duration: 60)
-        context.insert(sourcePlayback)
-        context.insert(sourceMedia)
 
-        source = Source(
+        let mediaCollection = MediaCollection.makeDraft()
+        context.insert(mediaCollection)
+        source = Source.makeDraft(
             name: "Source",
             sortOrder: 1,
-            measure1Start: 0,
-            isFavorite: false,
-            isExpanded: false,
-            notes: nil,
-            media: sourceMedia,
-            playback: sourcePlayback,
-            sourceGroup: nil
+            bpm: 120,
+            mediaCollection: mediaCollection
         )
         context.insert(source)
 
@@ -409,22 +404,13 @@ private final class Fixture {
         source: Source,
         context: ModelContext
     ) -> Clip {
-        let clipPlayback = Playback(timesToPlay: 1)
-        let clipMedia = Media(bpm: bpm, path: "clip.mp3", duration: end - start)
-        context.insert(clipPlayback)
-        context.insert(clipMedia)
 
-        let clip = Clip(
-            source: source,
+        let clip = Clip.makeDraft(
             name: name,
             startSeconds: start,
             endSeconds: end,
-            startMeasure: nil,
-            endMeasure: nil,
-            isFavorite: false,
-            notes: nil,
-            media: clipMedia,
-            playback: clipPlayback
+            bpm: bpm,
+            source: source
         )
         context.insert(clip)
         return clip

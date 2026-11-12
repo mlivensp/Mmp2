@@ -9,8 +9,7 @@ import Foundation
 
 enum PlaybackMode: CaseIterable {
     case constant
-    case stepwise
-    case bounce
+    case progression
 }
 
 extension PlaybackMode: Identifiable {
@@ -21,8 +20,7 @@ extension PlaybackMode {
     var label: String {
         switch self {
         case .constant: "Constant"
-        case .stepwise: "Stepwise"
-        case .bounce: "Bounce"
+        case .progression: "Progression"
         }
     }
 }

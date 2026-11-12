@@ -40,12 +40,12 @@ extension SourceEditView {
             self.collection = collection
             self.context = context
             
-            self.playbackVM = PlaybackEditViewModel(playback: source.playback, bpm: source.media.bpm, context: context)
+            self.playbackVM = PlaybackEditViewModel(playback: source.playback, bpm: source.bpm, context: context)
             
             self.storedNameString = source.primitiveName
-            self.bpm = source.media.bpm
+            self.bpm = source.bpm
             
-            if let bpm = source.media.bpm {
+            if let bpm = source.bpm {
                 self.storedBpmString = String(bpm)
             } else {
                 self.storedBpmString = ""
@@ -76,13 +76,13 @@ extension SourceEditView {
         }
         
         var mediaPath: String {
-            get { source.media.path ?? "" }
-            set { source.media.path = newValue }
+            get { source.path ?? "" }
+            set { source.path = newValue }
         }
         
         var bookmarkData: Data? {
-            get { source.media.bookmark }
-            set { source.media.bookmark = newValue }
+            get { source.bookmark }
+            set { source.bookmark = newValue }
         }
         
         var sourceGroups: [SourceGroup] {
@@ -300,7 +300,7 @@ extension SourceEditView {
             source.measure1Start = measure1Start
             source.isFavorite = isFavorite
             source.notes = notes.isEmpty ? nil : notes
-            source.media.bpm = bpm
+            source.bpm = bpm
 
             // Resolve the group once.
             source.sourceGroup = storedSourceGroupString.isEmpty

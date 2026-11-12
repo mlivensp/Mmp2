@@ -12,7 +12,7 @@ import SwiftData
 extension CollectionEditView {
     @Observable
     final class ViewModel {
-        let collection: MediaCollection
+        let mediaCollection: MediaCollection
         let context: ModelContext
         
         internal var storedNameString: String
@@ -21,7 +21,7 @@ extension CollectionEditView {
         internal var nameError: String?
         
         init(collection: MediaCollection, context: ModelContext) {
-            self.collection = collection
+            self.mediaCollection = collection
             self.context = context
             
             self.storedNameString = collection.primitiveName
@@ -49,7 +49,7 @@ extension CollectionEditView {
         }
 
         var sources: [Source] {
-            collection.sources.sorted(by: {
+            mediaCollection.sources.sorted(by: {
                 if $0.effectiveSortOrder == $1.effectiveSortOrder {
                     return $0.sortOrder < $1.sortOrder
                 } else {
@@ -76,7 +76,7 @@ extension CollectionEditView {
             let repo = MediaCollectionRepository(context: context)
             do {
                 let existingCollections = try repo.fetchAll()
-                return validateNameUniqueness(nameValue, collection: collection, existingCollections: existingCollections)
+                return validateNameUniqueness(nameValue, collection: mediaCollection, existingCollections: existingCollections)
             } catch {
                 Logger.data.error("MediaColledtionRepository.fetchAll \(error.localizedDescription)")
                 return .failure("An error occured validating the name.")
@@ -127,9 +127,9 @@ extension CollectionEditView {
                 throw AppError.attemptToSaveInvalidState("CollectionEditViewModel")
             }
             
-            collection.primitiveName = storedNameString
-            collection.name_normalized = storedNameString.normalizedForSearch
-            collection.notes = notes.isEmpty ? nil : notes
+            mediaCollection.primitiveName = storedNameString
+            mediaCollection.name_normalized = storedNameString.normalizedForSearch
+            mediaCollection.notes = notes.isEmpty ? nil : notes
             
             try context.save()
             return true

@@ -49,37 +49,15 @@ struct PlaybackEditViewModelTests {
     @Test("BPM changes scale stepwise start and max, but not step")
     func stepwiseRatesScaleWithBPM() {
         let playback = Playback(timesToPlay: 1)
-        let stepwise = PlaybackStepwise(start: 100, step: 2, max: 110, timesToPlayStep: 1, playback: playback)
-        playback.playbackStepwise = stepwise
+        let stepwise = PlaybackProgression(start: 100, increment: 2, max: 110, timesToPlayEach: 1)
+        playback.playbackProgression = stepwise
         let vm = PlaybackEditViewModel(playback: playback, bpm: nil, context: context)
 
         vm.bpm = 90
 
-        #expect(vm.stepwiseVM.startString == "90")
-        #expect(vm.stepwiseVM.stepString == "2")
-        #expect(vm.stepwiseVM.maxString == "99")
-    }
-
-    @Test("BPM changes scale all bounce tempos")
-    func bounceTemposScaleWithBPM() {
-        let playback = Playback(timesToPlay: 1)
-        let bounce = PlaybackBounce(
-            slow: 90,
-            timesToPlaySlow: 1,
-            mid: 100,
-            timesToPlayMid: 1,
-            fast: 110,
-            timesToPlayFast: 1,
-            playback: playback
-        )
-        playback.playbackBounce = bounce
-        let vm = PlaybackEditViewModel(playback: playback, bpm: nil, context: context)
-
-        vm.bpm = 90
-
-        #expect(vm.bounceVM.slowString == "81")
-        #expect(vm.bounceVM.midString == "90")
-        #expect(vm.bounceVM.fastString == "99")
+        #expect(vm.progressionVM.startString == "90")
+        #expect(vm.progressionVM.incrementString == "2")
+        #expect(vm.progressionVM.maxString == "99")
     }
     
     // MARK: - Times to play

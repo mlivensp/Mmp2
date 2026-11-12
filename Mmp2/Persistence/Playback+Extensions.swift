@@ -23,31 +23,22 @@ extension Playback {
 
         switch newMode {
         case .constant:
-            deleteIfNeeded(&playbackStepwise)
-            deleteIfNeeded(&playbackBounce)
+            deleteIfNeeded(&playbackProgression)
 
             if playbackConstant == nil {
                 let new = PlaybackConstant.makeDraft()
                 playbackConstant = new
             }
 
-        case .stepwise:
+        case .progression:
             deleteIfNeeded(&playbackConstant)
-            deleteIfNeeded(&playbackBounce)
 
-            if playbackStepwise == nil {
-                let new = PlaybackStepwise.makeDraft()
-                playbackStepwise = new
+            if playbackProgression == nil {
+                let new = PlaybackProgression.makeDraft()
+                playbackProgression = new
             }
-
-        case .bounce:
-            deleteIfNeeded(&playbackConstant)
-            deleteIfNeeded(&playbackStepwise)
-
-            if playbackBounce == nil {
-                let new = PlaybackBounce.makeDraft()
-                playbackBounce = new
-            }
+            
+            // TODO: sequence
         }
     }
 }
@@ -65,14 +56,8 @@ extension PlaybackConstant {
     }
 }
 
-extension PlaybackStepwise {
-    static func makeDraft() -> PlaybackStepwise {
-        PlaybackStepwise(start: 80, step: 2, max: 100, timesToPlayStep: 1)
-    }
-}
-
-extension PlaybackBounce {
-    static func makeDraft() -> PlaybackBounce {
-        PlaybackBounce(slow: 90, timesToPlaySlow: 1, mid: 100, timesToPlayMid: 1, fast: 110, timesToPlayFast: 1)
+extension PlaybackProgression {
+    static func makeDraft() -> PlaybackProgression {
+        PlaybackProgression(start: 80, increment: 2, max: 100, timesToPlayEach: 1)
     }
 }

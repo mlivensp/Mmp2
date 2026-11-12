@@ -14,15 +14,17 @@ import SwiftData
 struct CollectionReorderingTests {
     @Test
     func moveGroupUp() {
-
+        let mediaCollection = MediaCollection.makeDraft()
         let groupA = makeGroup(
             name: "A",
-            sortOrder: 1
+            sortOrder: 1,
+            mediaCollection: mediaCollection
         )
 
         let groupB = makeGroup(
             name: "B",
-            sortOrder: 2
+            sortOrder: 2,
+            mediaCollection: mediaCollection
         )
 
         let rows: [CollectionRow] = [
@@ -40,10 +42,12 @@ struct CollectionReorderingTests {
 
     @Test
     func firstGroupCannotMoveUp() async throws {
+        let mediaCollection = MediaCollection.makeDraft()
 
         let groupA = makeGroup(
             name: "A",
-            sortOrder: 1
+            sortOrder: 1,
+            mediaCollection: mediaCollection
         )
 
         let rows: [CollectionRow] = [
@@ -58,10 +62,12 @@ struct CollectionReorderingTests {
     
     @Test
     func lastGroupCannotMoveDown() async throws {
+        let mediaCollection = MediaCollection.makeDraft()
 
         let groupA = makeGroup(
             name: "A",
-            sortOrder: 1
+            sortOrder: 1,
+            mediaCollection: mediaCollection
         )
 
 
@@ -78,15 +84,18 @@ struct CollectionReorderingTests {
     
     @Test
     func ungroupedSourceMovesAboveGroup() async throws {
+        let mediaCollection = MediaCollection.makeDraft()
 
         let group = makeGroup(
             name: "Group",
-            sortOrder: 1
+            sortOrder: 1,
+            mediaCollection: mediaCollection
         )
 
         let source = makeSource(
             name: "Source",
-            sortOrder: 2
+            sortOrder: 2,
+            mediaCollection: mediaCollection
         )
 
  
@@ -105,15 +114,18 @@ struct CollectionReorderingTests {
     
     @Test
     func ungroupedSourceMovesBelowGroup() async throws {
+        let mediaCollection = MediaCollection.makeDraft()
 
         let source = makeSource(
             name: "Source",
-            sortOrder: 1
+            sortOrder: 1,
+            mediaCollection: mediaCollection
         )
 
         let group = makeGroup(
             name: "Group",
-            sortOrder: 2
+            sortOrder: 2,
+            mediaCollection: mediaCollection
         )
 
 
@@ -132,21 +144,25 @@ struct CollectionReorderingTests {
     
     @Test
     func groupedSourceMovesUpWithinGroup() async throws {
+        let mediaCollection = MediaCollection.makeDraft()
 
         let group = makeGroup(
             name: "Group",
-            sortOrder: 1
+            sortOrder: 1,
+            mediaCollection: mediaCollection
         )
 
         let source1 = makeSource(
             name: "1",
             sortOrder: 1,
+            mediaCollection: mediaCollection,
             group: group
         )
 
         let source2 = makeSource(
             name: "2",
             sortOrder: 2,
+            mediaCollection: mediaCollection,
             group: group
         )
 
@@ -167,15 +183,18 @@ struct CollectionReorderingTests {
     
     @Test
     func firstGroupedSourceCannotMoveUp() async throws {
+        let mediaCollection = MediaCollection.makeDraft()
 
         let group = makeGroup(
             name: "Group",
-            sortOrder: 1
+            sortOrder: 1,
+            mediaCollection: mediaCollection
         )
 
         let source = makeSource(
             name: "1",
             sortOrder: 1,
+            mediaCollection: mediaCollection,
             group: group
         )
 
@@ -194,15 +213,18 @@ struct CollectionReorderingTests {
     
     @Test
     func lastGroupedSourceCannotMoveDown() async throws {
+        let mediaCollection = MediaCollection.makeDraft()
 
         let group = makeGroup(
             name: "Group",
-            sortOrder: 1
+            sortOrder: 1,
+            mediaCollection: mediaCollection
         )
 
         let source = makeSource(
             name: "1",
             sortOrder: 1,
+            mediaCollection: mediaCollection,
             group: group
         )
 
@@ -221,26 +243,31 @@ struct CollectionReorderingTests {
     
     @Test
     func movingGroupedSourceDoesNotAffectGroupOrder() async throws {
+        let mediaCollection = MediaCollection.makeDraft()
 
         let groupA = makeGroup(
             name: "A",
-            sortOrder: 1
+            sortOrder: 1,
+            mediaCollection: mediaCollection
         )
 
         let groupB = makeGroup(
             name: "B",
-            sortOrder: 2
+            sortOrder: 2,
+            mediaCollection: mediaCollection
         )
 
         let source1 = makeSource(
             name: "1",
             sortOrder: 1,
+            mediaCollection: mediaCollection,
             group: groupA
         )
 
         let source2 = makeSource(
             name: "2",
             sortOrder: 2,
+            mediaCollection: mediaCollection,
             group: groupA
         )
         
@@ -262,15 +289,18 @@ struct CollectionReorderingTests {
     
     @Test
     func moveGroupDownPastUngroupedSource() {
+        let mediaCollection = MediaCollection.makeDraft()
 
         let group = makeGroup(
             name: "Group A",
-            sortOrder: 1
+            sortOrder: 1,
+            mediaCollection: mediaCollection
         )
 
         let source = makeSource(
             name: "Source A",
-            sortOrder: 2
+            sortOrder: 2,
+            mediaCollection: mediaCollection
         )
 
         let rows: [CollectionRow] = [
@@ -291,9 +321,10 @@ struct CollectionReorderingTests {
     
     @Test
     func repeatedMoveUpProducesExpectedOrdering() async throws {
-        let group1 = makeGroup(name: "GroupA", sortOrder: 1)
-        let group2 = makeGroup(name: "GroupB", sortOrder: 2)
-        let group3 = makeGroup(name: "GroupC", sortOrder: 3)
+        let mediaCollection = MediaCollection.makeDraft()
+        let group1 = makeGroup(name: "GroupA", sortOrder: 1, mediaCollection: mediaCollection)
+        let group2 = makeGroup(name: "GroupB", sortOrder: 2, mediaCollection: mediaCollection)
+        let group3 = makeGroup(name: "GroupC", sortOrder: 3, mediaCollection: mediaCollection)
 
         let rows: [CollectionRow] = [
             .group(group1),
@@ -313,34 +344,23 @@ struct CollectionReorderingTests {
     
     private func makeGroup(
         name: String,
-        sortOrder: Int
-    ) -> SourceGroup {
+        sortOrder: Int,
+        mediaCollection: MediaCollection) -> SourceGroup {
 
         SourceGroup(
             name: name,
-            sortOrder: sortOrder
+            sortOrder: sortOrder,
+            mediaCollection: mediaCollection
         )
     }
 
     private func makeSource(
         name: String,
         sortOrder: Int,
+        mediaCollection: MediaCollection,
         group: SourceGroup? = nil
     ) -> Source {
-
-        let media = Media.makeDraft()
-        let playback = Playback.makeDraft()
-        return Source(
-            name: name,
-            sortOrder: sortOrder,
-            measure1Start: nil,
-            isFavorite: false,
-            isExpanded: false,
-            notes: nil,
-            media: media,
-            playback: playback,
-            sourceGroup: group
-        )
+        return Source.makeDraft(name: name, sortOrder: sortOrder, mediaCollection: mediaCollection, sourceGroup: group)
     }
     
     private func makeViewModel(
@@ -353,7 +373,6 @@ struct CollectionReorderingTests {
                 MediaCollection.self,
                 Source.self,
                 SourceGroup.self,
-                Media.self,
                 Playback.self,
             configurations: ModelConfiguration(
                 isStoredInMemoryOnly: true

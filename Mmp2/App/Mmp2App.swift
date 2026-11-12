@@ -102,11 +102,11 @@ struct Mmp2App: App {
     }
     
     private func locateSources(using folderURL: URL) throws {
-        let fetchDescriptor = FetchDescriptor<Media>(predicate: #Predicate { media in
-            media.pathIsValid == false && media.clip == nil
+        let fetchDescriptor = FetchDescriptor<Source>(predicate: #Predicate { source in
+            source.pathIsValid == false
         })
-        let items = try sharedModelContainer.mainContext.fetch(fetchDescriptor)
-        guard !items.isEmpty else { return }
+        let sources = try sharedModelContainer.mainContext.fetch(fetchDescriptor)
+        guard !sources.isEmpty else { return }
         
         isWorking = true
         progress = 0
@@ -116,7 +116,7 @@ struct Mmp2App: App {
             do {
                 try await locator.repairPaths(
                     in: folderURL,
-                    mediaItems: items
+                    sources: sources
                 ) { update in
                     // MainActor guaranteed by actor
                     self.progress = Double(update.checked) / Double(update.total)

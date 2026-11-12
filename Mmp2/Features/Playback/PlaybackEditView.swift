@@ -33,10 +33,9 @@ struct PlaybackEditView: View {
         switch vm.mode {
         case .constant:
             PlaybackConstantView(vm: vm.constantVM, isBPM: vm.bpm != nil)
-        case .stepwise:
-            PlaybackStepwiseView(vm: vm.stepwiseVM, isBPM: vm.bpm != nil)
-        case .bounce:
-            PlaybackBounceView(vm: vm.bounceVM)
+        case .progression:
+            PlaybackProgressionView(vm: vm.progressionVM, isBPM: vm.bpm != nil)
+            // TODO: sequence
         }
     }
 }

@@ -52,11 +52,10 @@ struct SequencerFactory {
     private static func createSequenceGenerator(_ playback: Playback) throws -> SequenceGenerator {
         if let constant = playback.playbackConstant {
             return ConstantSequenceGenerator(value: constant.value)
-        } else if let stepwise = playback.playbackStepwise {
-            return StepwiseSequenceGenerator(stepwise: stepwise)
-        } else if let bounce = playback.playbackBounce {
-            return BounceSequenceGenerator(bounce: bounce)
+        } else if let progression = playback.playbackProgression {
+            return StepwiseSequenceGenerator(progression: progression)
         } else {
+            // TODO: sequence
             throw AppError.invalidPlayback
         }
     }

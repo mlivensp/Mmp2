@@ -20,11 +20,11 @@ actor SourceLocatorActor {
 
     func repairPaths(
         in directoryURL: URL,
-        mediaItems: [Media],
+        sources: [Source],
         progressHandler: @escaping (Progress) -> Void
     ) async throws {
 
-        let total = mediaItems.count
+        let total = sources.count
 
         // Security scope MUST be activated on the same thread that will create bookmarks.
         print("Accessing:", directoryURL.startAccessingSecurityScopedResource())
@@ -34,10 +34,10 @@ actor SourceLocatorActor {
         let _ = directoryURL.startAccessingSecurityScopedResource()
         defer { directoryURL.stopAccessingSecurityScopedResource() }
 
-        for (index, media) in mediaItems.enumerated() {
+        for (index, source) in sources.enumerated() {
             try Task.checkCancellation()
 
-            guard let rebasedURL = await URL.rebaseCrossPlatform(media.path ?? "", on: directoryURL)
+            guard let rebasedURL = await URL.rebaseCrossPlatform(source.path ?? "", on: directoryURL)
             else {
                 await MainActor.run {
                     progressHandler(.init(checked: index + 1, total: total))
@@ -49,7 +49,7 @@ actor SourceLocatorActor {
 
             if exists {
                 // Bookmark creation MUST happen inside the actor (Option A)
-                await updateMedia(media, with: rebasedURL)
+                await updateBookmark(on: source, with: rebasedURL)
             }
 
             await MainActor.run {
@@ -75,7 +75,7 @@ actor SourceLocatorActor {
     }
 
     /// Bookmark creation MUST happen inside the actor (same thread as security scope).
-    private func updateMedia(_ media: Media, with url: URL) async {
+    private func updateBookmark(on source: Source, with url: URL) async {
         do {
             let bookmarkData = try url.bookmarkData(
                 options: [.withSecurityScope],
@@ -83,9 +83,9 @@ actor SourceLocatorActor {
                 relativeTo: nil
             )
 
-            media.bookmark = bookmarkData
-            media.path = url.path  // Store POSIX path
-            media.pathIsValid = true
+            source.bookmark = bookmarkData
+            source.path = url.path  // Store POSIX path
+            source.pathIsValid = true
 //            print("about to save media with path \(media.path)")
             try modelContext.save()
         } catch {

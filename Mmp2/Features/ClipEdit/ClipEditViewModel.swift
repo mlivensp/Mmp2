@@ -47,15 +47,15 @@ extension ClipEditView {
             self.source = source
             self.context = context
             
-            self.playbackVM = PlaybackEditViewModel(playback: clip.playback, bpm: clip.media.bpm, context: context)
+            self.playbackVM = PlaybackEditViewModel(playback: clip.playback, bpm: clip.bpm, context: context)
             
             storedNameString = clip.primitiveName
             
             if clip.isNew {
-                clip.media.bpm = source.media.bpm
+                clip.bpm = source.bpm
             }
             
-            if let bpm = clip.media.bpm {
+            if let bpm = clip.bpm {
                 self.storedBpmString = String(bpm)
             } else {
                 self.storedBpmString = ""
@@ -83,7 +83,7 @@ extension ClipEditView {
             self.notes = clip.notes ?? ""
             
             measureMode = determineMeasureMode()
-            playbackVM.bpm = clip.media.bpm
+            playbackVM.bpm = clip.bpm
             _ = validate()
         }
         
@@ -373,7 +373,7 @@ extension ClipEditView {
             
             clip.isFavorite = isFavorite
             clip.notes = notes.isEmpty ? nil : notes
-            clip.media.bpm = bpm
+            clip.bpm = bpm
             
             if measureMode {
                 clip.firstMeasure = firstMeasure

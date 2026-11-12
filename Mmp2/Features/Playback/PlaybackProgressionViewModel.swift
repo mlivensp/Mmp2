@@ -8,40 +8,40 @@
 import Foundation
 
 @Observable
-final class PlaybackStepwiseViewModel {
+final class PlaybackProgressionViewModel {
     var start: Int
     private var preciseStart: Double
-    var step: Int
+    var increment: Int
     var max: Int
     private var preciseMax: Double
-    var timesToPlayStep: Int
+    var timesToPlayEach: Int
     
     var storedStartString: String
-    var storedStepString: String
+    var storedIncrementString: String
     var storedMaxString: String
-    var storedTimesToPlayString: String
+    var storedTimesToPlayEachString: String
     
     var startError: String?
-    var stepError: String?
+    var incrementError: String?
     var maxError: String?
-    var timesToPlayError: String?
+    var timesToPlayEachError: String?
     
-    static func `default`() -> PlaybackStepwiseViewModel {
-        PlaybackStepwiseViewModel(start: 100, step: 2, max: 110, timesToPlayStep: 1)
+    static func `default`() -> PlaybackProgressionViewModel {
+        PlaybackProgressionViewModel(start: 100, increment: 2, max: 110, timesToPlayEach: 1)
     }
 
-    init(start: Int, step: Int, max: Int, timesToPlayStep: Int) {
+    init(start: Int, increment: Int, max: Int, timesToPlayEach: Int) {
         self.start = start
         self.preciseStart = Double(start)
-        self.step = step
+        self.increment = increment
         self.max = max
         self.preciseMax = Double(max)
-        self.timesToPlayStep = timesToPlayStep
+        self.timesToPlayEach = timesToPlayEach
         
         storedStartString = String(start)
-        storedStepString = String(step)
+        storedIncrementString = String(increment)
         storedMaxString = String(max)
-        storedTimesToPlayString = String(timesToPlayStep)
+        storedTimesToPlayEachString = String(timesToPlayEach)
         
         validate()
     }
@@ -73,11 +73,11 @@ final class PlaybackStepwiseViewModel {
         }
     }
     
-    var stepString: String {
-        get { storedStepString }
+    var incrementString: String {
+        get { storedIncrementString }
         set {
-            storedStepString = newValue
-            applyStepValidationResult(validateStep(storedStepString))
+            storedIncrementString = newValue
+            applyIncrementValidationResult(validateIncrement(storedIncrementString))
             validateRelationships()
         }
     }
@@ -95,11 +95,11 @@ final class PlaybackStepwiseViewModel {
         }
     }
 
-    var timesToPlayString: String {
-        get { storedTimesToPlayString }
+    var timesToPlayEachString: String {
+        get { storedTimesToPlayEachString }
         set {
-            storedTimesToPlayString = newValue
-            let result = validateTimesToPlay(storedTimesToPlayString)
+            storedTimesToPlayEachString = newValue
+            let result = validateTimesToPlayEach(storedTimesToPlayEachString)
             applyTimesToPlayValidationResult(result)
         }
     }
@@ -120,18 +120,18 @@ final class PlaybackStepwiseViewModel {
         return .failure("Start must be a number greater than zero.")
     }
     
-    func validateStep(_ stepValue: String) -> ValidationResult<Int> {
-        if stepValue.isEmpty {
-            return .failure("Step is required.")
+    func validateIncrement(_ incrementValue: String) -> ValidationResult<Int> {
+        if incrementValue.isEmpty {
+            return .failure("Increment is required.")
         } else {
-            if let step = Int(stepValue) {
-                if step > 0 {
-                    return .success(step)
+            if let increment = Int(incrementValue) {
+                if increment > 0 {
+                    return .success(increment)
                 }
             }
         }
         
-        return .failure("Step must be a number greater than zero.")
+        return .failure("Increment must be a number greater than zero.")
     }
     
     func validateMax(_ maxValue: String) -> ValidationResult<Int> {
@@ -148,9 +148,9 @@ final class PlaybackStepwiseViewModel {
         return .failure("Max must be a number greater than zero.")
     }
     
-    func validateTimesToPlay(_ timesToPlayValue: String) -> ValidationResult<Int> {
+    func validateTimesToPlayEach(_ timesToPlayValue: String) -> ValidationResult<Int> {
         if timesToPlayValue.isEmpty {
-            return .failure("Times To Play is required.")
+            return .failure("Times To Play Each is required.")
         } else {
             if let timesToPlay = Int(timesToPlayValue) {
                 if timesToPlay > 0 {
@@ -159,19 +159,19 @@ final class PlaybackStepwiseViewModel {
             }
         }
         
-        return .failure("Times To Play must be a number greater than zero.")
+        return .failure("Times To Play Each must be a number greater than zero.")
     }
     
     // Cross-field validation. Only runs for fields that passed their own validation.
     // Re-applies the field-level result first so stale relationship errors are cleared.
     func validateRelationships() {
         let startResult = validateStart(storedStartString)
-        let stepResult = validateStep(storedStepString)
+        let stepResult = validateIncrement(storedIncrementString)
         let maxResult = validateMax(storedMaxString)
         
         // Reset max/step errors to their field-level state
         applyMaxValidationResult(maxResult)
-        applyStepValidationResult(stepResult)
+        applyIncrementValidationResult(stepResult)
         
         guard case .success(let startValue) = startResult,
               case .success(let maxValue) = maxResult else { return }
@@ -184,7 +184,7 @@ final class PlaybackStepwiseViewModel {
         
         // start + step <= max
         if case .success(let stepValue) = stepResult, startValue + stepValue > maxValue {
-            stepError = "Start + Step must not exceed Max."
+            incrementError = "Start + Step must not exceed Max."
         }
     }
     
@@ -200,13 +200,13 @@ final class PlaybackStepwiseViewModel {
     
     // MARK: apply validation result
 
-    private func applyStepValidationResult(_ result: ValidationResult<Int>) {
+    private func applyIncrementValidationResult(_ result: ValidationResult<Int>) {
         switch result {
         case .success(let value):
-            stepError = nil
-            step = value
+            incrementError = nil
+            increment = value
         case .failure(let message):
-            stepError = message
+            incrementError = message
         }
     }
 
@@ -223,34 +223,34 @@ final class PlaybackStepwiseViewModel {
     private func applyTimesToPlayValidationResult(_ result: ValidationResult<Int>) {
         switch result {
         case .success(let value):
-            timesToPlayError = nil
-            timesToPlayStep = value
+            timesToPlayEachError = nil
+            timesToPlayEach = value
         case .failure(let message):
-            timesToPlayError = message
+            timesToPlayEachError = message
         }
     }
     
     var isValid: Bool {
-        startError == nil && stepError == nil && maxError == nil && timesToPlayError == nil
+        startError == nil && incrementError == nil && maxError == nil && timesToPlayEachError == nil
     }
 
     func validate() {
         applyStartValidationResult(validateStart(storedStartString))
-        applyStepValidationResult(validateStep(storedStepString))
+        applyIncrementValidationResult(validateIncrement(storedIncrementString))
         applyMaxValidationResult(validateMax(storedMaxString))
-        applyTimesToPlayValidationResult(validateTimesToPlay(storedTimesToPlayString))
+        applyTimesToPlayValidationResult(validateTimesToPlayEach(storedTimesToPlayEachString))
         validateRelationships()
     }
     
-    func apply(to stepwise: PlaybackStepwise) throws {
+    func apply(to progression: PlaybackProgression) throws {
         validate()
         guard isValid else {
-            throw AppError.attemptToSaveInvalidState("PlaybackStepwiseViewModel")
+            throw AppError.attemptToSaveInvalidState("PlaybackProgressionViewModel")
         }
         
-        stepwise.start = start
-        stepwise.step = step
-        stepwise.max = max
-        stepwise.timesToPlayStep = timesToPlayStep
+        progression.start = start
+        progression.increment = increment
+        progression.max = max
+        progression.timesToPlayEach = timesToPlayEach
     }
 }

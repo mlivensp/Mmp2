@@ -19,7 +19,6 @@ struct SourceEditViewModelTests {
             MediaCollection.self,
             Source.self,
             SourceGroup.self,
-            Media.self,
             Playback.self
         ])
         let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
@@ -48,17 +47,17 @@ struct SourceEditViewModelTests {
             context.insert(sourceGroup!)
             collection.sourceGroups.append(sourceGroup!)
         }
-
-        let media = Media(
-            bpm: bpm,
-            path: "/tmp/test.mp3",
-            duration: 120.0,
-            isArchived: false,
-            pathIsValid: true,
-            numberTimesPlayed: 0,
-            lastPlayed: nil
-        )
-        context.insert(media)
+//
+//        let media = Media(
+//            bpm: bpm,
+//            path: "/tmp/test.mp3",
+//            duration: 120.0,
+//            isArchived: false,
+//            pathIsValid: true,
+//            numberTimesPlayed: 0,
+//            lastPlayed: nil
+//        )
+//        context.insert(media)
 
         let playback = Playback(timesToPlay: 1)
         context.insert(playback)
@@ -70,7 +69,14 @@ struct SourceEditViewModelTests {
             isFavorite: isFavorite,
             isExpanded: false,
             notes: notes,
-            media: media,
+            bpm: bpm,
+            duration: 120.0,
+            lastPlayed: nil,
+            numberTimesPlayed: 0,
+            path: "/tmp/test.mp3",
+            pathIsValid: false,
+            bookmark: nil,
+            mediaCollection: collection,
             playback: playback,
             sourceGroup: sourceGroup
         )
@@ -80,30 +86,19 @@ struct SourceEditViewModelTests {
         collection.sources.append(source)
 
         for existingName in existingNames {
-            let existingMedia = Media(
-                bpm: 100,
-                path: "/tmp/\(existingName).mp3",
-                duration: 60,
-                isArchived: false,
-                pathIsValid: true
-            )
-            let existingPlayback = Playback(timesToPlay: 1)
-            context.insert(existingMedia)
-            context.insert(existingPlayback)
+//            let existingMedia = Media(
+//                bpm: 100,
+//                path: "/tmp/\(existingName).mp3",
+//                duration: 60,
+//                isArchived: false,
+//                pathIsValid: true
+//            )
+//            let existingPlayback = Playback(timesToPlay: 1)
+//            context.insert(existingMedia)
+//            context.insert(existingPlayback)
 
-            let existing = Source(
-                name: existingName,
-                sortOrder: 0,
-                measure1Start: nil,
-                isFavorite: false,
-                isExpanded: false,
-                notes: nil,
-                media: existingMedia,
-                playback: existingPlayback,
-                sourceGroup: nil
-            )
+            let existing = Source.makeDraft(name: existingName, sortOrder: 0, mediaCollection: collection,)
             context.insert(existing)
-            existing.mediaCollection = collection
             collection.sources.append(existing)
         }
 
@@ -375,7 +370,7 @@ struct SourceEditViewModelTests {
 
         #expect(result == true)
         #expect(fixture.source.primitiveName == "Updated Name")
-        #expect(fixture.source.media.bpm == 120)
+        #expect(fixture.source.bpm == 120)
         #expect(fixture.source.sortOrder == 8)
         #expect(fixture.source.measure1Start == 10.0)
         #expect(fixture.source.isFavorite == true)
@@ -400,7 +395,7 @@ struct SourceEditViewModelTests {
         }
 
         #expect(fixture.source.primitiveName == "Original")
-        #expect(fixture.source.media.bpm == 90)
+        #expect(fixture.source.bpm == 90)
         #expect(fixture.source.sortOrder == 3)
     }
 }

@@ -8,41 +8,41 @@
 import Testing
 @testable import Mmp2
 
-@Suite("PlaybackStepwiseViewModel")
-struct PlaybackStepwiseViewModelTests {
+@Suite("PlaybackProgressionViewModel")
+struct PlaybackProgressionViewModelTests {
 
     // MARK: - Init
 
     @Test("init maps values to strings and numeric state, and starts valid")
     func initMapsValues() {
-        let vm = makeVM(start: 60, step: 5, max: 120, timesToPlay: 3)
+        let vm = makeVM(start: 60, increment: 5, max: 120, timesToPlayEach: 3)
 
         #expect(vm.startString == "60")
-        #expect(vm.stepString == "5")
+        #expect(vm.incrementString == "5")
         #expect(vm.maxString == "120")
-        #expect(vm.timesToPlayString == "3")
+        #expect(vm.timesToPlayEachString == "3")
 
         #expect(vm.start == 60)
-        #expect(vm.step == 5)
+        #expect(vm.increment == 5)
         #expect(vm.max == 120)
-        #expect(vm.timesToPlayStep == 3)
+        #expect(vm.timesToPlayEach == 3)
 
         #expect(vm.isValid)
         #expect(vm.startError == nil)
-        #expect(vm.stepError == nil)
+        #expect(vm.incrementError == nil)
         #expect(vm.maxError == nil)
-        #expect(vm.timesToPlayError == nil)
+        #expect(vm.timesToPlayEachError == nil)
     }
 
     @Test("init with invalid values reports errors after validate()")
     func initWithInvalidValuesIsInvalid() {
-        let vm = makeVM(start: 0, step: 0, max: 0, timesToPlay: 0)
+        let vm = makeVM(start: 0, increment: 0, max: 0, timesToPlayEach: 0)
 
         #expect(!vm.isValid)
         #expect(vm.startError != nil)
-        #expect(vm.stepError != nil)
+        #expect(vm.incrementError != nil)
         #expect(vm.maxError != nil)
-        #expect(vm.timesToPlayError != nil)
+        #expect(vm.timesToPlayEachError != nil)
     }
 
     // MARK: - Start
@@ -88,22 +88,22 @@ struct PlaybackStepwiseViewModelTests {
     @Test("step accepts positive number")
     func stepAcceptsPositive() {
         let vm = makeDefaultVM()
-        vm.stepString = "10"
+        vm.incrementString = "10"
 
-        #expect(vm.step == 10)
-        #expect(vm.stepError == nil)
+        #expect(vm.increment == 10)
+        #expect(vm.incrementError == nil)
     }
 
     @Test("step invalid input sets error and keeps previous value",
           arguments: ["", "0", "-1", "x"])
     func stepRejectsInvalid(input: String) {
         let vm = makeDefaultVM()
-        let original = vm.step
+        let original = vm.increment
 
-        vm.stepString = input
+        vm.incrementString = input
 
-        #expect(vm.step == original)
-        #expect(vm.stepError != nil)
+        #expect(vm.increment == original)
+        #expect(vm.incrementError != nil)
         #expect(!vm.isValid)
     }
 
@@ -136,40 +136,40 @@ struct PlaybackStepwiseViewModelTests {
     @Test("timesToPlay accepts positive number")
     func timesToPlayAcceptsPositive() {
         let vm = makeDefaultVM()
-        vm.timesToPlayString = "4"
+        vm.timesToPlayEachString = "4"
 
-        #expect(vm.timesToPlayStep == 4)
-        #expect(vm.timesToPlayError == nil)
+        #expect(vm.timesToPlayEach == 4)
+        #expect(vm.timesToPlayEachError == nil)
     }
 
     @Test("timesToPlay invalid input sets error and keeps previous value",
           arguments: ["", "0", "-1", "x"])
     func timesToPlayRejectsInvalid(input: String) {
         let vm = makeDefaultVM()
-        let original = vm.timesToPlayStep
+        let original = vm.timesToPlayEach
 
-        vm.timesToPlayString = input
+        vm.timesToPlayEachString = input
 
-        #expect(vm.timesToPlayStep == original)
-        #expect(vm.timesToPlayError != nil)
+        #expect(vm.timesToPlayEach == original)
+        #expect(vm.timesToPlayEachError != nil)
         #expect(!vm.isValid)
     }
 
     // Documents a bug: the setter and validate() call validateStart for timesToPlay,
     // so the message mentions "Start" instead of "Times To Play". Fails until fixed.
-    @Test("timesToPlay error message refers to Times To Play")
+    @Test("timesToPlayEach error message refers to Times To Play Each")
     func timesToPlayErrorMessage() {
         let vm = makeDefaultVM()
-        vm.timesToPlayString = ""
+        vm.timesToPlayEachString = ""
 
-        #expect(vm.timesToPlayError == "Times To Play is required.")
+        #expect(vm.timesToPlayEachError == "Times To Play Each is required.")
     }
     
     // MARK: - Cross-field validation: max > start
     
     @Test("max > start: valid when max is greater than start")
     func maxGreaterThanStartValid() {
-        let vm = makeVM(start: 50, step: 5, max: 100, timesToPlay: 3)
+        let vm = makeVM(start: 50, increment: 5, max: 100, timesToPlayEach: 3)
         
         #expect(vm.isValid)
         #expect(vm.maxError == nil)
@@ -177,7 +177,7 @@ struct PlaybackStepwiseViewModelTests {
     
     @Test("max > start: invalid when max equals start")
     func maxEqualsStartInvalid() {
-        let vm = makeVM(start: 50, step: 5, max: 50, timesToPlay: 3)
+        let vm = makeVM(start: 50, increment: 5, max: 50, timesToPlayEach: 3)
         
         #expect(!vm.isValid)
         #expect(vm.maxError == "Max must be greater than Start.")
@@ -185,7 +185,7 @@ struct PlaybackStepwiseViewModelTests {
     
     @Test("max > start: invalid when max is less than start")
     func maxLessThanStartInvalid() {
-        let vm = makeVM(start: 100, step: 5, max: 50, timesToPlay: 3)
+        let vm = makeVM(start: 100, increment: 5, max: 50, timesToPlayEach: 3)
         
         #expect(!vm.isValid)
         #expect(vm.maxError == "Max must be greater than Start.")
@@ -193,7 +193,7 @@ struct PlaybackStepwiseViewModelTests {
     
     @Test("max > start: error clears when max is increased above start")
     func maxGreaterThanStartErrorClears() {
-        let vm = makeVM(start: 50, step: 5, max: 50, timesToPlay: 3)
+        let vm = makeVM(start: 50, increment: 5, max: 50, timesToPlayEach: 3)
         #expect(vm.maxError != nil)
         
         vm.maxString = "100"
@@ -204,7 +204,7 @@ struct PlaybackStepwiseViewModelTests {
     
     @Test("max > start: error clears when start is decreased below max")
     func maxGreaterThanStartErrorClearsViaStart() {
-        let vm = makeVM(start: 100, step: 5, max: 50, timesToPlay: 3)
+        let vm = makeVM(start: 100, increment: 5, max: 50, timesToPlayEach: 3)
         #expect(vm.maxError != nil)
         
         vm.startString = "40"
@@ -217,81 +217,81 @@ struct PlaybackStepwiseViewModelTests {
     
     @Test("start + step <= max: valid when sum is less than max")
     func startPlusStepLessThanMaxValid() {
-        let vm = makeVM(start: 50, step: 20, max: 100, timesToPlay: 3)
+        let vm = makeVM(start: 50, increment: 20, max: 100, timesToPlayEach: 3)
         
         #expect(vm.isValid)
-        #expect(vm.stepError == nil)
+        #expect(vm.incrementError == nil)
     }
     
     @Test("start + step <= max: valid when sum equals max")
     func startPlusStepEqualsMaxValid() {
-        let vm = makeVM(start: 50, step: 50, max: 100, timesToPlay: 3)
+        let vm = makeVM(start: 50, increment: 50, max: 100, timesToPlayEach: 3)
         
         #expect(vm.isValid)
-        #expect(vm.stepError == nil)
+        #expect(vm.incrementError == nil)
     }
     
     @Test("start + step <= max: invalid when sum exceeds max")
     func startPlusStepExceedsMaxInvalid() {
-        let vm = makeVM(start: 50, step: 60, max: 100, timesToPlay: 3)
+        let vm = makeVM(start: 50, increment: 60, max: 100, timesToPlayEach: 3)
         
         #expect(!vm.isValid)
-        #expect(vm.stepError == "Start + Step must not exceed Max.")
+        #expect(vm.incrementError == "Start + Step must not exceed Max.")
     }
     
     @Test("start + step <= max: error clears when step is decreased")
     func startPlusStepErrorClearsViaStep() {
-        let vm = makeVM(start: 50, step: 60, max: 100, timesToPlay: 3)
-        #expect(vm.stepError != nil)
+        let vm = makeVM(start: 50, increment: 60, max: 100, timesToPlayEach: 3)
+        #expect(vm.incrementError != nil)
         
-        vm.stepString = "30"
+        vm.incrementString = "30"
         
-        #expect(vm.stepError == nil)
+        #expect(vm.incrementError == nil)
         #expect(vm.isValid)
     }
     
     @Test("start + step <= max: error clears when start is decreased")
     func startPlusStepErrorClearsViaStart() {
-        let vm = makeVM(start: 60, step: 60, max: 100, timesToPlay: 3)
-        #expect(vm.stepError != nil)
+        let vm = makeVM(start: 60, increment: 60, max: 100, timesToPlayEach: 3)
+        #expect(vm.incrementError != nil)
         
         vm.startString = "30"
         
-        #expect(vm.stepError == nil)
+        #expect(vm.incrementError == nil)
         #expect(vm.isValid)
     }
     
     @Test("start + step <= max: error clears when max is increased")
     func startPlusStepErrorClearsViaMax() {
-        let vm = makeVM(start: 50, step: 60, max: 100, timesToPlay: 3)
-        #expect(vm.stepError != nil)
+        let vm = makeVM(start: 50, increment: 60, max: 100, timesToPlayEach: 3)
+        #expect(vm.incrementError != nil)
         
         vm.maxString = "150"
         
-        #expect(vm.stepError == nil)
+        #expect(vm.incrementError == nil)
         #expect(vm.isValid)
     }
     
     @Test("start + step <= max: skipped when step fails field validation")
     func startPlusStepSkippedWhenStepInvalid() {
-        let vm = makeVM(start: 50, step: 20, max: 100, timesToPlay: 3)
+        let vm = makeVM(start: 50, increment: 20, max: 100, timesToPlayEach: 3)
         
-        vm.stepString = "abc"
+        vm.incrementString = "abc"
         
-        #expect(vm.stepError == "Step must be a number greater than zero.")
+        #expect(vm.incrementError == "Increment must be a number greater than zero.")
         #expect(!vm.isValid)
     }
     
     @Test("start + step <= max: no error when max > start but sum exceeds max (max > start only)")
     func maxGreaterThanStartTakesPriority() {
-        let vm = makeVM(start: 100, step: 50, max: 150, timesToPlay: 3)
+        let vm = makeVM(start: 100, increment: 50, max: 150, timesToPlayEach: 3)
         
         // First violate max > start
         vm.maxString = "50"
         
         #expect(vm.maxError == "Max must be greater than Start.")
         // The step rule should not run because max <= start
-        #expect(vm.stepError == nil)
+        #expect(vm.incrementError == nil)
         #expect(!vm.isValid)
     }
     // MARK: - Validators
@@ -303,11 +303,11 @@ struct PlaybackStepwiseViewModelTests {
         #expect(failureMessage(makeDefaultVM().validateStart("0")) == "Start must be a number greater than zero.")
     }
 
-    @Test("validateStep")
-    func validateStepResults() {
-        #expect(successValue(makeDefaultVM().validateStep("5")) == 5)
-        #expect(failureMessage(makeDefaultVM().validateStep("")) == "Step is required.")
-        #expect(failureMessage(makeDefaultVM().validateStep("-2")) == "Step must be a number greater than zero.")
+    @Test("validateIncrement")
+    func validateIncrementResults() {
+        #expect(successValue(makeDefaultVM().validateIncrement("5")) == 5)
+        #expect(failureMessage(makeDefaultVM().validateIncrement("")) == "Increment is required.")
+        #expect(failureMessage(makeDefaultVM().validateIncrement("-2")) == "Increment must be a number greater than zero.")
     }
 
     @Test("validateMax")
@@ -317,11 +317,11 @@ struct PlaybackStepwiseViewModelTests {
         #expect(failureMessage(makeDefaultVM().validateMax("q")) == "Max must be a number greater than zero.")
     }
 
-    @Test("validateTimesToPlay")
-    func validateTimesToPlayResults() {
-        #expect(successValue(makeDefaultVM().validateTimesToPlay("5")) == 5)
-        #expect(failureMessage(makeDefaultVM().validateTimesToPlay("")) == "Times To Play is required.")
-        #expect(failureMessage(makeDefaultVM().validateTimesToPlay("0")) == "Times To Play must be a number greater than zero.")
+    @Test("validateTimesToPlayEach")
+    func validateTimesToPlayEachResults() {
+        #expect(successValue(makeDefaultVM().validateTimesToPlayEach("5")) == 5)
+        #expect(failureMessage(makeDefaultVM().validateTimesToPlayEach("")) == "Times To Play Each is required.")
+        #expect(failureMessage(makeDefaultVM().validateTimesToPlayEach("0")) == "Times To Play Each must be a number greater than zero.")
     }
 
     // MARK: - isValid
@@ -331,10 +331,10 @@ struct PlaybackStepwiseViewModelTests {
         let vm = makeDefaultVM()
         #expect(vm.isValid)
 
-        vm.stepString = "bad"
+        vm.incrementString = "bad"
         #expect(!vm.isValid)
 
-        vm.stepString = "5"
+        vm.incrementString = "5"
         #expect(vm.isValid)
     }
 
@@ -342,26 +342,26 @@ struct PlaybackStepwiseViewModelTests {
 
     @Test("apply copies values to PlaybackStepwise when valid")
     func applyCopiesValues() throws {
-        let vm = makeVM(start: 60, step: 5, max: 120, timesToPlay: 3)
-        let model = Mmp2.PlaybackStepwise(start: 1, step: 1, max: 1, timesToPlayStep: 1, playback: nil)
+        let vm = makeVM(start: 60, increment: 5, max: 120, timesToPlayEach: 3)
+        let model = Mmp2.PlaybackProgression(start: 1, increment: 1, max: 1, timesToPlayEach: 1)
 
         vm.startString = "70"
-        vm.stepString = "10"
+        vm.incrementString = "10"
         vm.maxString = "150"
-        vm.timesToPlayString = "6"
+        vm.timesToPlayEachString = "6"
 
         try vm.apply(to: model)
 
         #expect(model.start == 70)
-        #expect(model.step == 10)
+        #expect(model.increment == 10)
         #expect(model.max == 150)
-        #expect(model.timesToPlayStep == 6)
+        #expect(model.timesToPlayEach == 6)
     }
 
     @Test("apply throws and leaves model untouched when state is invalid")
     func applyThrowsWhenInvalid() {
-        let vm = makeVM(start: 60, step: 5, max: 120, timesToPlay: 3)
-        let model = Mmp2.PlaybackStepwise(start: 1, step: 2, max: 3, timesToPlayStep: 4, playback: nil)
+        let vm = makeVM(start: 60, increment: 5, max: 120, timesToPlayEach: 3)
+        let model = Mmp2.PlaybackProgression(start: 1, increment: 2, max: 3, timesToPlayEach: 4)
 
         vm.maxString = "nope"
 
@@ -369,19 +369,19 @@ struct PlaybackStepwiseViewModelTests {
             try vm.apply(to: model)
         }
         #expect(model.start == 1)
-        #expect(model.step == 2)
+        #expect(model.increment == 2)
         #expect(model.max == 3)
-        #expect(model.timesToPlayStep == 4)
+        #expect(model.timesToPlayEach == 4)
     }
 
     // MARK: - Helpers
 
-    private func makeDefaultVM() -> PlaybackStepwiseViewModel {
-        makeVM(start: 60, step: 5, max: 120, timesToPlay: 3)
+    private func makeDefaultVM() -> PlaybackProgressionViewModel {
+        makeVM(start: 60, increment: 5, max: 120, timesToPlayEach: 3)
     }
 
-    private func makeVM(start: Int, step: Int, max: Int, timesToPlay: Int) -> PlaybackStepwiseViewModel {
-        PlaybackStepwiseViewModel(start: start, step: step, max: max, timesToPlayStep: timesToPlay)
+    private func makeVM(start: Int, increment: Int, max: Int, timesToPlayEach: Int) -> PlaybackProgressionViewModel {
+        PlaybackProgressionViewModel(start: start, increment: increment, max: max, timesToPlayEach: timesToPlayEach)
     }
 
     private func successValue(_ result: ValidationResult<Int>) -> Int? {
@@ -402,7 +402,7 @@ struct PlaybackStepwiseViewModelTests {
 //        let model = Mmp2.PlaybackStepwise(start: 1, step: 1, max: 1, timesToPlay: 1, playback: nil)
 //
 //        vm.startString = "80"
-//        vm.stepString = "7"
+//        vm.incrementString = "7"
 //        vm.maxString = "200"
 //        vm.timesToPlayString = "6"
 //

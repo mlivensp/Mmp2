@@ -8,14 +8,14 @@
 import Foundation
 
 struct StepwiseSequenceGenerator: SequenceGenerator {
-    let stepwise: PlaybackStepwise
+    let progression: PlaybackProgression
     
     func generateSequence() -> [TempoStep] {
         var sequence: [TempoStep] = []
-        var tempo = stepwise.start
-        let max = stepwise.max
-        let step = stepwise.step
-        let timesToPlayStep = stepwise.timesToPlayStep
+        var tempo = progression.start
+        let max = progression.max
+        let step = progression.increment
+        let timesToPlayStep = progression.timesToPlayEach
         var done = false
         
         repeat {

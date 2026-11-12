@@ -19,11 +19,11 @@ struct PlaylistItemViewModel: Identifiable {
         var nameParts: [String] = []
         
         if let source = playlistItem.source {
-            nameParts.append(source.mediaCollection?.primitiveName ?? "?")
+            nameParts.append(source.mediaCollection.primitiveName)
             nameParts.append(source.primitiveName)
         } else if let clip = playlistItem.clip {
-            nameParts.append(clip.source?.mediaCollection?.primitiveName ?? "?")
-            nameParts.append(clip.source?.primitiveName ?? "?")
+            nameParts.append(clip.source.mediaCollection.primitiveName)
+            nameParts.append(clip.source.primitiveName)
             nameParts.append(clip.primitiveName)
         }
         

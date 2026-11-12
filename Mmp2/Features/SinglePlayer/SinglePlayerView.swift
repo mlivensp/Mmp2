@@ -145,7 +145,7 @@ struct SinglePlayerView: View {
             
             Button(action: {
                 guard let source else { return }
-                let clip = Clip.makeDraft()
+                let clip = Clip.makeDraft(source: source)
 
                 appRootManager.selectedSource = source
                 appRootManager.editingClip = clip
@@ -193,8 +193,8 @@ struct SinglePlayerView: View {
     }
     
     private func resolveURL() throws {
-        guard let media = source?.media else { throw AppError.noMedia }
-        guard let url = try media.resolveURL() else { return }
+        guard let source else { throw AppError.invalidState }
+        guard let url = try source.resolveURL() else { return }
         resolvedURL = url
     }
 }

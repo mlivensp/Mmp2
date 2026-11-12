@@ -43,7 +43,7 @@ struct CollectionEditForm: View {
             ) { source in
                 appRootManager.editSource(
                     source,
-                    in: vm.collection
+                    in: vm.mediaCollection
                 )
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

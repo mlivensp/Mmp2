@@ -22,16 +22,15 @@ final class PlaybackEditViewModel {
 
             let factor = Double(currentBpm) / Double(previousBpm)
             constantVM.scaleRate(by: factor)
-            stepwiseVM.scaleRates(by: factor)
-            bounceVM.scaleTempos(by: factor)
+            progressionVM.scaleRates(by: factor)
+            // TODO: sequence
         }
     }
     var context: ModelContext
     
     var mode: PlaybackMode
     var constantVM: PlaybackConstantViewModel
-    var stepwiseVM: PlaybackStepwiseViewModel
-    var bounceVM: PlaybackBounceViewModel
+    var progressionVM: PlaybackProgressionViewModel
     
     var timesToPlayError: String? = nil
 
@@ -45,24 +44,17 @@ final class PlaybackEditViewModel {
             self.constantVM = PlaybackConstantViewModel(
                 value: constant.value
             )
-            self.stepwiseVM = PlaybackStepwiseViewModel.default()
-            self.bounceVM = PlaybackBounceViewModel.default()
-        } else if let stepwise = playback.playbackStepwise {
-            self.mode = .stepwise
-            self.stepwiseVM = PlaybackStepwiseViewModel(start: stepwise.start, step: stepwise.step, max: stepwise.max, timesToPlayStep: stepwise.timesToPlayStep)
+            self.progressionVM = PlaybackProgressionViewModel.default()
+        } else if let progression = playback.playbackProgression {
+            self.mode = .progression
+            self.progressionVM = PlaybackProgressionViewModel(start: progression.start, increment: progression.increment, max: progression.max, timesToPlayEach: progression.timesToPlayEach)
             self.constantVM = PlaybackConstantViewModel.default()
-            self.bounceVM = PlaybackBounceViewModel.default()
-        } else if let bounce = playback.playbackBounce {
-            self.mode = .bounce
-            self.bounceVM = PlaybackBounceViewModel(slow: bounce.slow, slowTimesToPlay: bounce.timesToPlaySlow, mid: bounce.mid, midTimesToPlay: bounce.timesToPlayMid, fast: bounce.fast, fastTimesToPlay: bounce.timesToPlayFast, playOrder: bounce.playOrder)
-            self.constantVM = PlaybackConstantViewModel.default()
-            self.stepwiseVM = PlaybackStepwiseViewModel.default()
+            // TODO: sequence
         } else {
             // default mode for new clips
             self.mode = .constant
             self.constantVM = PlaybackConstantViewModel.default()
-            self.stepwiseVM = PlaybackStepwiseViewModel.default()
-            self.bounceVM = PlaybackBounceViewModel.default()
+            self.progressionVM = PlaybackProgressionViewModel.default()
         }
         
         if let timesToPlay = playback.timesToPlay {
@@ -134,10 +126,9 @@ final class PlaybackEditViewModel {
         switch mode {
         case .constant:
             try constantVM.apply(to: playback.playbackConstant!)
-        case .stepwise:
-            try stepwiseVM.apply(to: playback.playbackStepwise!)
-        case .bounce:
-            try bounceVM.apply(to: playback.playbackBounce!)
+        case .progression:
+            try progressionVM.apply(to: playback.playbackProgression!)
+            // TODO: sequence
         }
     }
 }
