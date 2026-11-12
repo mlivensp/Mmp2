@@ -36,6 +36,8 @@ struct ClipEditForm: View {
                     HStack {
                         Text("BPM")
                         TextField("", text: $vm.bpmString)
+                            .frame(width: numericFieldWidth)
+                            .multilineTextAlignment(.trailing)
                     }
                 }
                 
@@ -44,7 +46,6 @@ struct ClipEditForm: View {
                     errorMessage: ""
                 ) {
                     HStack {
-                        Text("Measure Mode")
                         Toggle(isOn: $vm.measureMode) {
                             Text("Measure Mode")
                         }
@@ -59,6 +60,8 @@ struct ClipEditForm: View {
                         HStack {
                             Text("Start")
                             TextField("", text: $vm.startTimeString)
+                                .frame(width: timespanFieldWidth)
+                                .multilineTextAlignment(.trailing)
                         }
                     }
                     
@@ -69,6 +72,8 @@ struct ClipEditForm: View {
                         HStack {
                             Text("End")
                             TextField("", text: $vm.endTimeString)
+                                .frame(width: timespanFieldWidth)
+                                .multilineTextAlignment(.trailing)
                         }
                     }
                 } else {
@@ -79,7 +84,8 @@ struct ClipEditForm: View {
                         HStack {
                             Text("First Measure")
                             TextField("", text: $vm.startMeasureString)
-                                .frame(maxWidth: 60)
+                                .frame(width: numericFieldWidth)
+                                .multilineTextAlignment(.trailing)
                         }
                     }
                     
@@ -90,7 +96,8 @@ struct ClipEditForm: View {
                         HStack {
                             Text("Last Measure")
                             TextField("", text: $vm.endMeasureString)
-                                .frame(maxWidth: 60)
+                                .frame(width: numericFieldWidth)
+                                .multilineTextAlignment(.trailing)
                         }
                     }
                 }

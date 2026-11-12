@@ -79,7 +79,8 @@ struct SourceEditForm: View {
                     HStack {
                         Text("Measure 1 Start")
                         TextField("", text: $vm.measure1StartString)
-                            .frame(width: 200)
+                            .frame(width: timespanFieldWidth)
+                            .multilineTextAlignment(.trailing)
                     }
                 }
                 
