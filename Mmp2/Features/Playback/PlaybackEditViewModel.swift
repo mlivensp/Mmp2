@@ -23,7 +23,7 @@ final class PlaybackEditViewModel {
             let factor = Double(currentBpm) / Double(previousBpm)
             constantVM.scaleRate(by: factor)
             progressionVM.scaleRates(by: factor)
-            // TODO: sequence
+            sequencesVM.scaleRates(by: factor)
         }
     }
     var context: ModelContext
@@ -31,6 +31,7 @@ final class PlaybackEditViewModel {
     var mode: PlaybackMode
     var constantVM: PlaybackConstantViewModel
     var progressionVM: PlaybackProgressionViewModel
+    var sequencesVM: PlaybackSequencesViewModel
     
     var timesToPlayError: String? = nil
 
@@ -44,17 +45,24 @@ final class PlaybackEditViewModel {
             self.constantVM = PlaybackConstantViewModel(
                 value: constant.value
             )
-            self.progressionVM = PlaybackProgressionViewModel.default()
+            self.progressionVM = PlaybackProgressionViewModel.draft()
+            self.sequencesVM = PlaybackSequencesViewModel.draft()
         } else if let progression = playback.playbackProgression {
             self.mode = .progression
             self.progressionVM = PlaybackProgressionViewModel(start: progression.start, increment: progression.increment, max: progression.max, timesToPlayEach: progression.timesToPlayEach)
-            self.constantVM = PlaybackConstantViewModel.default()
-            // TODO: sequence
+            self.constantVM = PlaybackConstantViewModel.draft()
+            self.sequencesVM = PlaybackSequencesViewModel.draft()
+        } else if let sequences = playback.playbackSequences {
+            self.mode = .sequence
+            self.sequencesVM = PlaybackSequencesViewModel(sequences: sequences)
+            self.constantVM = PlaybackConstantViewModel.draft()
+            self.progressionVM = PlaybackProgressionViewModel.draft()
         } else {
             // default mode for new clips
             self.mode = .constant
-            self.constantVM = PlaybackConstantViewModel.default()
-            self.progressionVM = PlaybackProgressionViewModel.default()
+            self.constantVM = PlaybackConstantViewModel.draft()
+            self.progressionVM = PlaybackProgressionViewModel.draft()
+            self.sequencesVM = PlaybackSequencesViewModel.draft()
         }
         
         if let timesToPlay = playback.timesToPlay {
@@ -128,7 +136,17 @@ final class PlaybackEditViewModel {
             try constantVM.apply(to: playback.playbackConstant!)
         case .progression:
             try progressionVM.apply(to: playback.playbackProgression!)
-            // TODO: sequence
+        case .sequence:
+            let (sequencesToAdd, sequencesToDelete) = try sequencesVM.apply(to: playback.playbackSequences!, context: context)
+            sequencesToAdd.forEach { playback.playbackSequences?.append($0) }
+            sequencesToDelete.forEach { sequenceToDelete in
+                if let index = playback.playbackSequences?
+                    .firstIndex(where: { $0.persistentModelID == sequenceToDelete.persistentModelID }) {
+                    playback.playbackSequences?.remove(at: index)
+                }
+                
+                context.delete(sequenceToDelete)
+            }
         }
     }
 }

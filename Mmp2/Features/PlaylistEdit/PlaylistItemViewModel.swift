@@ -32,6 +32,6 @@ struct PlaylistItemViewModel: Identifiable {
     }
     
     var sequence: Int {
-        playlistItem.sequence
+        playlistItem.playOrder
     }
 }

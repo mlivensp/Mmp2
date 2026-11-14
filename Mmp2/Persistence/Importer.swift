@@ -12,35 +12,35 @@ import SwiftData
 
 @dynamicMemberLookup
 struct JSON: RandomAccessCollection {
-    var value: Any?
+    var jsonValue: Any?
     
     init(string: String) throws {
-        let data = Data(string.utf8)
-        value = try JSONSerialization.jsonObject(with: data)
+        let dataString = Data(string.utf8)
+        jsonValue = try JSONSerialization.jsonObject(with: dataString)
     }
     
     init(value: Any?) {
-        self.value = value
+        self.jsonValue = value
     }
     
     var optionalBool: Bool? {
-        value as? Bool
+        jsonValue as? Bool
     }
     
     var optionalDouble: Double? {
-        value as? Double
+        jsonValue as? Double
     }
     
     var optionalInt: Int? {
-        value as? Int
+        jsonValue as? Int
     }
     
     var optionalInt64: Int64? {
-        value as? Int64
+        jsonValue as? Int64
     }
     
     var optionalString: String? {
-        value as? String
+        jsonValue as? String
     }
     
     var optionalDate: Date? {
@@ -52,12 +52,12 @@ struct JSON: RandomAccessCollection {
     }
     
     var optionalArray: [JSON]? {
-        let converted = value as? [Any]
+        let converted = jsonValue as? [Any]
         return converted?.map { JSON(value: $0) }
     }
     
     var optionalDictionary: [String: JSON]? {
-        let converted = value as? [String: Any]
+        let converted = jsonValue as? [String: Any]
         return converted?.mapValues { JSON(value: $0) }
     }
     
@@ -302,12 +302,29 @@ struct Importer {
         return PlaybackConstant(value: value)
     }
     
-    private func importProgression(_ stepwiseJson: JSON) -> PlaybackProgression {
-        let start = stepwiseJson.start.int
-        let increment = stepwiseJson.increment.int
-        let max = stepwiseJson["max"].int
-        let timesToPlayStep = stepwiseJson.timesToPlayStep.int
+    private func importProgression(_ progressionJson: JSON) -> PlaybackProgression {
+        let start = progressionJson.start.int
+        let increment = progressionJson.increment.int
+        let max = progressionJson["max"].int
+        let timesToPlayStep = progressionJson.timesToPlayStep.int
         return PlaybackProgression(start: start, increment: increment, max: max, timesToPlayEach: timesToPlayStep)
+    }
+    
+    private func importSequences(_ playbackSequenceJson: JSON) -> [PlaybackSequence] {
+        var result: [PlaybackSequence] = []
+        let sequencesJson = playbackSequenceJson.sequences.array
+        for sequenceJson in sequencesJson {
+            let playOrder = sequenceJson.playOrder.int
+            let value = sequenceJson.value.int
+            let timesToPlay = sequenceJson.timesToPlay.optionalInt
+            let playbackSequence = PlaybackSequence.makeDraft(
+                playOrder: playOrder,
+                value: value,
+                timesToPlay: timesToPlay
+                )
+            result.append(playbackSequence)
+        }
+        return result
     }
     
     func importPlayback(modelContext: ModelContext, _ playbackJson: JSON,) -> Playback {
@@ -317,25 +334,28 @@ struct Importer {
         
         var constant: PlaybackConstant?
         var progression: PlaybackProgression?
+        var sequences: [PlaybackSequence]?
         
-        if !(playbackJson.playbackConstant.value is NSNull) {
+        if !(playbackJson.playbackConstant.jsonValue is NSNull) {
             constant = importConstant(playbackJson.playbackConstant)
-        } else if !(playbackJson.playbackProgression.value is NSNull) {
+        } else if !(playbackJson.playbackProgression.jsonValue is NSNull) {
             progression = importProgression(playbackJson.playbackProgression)
+        } else if !(playbackJson.playbackSequence.jsonValue is NSNull) {
+            sequences = importSequences(playbackJson.playbackSequence)
         } else {
-            // TODO: import PlaybackSequence
-            Logger.data.warning("missing Playback subrecord")
+            Logger.data.warning("missing Playback data")
         }
         
         let playback = Playback(timesToPlay: timesToPlay)
         playback.playbackConstant = constant
         playback.playbackProgression = progression
+        playback.playbackSequences = sequences
         modelContext.insert(playback)
         return playback
     }
     
     
-    fileprivate func importPlaylistMembers(in modelContext: ModelContext,_ playlistMembersJson: JSON, sourceMap: [Int: Source], clipMap: [Int: Clip]) -> [PlaylistItem] {
+    fileprivate func importPlaylistItems(in modelContext: ModelContext,_ playlistMembersJson: JSON, sourceMap: [Int: Source], clipMap: [Int: Clip]) -> [PlaylistItem] {
         var result: [PlaylistItem] = []
         
         for playlistItemAggregate in playlistMembersJson.array {
@@ -355,18 +375,18 @@ struct Importer {
                 continue
             }
             
-            let sequence = playlistItemJson.sequence.int
+            let playOrder = playlistItemJson.playOrder.int
             let secondsToDelayOverride = playlistItemJson.secondsToDelayOverride.optionalInt
             
             let playbackJson = playlistItemAggregate.playback
             
-            if (playbackJson.value is NSNull) {
+            if (playbackJson.jsonValue is NSNull) {
                 playback = nil
             } else {
                 playback = importPlayback(modelContext: modelContext, playbackJson)
             }
 
-            let playlistItem = PlaylistItem(sequence: sequence, secondsToDelayOverride: secondsToDelayOverride, source: source, clip: clip, playback: playback)
+            let playlistItem = PlaylistItem(playOrder: playOrder, secondsToDelayOverride: secondsToDelayOverride, source: source, clip: clip, playback: playback)
             result.append(playlistItem)
         }
     
@@ -404,7 +424,7 @@ struct Importer {
             }
             
             let playlistItemsJson = playlistAggregate.playlistItems
-            let playlistItems = importPlaylistMembers(in: modelContext, playlistItemsJson, sourceMap: sourceMap, clipMap: clipMap)
+            let playlistItems = importPlaylistItems(in: modelContext, playlistItemsJson, sourceMap: sourceMap, clipMap: clipMap)
             _ = playlistItems.map { playlist.playlistItems.append($0) }
         }
     }

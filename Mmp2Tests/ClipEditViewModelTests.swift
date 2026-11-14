@@ -45,7 +45,7 @@ struct ClipEditViewModelTests {
 
         #expect(vm.bpmString == "90")
         #expect(vm.playbackVM.bpm == 90)
-        #expect(vm.playbackVM.constantVM.rateString == "90")
+        #expect(vm.playbackVM.constantVM.valueString == "90")
     }
 
     // MARK: - Name

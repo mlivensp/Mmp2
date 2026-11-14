@@ -18,6 +18,7 @@ struct CollectionEditView: View {
                 .font(.largeTitle)
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity, alignment: .leading)
+            Divider()
             CollectionEditForm(collection: collection, context: context)
         }
         .padding(formPadding)

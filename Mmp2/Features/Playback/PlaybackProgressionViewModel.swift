@@ -26,7 +26,7 @@ final class PlaybackProgressionViewModel {
     var maxError: String?
     var timesToPlayEachError: String?
     
-    static func `default`() -> PlaybackProgressionViewModel {
+    static func draft() -> PlaybackProgressionViewModel {
         PlaybackProgressionViewModel(start: 100, increment: 2, max: 110, timesToPlayEach: 1)
     }
 
@@ -100,7 +100,7 @@ final class PlaybackProgressionViewModel {
         set {
             storedTimesToPlayEachString = newValue
             let result = validateTimesToPlayEach(storedTimesToPlayEachString)
-            applyTimesToPlayValidationResult(result)
+            applyTimesToPlayEachValidationResult(result)
         }
     }
     
@@ -148,11 +148,11 @@ final class PlaybackProgressionViewModel {
         return .failure("Max must be a number greater than zero.")
     }
     
-    func validateTimesToPlayEach(_ timesToPlayValue: String) -> ValidationResult<Int> {
-        if timesToPlayValue.isEmpty {
+    func validateTimesToPlayEach(_ timesToPlayEachValue: String) -> ValidationResult<Int> {
+        if timesToPlayEachValue.isEmpty {
             return .failure("Times To Play Each is required.")
         } else {
-            if let timesToPlay = Int(timesToPlayValue) {
+            if let timesToPlay = Int(timesToPlayEachValue) {
                 if timesToPlay > 0 {
                     return .success(timesToPlay)
                 }
@@ -220,7 +220,7 @@ final class PlaybackProgressionViewModel {
         }
     }
 
-    private func applyTimesToPlayValidationResult(_ result: ValidationResult<Int>) {
+    private func applyTimesToPlayEachValidationResult(_ result: ValidationResult<Int>) {
         switch result {
         case .success(let value):
             timesToPlayEachError = nil
@@ -238,7 +238,7 @@ final class PlaybackProgressionViewModel {
         applyStartValidationResult(validateStart(storedStartString))
         applyIncrementValidationResult(validateIncrement(storedIncrementString))
         applyMaxValidationResult(validateMax(storedMaxString))
-        applyTimesToPlayValidationResult(validateTimesToPlayEach(storedTimesToPlayEachString))
+        applyTimesToPlayEachValidationResult(validateTimesToPlayEach(storedTimesToPlayEachString))
         validateRelationships()
     }
     

@@ -33,17 +33,17 @@ struct PlaybackEditViewModelTests {
 
         vm.bpm = 9
         vm.bpm = 90
-        #expect(vm.constantVM.rateString == "81")
+        #expect(vm.constantVM.valueString == "81")
 
         vm.bpm = nil
-        #expect(vm.constantVM.rateString == "90")
+        #expect(vm.constantVM.valueString == "90")
 
         let defaultPlayback = Playback(timesToPlay: 1)
         let defaultConstant = PlaybackConstant(value: 100)
         defaultPlayback.playbackConstant = defaultConstant
         let defaultVM = PlaybackEditViewModel(playback: defaultPlayback, bpm: nil, context: context)
         defaultVM.bpm = 90
-        #expect(defaultVM.constantVM.rateString == "90")
+        #expect(defaultVM.constantVM.valueString == "90")
     }
 
     @Test("BPM changes scale stepwise start and max, but not step")

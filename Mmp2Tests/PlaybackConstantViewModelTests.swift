@@ -17,8 +17,8 @@ struct PlaybackConstantViewModelTests {
     func initMapsValues() {
         let vm = PlaybackConstantViewModel(value: 80)
         
-        #expect(vm.rateString == "80")
-        #expect(vm.rateError == nil)
+        #expect(vm.valueString == "80")
+        #expect(vm.valueError == nil)
         #expect(vm.isValid)
     }
     
@@ -26,7 +26,7 @@ struct PlaybackConstantViewModelTests {
     func initInvalidValues() {
         let vm = PlaybackConstantViewModel(value: 0)
         
-        #expect(vm.rateError != nil)
+        #expect(vm.valueError != nil)
         #expect(!vm.isValid)
     }
     
@@ -36,10 +36,10 @@ struct PlaybackConstantViewModelTests {
     func rateAcceptsPositive() throws {
         let vm = PlaybackConstantViewModel(value: 80)
         
-        vm.rateString = "95"
+        vm.valueString = "95"
         
-        #expect(vm.rateString == "95")
-        #expect(vm.rateError == nil)
+        #expect(vm.valueString == "95")
+        #expect(vm.valueError == nil)
         #expect(try appliedRate(vm) == 95)
     }
     
@@ -48,10 +48,10 @@ struct PlaybackConstantViewModelTests {
     func rateRejectsInvalid(input: String) throws {
         let vm = PlaybackConstantViewModel(value: 80)
         
-        vm.rateString = input
+        vm.valueString = input
         
-        #expect(vm.rateString == input)
-        #expect(vm.rateError != nil)
+        #expect(vm.valueString == input)
+        #expect(vm.valueError != nil)
         #expect(!vm.isValid)
 //        #expect(throws: AppError.self) {
 //            #expect(try appliedRate(vm) == 80)
@@ -62,22 +62,22 @@ struct PlaybackConstantViewModelTests {
     func rateErrorMessages() {
         let vm = PlaybackConstantViewModel(value: 80)
         
-        vm.rateString = ""
-        #expect(vm.rateError == "Rate is required.")
+        vm.valueString = ""
+        #expect(vm.valueError == "Rate is required.")
         
-        vm.rateString = "0"
-        #expect(vm.rateError == "Rate must be a number greater than zero.")
+        vm.valueString = "0"
+        #expect(vm.valueError == "Rate must be a number greater than zero.")
     }
     
     @Test("rate error clears after valid input")
     func rateErrorClears() {
         let vm = PlaybackConstantViewModel(value: 80)
-        vm.rateString = "abc"
-        #expect(vm.rateError != nil)
+        vm.valueString = "abc"
+        #expect(vm.valueError != nil)
         
-        vm.rateString = "60"
+        vm.valueString = "60"
         
-        #expect(vm.rateError == nil)
+        #expect(vm.valueError == nil)
         #expect(vm.isValid)
     }
     
@@ -87,10 +87,10 @@ struct PlaybackConstantViewModelTests {
     @Test("validate clears stale errors when state is valid")
     func validateClearsErrors() {
         let vm = PlaybackConstantViewModel(value: 80)
-        vm.rateString = "bad"
+        vm.valueString = "bad"
         #expect(!vm.isValid)
         
-        vm.rateString = "80"
+        vm.valueString = "80"
         vm.validate()
         
         #expect(vm.isValid)
@@ -99,11 +99,11 @@ struct PlaybackConstantViewModelTests {
     @Test("validate re-reports errors for invalid stored strings")
     func validateReportsErrors() {
         let vm = PlaybackConstantViewModel(value: 80)
-        vm.rateString = "bad"
+        vm.valueString = "bad"
         
         vm.validate()
         
-        #expect(vm.rateError == "Rate must be a number greater than zero.")
+        #expect(vm.valueError == "Rate must be a number greater than zero.")
         #expect(!vm.isValid)
     }
     
@@ -114,7 +114,7 @@ struct PlaybackConstantViewModelTests {
         let vm = PlaybackConstantViewModel(value: 80)
         let model = makeModel(rate: 1)
         
-        vm.rateString = "100"
+        vm.valueString = "100"
         try vm.apply(to: model)
         
         #expect(model.value == 100)

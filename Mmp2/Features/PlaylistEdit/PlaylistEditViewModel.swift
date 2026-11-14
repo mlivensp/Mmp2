@@ -79,7 +79,7 @@ extension PlaylistEditView {
         
         public var playlistItems: [PlaylistItemViewModel] {
             playlist.playlistItems
-                .sorted { $0.sequence < $1.sequence }
+                .sorted { $0.playOrder < $1.playOrder }
                 .map { PlaylistItemViewModel(playlistItem: $0) }
         }
         
@@ -228,9 +228,9 @@ extension PlaylistEditView {
             let current = playlistItems[index].playlistItem
             let previous = playlistItems[index - 1].playlistItem
             
-            let temp = current.sequence
-            current.sequence = previous.sequence
-            previous.sequence = temp
+            let temp = current.playOrder
+            current.playOrder = previous.playOrder
+            previous.playOrder = temp
         }
         
         func moveItemDown(_ item: PlaylistItemViewModel) {
@@ -248,9 +248,9 @@ extension PlaylistEditView {
             let current = playlistItems[index].playlistItem
             let next = playlistItems[index + 1].playlistItem
             
-            let temp = current.sequence
-            current.sequence = next.sequence
-            next.sequence = temp
+            let temp = current.playOrder
+            current.playOrder = next.playOrder
+            next.playOrder = temp
         }
         
         // MARK: Delete group

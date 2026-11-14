@@ -20,6 +20,7 @@ struct SourceEditView: View {
                 .font(.largeTitle)
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity, alignment: .leading)
+            Divider()
             SourceEditForm(source: source, collection: collection, context: context)
                 .navigationTitle("Edit Source")
         }

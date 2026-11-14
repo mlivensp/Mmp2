@@ -53,7 +53,10 @@ struct SequencerFactory {
         if let constant = playback.playbackConstant {
             return ConstantSequenceGenerator(value: constant.value)
         } else if let progression = playback.playbackProgression {
-            return StepwiseSequenceGenerator(progression: progression)
+            return ProgressionSequenceGenerator(progression: progression)
+        } else if let sequences = playback.playbackSequences {
+            let sortedSequences = sequences.sorted { $0.playOrder < $1.playOrder }
+            return SequenceSequenceGenerator(sequences: sortedSequences)
         } else {
             // TODO: sequence
             throw AppError.invalidPlayback

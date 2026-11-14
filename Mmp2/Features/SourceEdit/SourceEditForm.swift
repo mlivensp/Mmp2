@@ -23,8 +23,6 @@ struct SourceEditForm: View {
     
     var body: some View {
         ScrollView {
-            Text("Source")
-                .font(.title)
             Form {
                 HStack {
                     Button {
@@ -36,8 +34,8 @@ struct SourceEditForm: View {
                     TextEditor(text: $vm.mediaPath)   // wraps + grows
                         .disabled(true)        // if you want it read-only
                 }
-//
-                
+                .padding(.top, 4)
+                 
                 ErrorFieldContainer(
                     hasError: vm.nameError != nil,
                     errorMessage: vm.nameError

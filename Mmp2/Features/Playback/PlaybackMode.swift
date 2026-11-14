@@ -10,6 +10,7 @@ import Foundation
 enum PlaybackMode: CaseIterable {
     case constant
     case progression
+    case sequence
 }
 
 extension PlaybackMode: Identifiable {
@@ -21,6 +22,7 @@ extension PlaybackMode {
         switch self {
         case .constant: "Constant"
         case .progression: "Progression"
+        case .sequence: "Custom"
         }
     }
 }

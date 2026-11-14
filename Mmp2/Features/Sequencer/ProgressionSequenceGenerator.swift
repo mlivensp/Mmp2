@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct StepwiseSequenceGenerator: SequenceGenerator {
+struct ProgressionSequenceGenerator: SequenceGenerator {
     let progression: PlaybackProgression
     
     func generateSequence() -> [TempoStep] {
@@ -15,16 +15,16 @@ struct StepwiseSequenceGenerator: SequenceGenerator {
         var tempo = progression.start
         let max = progression.max
         let step = progression.increment
-        let timesToPlayStep = progression.timesToPlayEach
+        let timesToPlayEach = progression.timesToPlayEach
         var done = false
         
         repeat {
-            for i in 0..<timesToPlayStep {
+            for i in 0..<timesToPlayEach {
                 sequence.append(
                     TempoStep(
                         tempo: Float(tempo),
                         tempoIndex: i + 1,
-                        tempoCount: timesToPlayStep,
+                        tempoCount: timesToPlayEach,
                         sequenceIndex: 0,
                         sequenceOccurrence: 0))
             }

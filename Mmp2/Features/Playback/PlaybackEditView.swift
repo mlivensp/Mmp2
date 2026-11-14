@@ -35,7 +35,8 @@ struct PlaybackEditView: View {
             PlaybackConstantView(vm: vm.constantVM, isBPM: vm.bpm != nil)
         case .progression:
             PlaybackProgressionView(vm: vm.progressionVM, isBPM: vm.bpm != nil)
-            // TODO: sequence
+        case .sequence:
+            PlaybackSequencesView(vm: vm.sequencesVM, isBPM: vm.bpm != nil)
         }
     }
 }

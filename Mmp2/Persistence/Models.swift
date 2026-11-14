@@ -195,12 +195,12 @@ import SwiftData
 }
 
 @Model public class PlaybackSequence {
-    var sequence: Int
+    var playOrder: Int
     var value: Int
     var timesToPlay: Int?
     
-    init(sequence: Int, value: Int, timesToPlay: Int? = nil) {
-        self.sequence = sequence
+    init(playOrder: Int, value: Int, timesToPlay: Int? = nil) {
+        self.playOrder = playOrder
         self.value = value
         self.timesToPlay = timesToPlay
     }
@@ -208,12 +208,12 @@ import SwiftData
 
 @Model public class Playlist {
     var primitiveName: String
+    var name_normalized: String
     var shuffle: Bool
     var defaultSecondsToDelay: Int
     var duration: TimeInterval
     var timesToRepeat: Int?
     var notes: String?
-    var name_normalized: String
     
     @Relationship(deleteRule: .cascade, inverse: \PlaylistItem.playlist) var playlistItems: [PlaylistItem] = []
     @Relationship(deleteRule: .cascade, inverse: \PlaylistGroupItem.playlist) var groups: [PlaylistGroupItem] = []
@@ -254,15 +254,15 @@ import SwiftData
 }
 
 @Model public class PlaylistItem {
-    var sequence: Int = 0
+    var playOrder: Int
     var secondsToDelayOverride: Int?
     @Relationship var source: Source?
     @Relationship var clip: Clip?
     @Relationship(deleteRule: .cascade) var playback: Playback?
     @Relationship var playlist: Playlist?
 
-    init(sequence: Int, secondsToDelayOverride: Int? = nil, source: Source? = nil, clip: Clip? = nil, playback: Playback? = nil, playlist: Playlist? = nil) {
-        self.sequence = sequence
+    init(playOrder: Int, secondsToDelayOverride: Int? = nil, source: Source? = nil, clip: Clip? = nil, playback: Playback? = nil, playlist: Playlist? = nil) {
+        self.playOrder = playOrder
         self.secondsToDelayOverride = secondsToDelayOverride
         self.source = source
         self.clip = clip

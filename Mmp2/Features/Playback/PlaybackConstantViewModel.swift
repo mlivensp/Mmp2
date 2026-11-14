@@ -12,37 +12,37 @@ final class PlaybackConstantViewModel {
     private var value: Int
     private var preciseValue: Double
 
-    private var storedRateString: String
+    private var storedValueString: String
     
-    var rateError: String? = nil
+    var valueError: String? = nil
     
     init(value: Int) {
         self.value = value
         self.preciseValue = Double(value)
         
-        self.storedRateString = String(value)
+        self.storedValueString = String(value)
         
         validate()
     }
     
-    static func `default`() -> PlaybackConstantViewModel {
+    static func draft() -> PlaybackConstantViewModel {
         PlaybackConstantViewModel(value: 100)
     }
 
     func scaleRate(by factor: Double) {
-        guard case .success = validateRate(storedRateString) else { return }
+        guard case .success = validateValue(storedValueString) else { return }
         preciseValue *= factor
         value = scaledPlaybackValue(preciseValue)
-        storedRateString = String(value)
+        storedValueString = String(value)
         validate()
     }
 
-    var rateString: String {
-        get { return storedRateString }
+    var valueString: String {
+        get { return storedValueString }
         set {
-            storedRateString = newValue
-            let result = validateRate(storedRateString)
-            applyRateValidationResult(result)
+            storedValueString = newValue
+            let result = validateValue(storedValueString)
+            applyValueValidationResult(result)
             if case .success(let value) = result {
                 preciseValue = Double(value)
             }
@@ -50,17 +50,17 @@ final class PlaybackConstantViewModel {
     }
         
     
-    private func applyRateValidationResult(_ result: ValidationResult<Int>) {
+    private func applyValueValidationResult(_ result: ValidationResult<Int>) {
         switch result {
         case .success(let resultValue):
-            rateError = nil
+            valueError = nil
             value = resultValue
         case .failure(let message):
-            rateError = message
+            valueError = message
         }
     }
 
-    fileprivate func validateRate(_ value: String) -> ValidationResult<Int> {
+    fileprivate func validateValue(_ value: String) -> ValidationResult<Int> {
         if value.isEmpty {
             return .failure("Rate is required.")
         } else {
@@ -89,14 +89,14 @@ final class PlaybackConstantViewModel {
     }
     
     func validate() {
-        rateError = nil
+        valueError = nil
         
-        let rateResult = validateRate(storedRateString)
-        applyRateValidationResult(rateResult)
+        let rateResult = validateValue(storedValueString)
+        applyValueValidationResult(rateResult)
     }
     
     var isValid: Bool {
-        rateError == nil 
+        valueError == nil 
     }
     
     func apply(to playbackConstant: PlaybackConstant) throws {

@@ -195,15 +195,15 @@ struct PlaylistItemPickerSheet: View {
     }
     
     private var nextSequence: Int {
-        (playlist.playlistItems.map(\.sequence).max() ?? -1) + 1
+        (playlist.playlistItems.map(\.playOrder).max() ?? -1) + 1
     }
     
     private func addItems(
         sourceIdsToAdd: Set<PersistentIdentifier>,
         clipIdsToAdd: Set<PersistentIdentifier>
     ) {
-        var sequence =
-            (playlist.playlistItems.map(\.sequence).max() ?? -1) + 1
+        var playOrder =
+            (playlist.playlistItems.map(\.playOrder).max() ?? -1) + 1
 
         for collection in mediaCollections {
 
@@ -214,14 +214,14 @@ struct PlaylistItemPickerSheet: View {
                 ) {
 
                     let item = PlaylistItem(
-                        sequence: sequence,
+                        playOrder: playOrder,
                         source: source,
                         playlist: playlist
                     )
 
                     modelContext.insert(item)
 
-                    sequence += 1
+                    playOrder += 1
                 }
 
                 for clip in source.clips {
@@ -231,14 +231,14 @@ struct PlaylistItemPickerSheet: View {
                     ) {
 
                         let item = PlaylistItem(
-                            sequence: sequence,
+                            playOrder: playOrder,
                             clip: clip,
                             playlist: playlist
                         )
 
                         modelContext.insert(item)
 
-                        sequence += 1
+                        playOrder += 1
                     }
                 }
             }

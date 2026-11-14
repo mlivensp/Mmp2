@@ -18,6 +18,7 @@ struct PlaylistEditView: View {
                 .font(.largeTitle)
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity, alignment: .leading)
+            Divider()
             PlaylistEditForm(playlist: playlist, context: context)
         }
         .padding(formPadding)

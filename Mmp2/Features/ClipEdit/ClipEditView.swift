@@ -20,6 +20,7 @@ struct ClipEditView: View {
                .font(.largeTitle)
                .fontWeight(.semibold)
                .frame(maxWidth: .infinity, alignment: .leading)
+           Divider()
            ClipEditForm(clip: clip, source: source, context: context)
        }
        .padding(formPadding)

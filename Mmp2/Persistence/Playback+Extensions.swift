@@ -37,15 +37,16 @@ extension Playback {
                 let new = PlaybackProgression.makeDraft()
                 playbackProgression = new
             }
-            
+        case .sequence:
+            let _ = 2
             // TODO: sequence
         }
     }
 }
 
 extension Playback {
-    static func makeDraft() -> Playback {
-        let playback = Playback(timesToPlay: 1)
+    static func makeDraft(timesToPlay: Int? = 1) -> Playback {
+        let playback = Playback(timesToPlay: timesToPlay)
         return playback
     }
 }
@@ -59,5 +60,15 @@ extension PlaybackConstant {
 extension PlaybackProgression {
     static func makeDraft() -> PlaybackProgression {
         PlaybackProgression(start: 80, increment: 2, max: 100, timesToPlayEach: 1)
+    }
+}
+
+extension PlaybackSequence {
+    static func makeDraft(
+        playOrder: Int = 0,
+        value: Int = 120,
+        timesToPlay: Int? = 1
+    ) -> PlaybackSequence {
+        return PlaybackSequence(playOrder: playOrder, value: value, timesToPlay: timesToPlay)
     }
 }

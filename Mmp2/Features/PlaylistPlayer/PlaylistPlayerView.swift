@@ -67,7 +67,7 @@ struct PlaylistPlayerView: View {
         .onAppear {
             guard controller == nil, let playlist = appRootManager.selectedPlaylist else { return }
             let items = playlist.playlistItems
-                .sorted { $0.sequence < $1.sequence }
+                .sorted { $0.playOrder < $1.playOrder }
                 .compactMap { playlistItem -> PlaylistPlaybackItem? in
 
                     guard let playable = playlistItem.makePlayableItem() else {

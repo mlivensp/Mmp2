@@ -9,7 +9,7 @@ import Testing
 @testable import Mmp2
 
 @MainActor
-struct StepwiseSequencerTests {
+struct ProgressionSequencerTests {
 
     @Test func rateStepsOncePerRate() async throws {
         let playback = Playback(timesToPlay: 1)

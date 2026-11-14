@@ -388,10 +388,7 @@ extension ClipEditView {
                 clip.endSeconds = endSeconds.roundedTo2Places()
             }
             
-            if clip.source == nil {
-                clip.source = source
-//                context.insert(clip)
-            }
+            clip.source = source
 
             try playbackVM.apply(to: clip.playback, context: context)
             try context.save()

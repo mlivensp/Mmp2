@@ -14,12 +14,12 @@ struct PlaybackConstantView: View {
     var body: some View {
         Group {
             ErrorFieldContainer(
-                hasError: vm.rateError != nil,
-                errorMessage: vm.rateError
+                hasError: vm.valueError != nil,
+                errorMessage: vm.valueError
             ) {
                 HStack {
                     Text(isBPM ? "BPM" : "% of Speed")
-                    TextField("", text: $vm.rateString)
+                    TextField("", text: $vm.valueString)
                         .frame(width: numericFieldWidth)
                         .multilineTextAlignment(.trailing)
                 }
