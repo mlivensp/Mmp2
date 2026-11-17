@@ -7,3 +7,10 @@
 5. Recent list
 6. Favorites list
 7. Update last played date and number of times played
+
+## Home navigation
+
+The sidebar selects a home category. Collections uses a three-column split
+view, while Playlists uses a two-column split view. Their detail columns host
+the shared editor navigation stack; changing categories clears its path.
+Favorites and Recents are placeholders.

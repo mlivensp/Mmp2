@@ -10,9 +10,9 @@ import SwiftUI
 
 struct RootView: View {
     let appRootManager: AppRootManager
-    
+
     var body: some View {
-        Group{
+        Group {
             switch appRootManager.currentRoot {
             case .splash:
                 SplashView()
@@ -23,7 +23,7 @@ struct RootView: View {
                    let source = appRootManager.selectedSource {
                     ClipEditView(clip: clip, source: source)
                 } else {
-                    SplashView() // fallback, shouldn't normally happen
+                    SplashView()
                 }
             case .playlistPlayer:
                 if appRootManager.selectedPlaylist != nil {
@@ -34,61 +34,103 @@ struct RootView: View {
             case .documents:
                 SplashView()
             case .home:
-                NavigationSplitView {
-                    SidebarView()
-                } content: {
-                    ContentView()
-                } detail: {
-                    @Bindable var appRootManager = appRootManager
-                    NavigationStack(path: $appRootManager.detailPath) {
-                        Group {
-                            switch appRootManager.selectedCategory {
-                            case .collections: SourcesView()
-                            case .playlists:   Text("Playlists")
-                            case .favorites:   Text("Favorites")
-                            case .recents:     Text("Recents")
-                            }
-                        }
-                        .navigationDestination(for: DetailRoute.self) { route in
-                            let _ = logDestination(route)
-
-                            switch route {
-                            case .collectionEdit(let collection):
-                                let _ = print("navigationDestination - CollectionEeitView")
-                                CollectionEditView(collection: collection)
-                            case .sourceEdit(let source, let collection):
-                                let _ = print("navigationDestination - SourceEditView")
-                                SourceEditView(source: source, collection: collection)
-                            case .clipEdit(let clip, let source):
-                                let _ = print("navigationDestination - ClipEditView")
-                                ClipEditView(clip: clip, source: source)
-                            case .playlistEdit(let playlist):
-                                let _ = print("navigationDestination - PlaylistEditView")
-                                PlaylistEditView(playlist: playlist)
-                            }
-                        }
-                    }
-                    .onChange(of: appRootManager.detailPath.count) { old, new in
-                        print("detailPath.count \(old) -> \(new)")
-                    }                    }
+                switch appRootManager.selectedCategory {
+                case .collections:
+                    CollectionsRootView()
+                case .playlists:
+                    PlaylistsRootView()
+                case .favorites:
+                    FavoritesRootView()
+                case .recents:
+                    RecentsRootView()
+                }
             }
-        }
-    }
-    
-    private func logDestination(_ route: DetailRoute) {
-        switch route {
-        case .collectionEdit(_):
-            Logger.navigation.info("destination - collectionEdit")
-        case .sourceEdit(_, _):
-            Logger.navigation.info("destination - sourceEdit")
-        case .clipEdit(_, _):
-            Logger.navigation.info("destination - clipEdit")
-        case .playlistEdit(_):
-            Logger.navigation.info("destination - playlistEdit")
         }
     }
 }
 
-//#Preview {
-//    RootView()
-//}
+struct CollectionsRootView: View {
+    var body: some View {
+        NavigationSplitView {
+            SidebarView()
+        } content: {
+            CollectionsView()
+        } detail: {
+            HomeDetailStack {
+                SourcesView()
+            }
+        }
+    }
+}
+
+struct PlaylistsRootView: View {
+    var body: some View {
+        NavigationSplitView {
+            SidebarView()
+        } detail: {
+            HomeDetailStack {
+                PlaylistsView()
+            }
+        }
+    }
+}
+
+struct FavoritesRootView: View {
+    var body: some View {
+        NavigationSplitView {
+            SidebarView()
+        } detail: {
+            Text("Favorites")
+        }
+    }
+}
+
+struct RecentsRootView: View {
+    var body: some View {
+        NavigationSplitView {
+            SidebarView()
+        } detail: {
+            Text("Recents")
+        }
+    }
+}
+
+private struct HomeDetailStack<Content: View>: View {
+    @Environment(AppRootManager.self) private var appRootManager
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        @Bindable var appRootManager = appRootManager
+
+        NavigationStack(path: $appRootManager.detailPath) {
+            content()
+                .navigationDestination(for: DetailRoute.self) { route in
+                    let _ = logDestination(route)
+
+                    switch route {
+                    case .collectionEdit(let collection):
+                        CollectionEditView(collection: collection)
+                    case .sourceEdit(let source, let collection):
+                        SourceEditView(source: source, collection: collection)
+                    case .clipEdit(let clip, let source):
+                        ClipEditView(clip: clip, source: source)
+                    case .playlistEdit(let playlist):
+                        PlaylistEditView(playlist: playlist)
+                    }
+                }
+
+                private func logDestination(_ route: DetailRoute) {
+                    switch route {
+                    case .collectionEdit:
+                        Logger.navigation.info("destination - collectionEdit")
+                    case .sourceEdit:
+                        Logger.navigation.info("destination - sourceEdit")
+                    case .clipEdit:
+                        Logger.navigation.info("destination - clipEdit")
+                    case .playlistEdit:
+                        Logger.navigation.info("destination - playlistEdit")
+                    }
+                }
+        }
+    }
+}

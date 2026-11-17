@@ -21,7 +21,13 @@ final class AppRootManager {
     static let shared = AppRootManager()
     
     var currentRoot: AppRoot = .splash
-    var selectedCategory: AppCategory = .collections
+    var selectedCategory: AppCategory = .collections {
+        didSet {
+            if selectedCategory != oldValue {
+                resetDetailPath()
+            }
+        }
+    }
     
     var selectedMediaCollection: MediaCollection?
     var selectedSource: Source?
@@ -56,7 +62,7 @@ final class AppRootManager {
     
     // MARK: Navigation helpers
     
-    /// Navigation stack contents for the home scene's detail column.
+    /// Navigation stack contents for the selected home view's detail column.
     var detailPath = NavigationPath()
     
     private func resetDetailPath() {
