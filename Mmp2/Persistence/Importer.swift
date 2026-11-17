@@ -150,7 +150,6 @@ struct Importer {
         var clipMap: [Int:Clip] = [:]
         
         for sourceAggregate in sources {
-            let media = importMedia(modelContext: modelContext, sourceAggregate.media)
             let playback = importPlayback(modelContext: modelContext, sourceAggregate.playback)
             
             let sourceData = sourceAggregate.source
@@ -158,16 +157,32 @@ struct Importer {
             let name = sourceData.name.string
             let sortOrder = sourceData.sortOrder.int
             let measure1Start: Double?
+            
             if let measure1StartValue = sourceData.measure1Start.optionalString {
                 measure1Start = try? TimeFormatter.shared.seconds(from: measure1StartValue)
             } else {
                 measure1Start = nil
             }
-            //            let measure1Start = sourceData.measure1Start.optionalDate
+
             let isFavorite = sourceData.isFavorite.bool
             let isExpanded = sourceData.isExpanded.bool
+            let bpm = sourceData.bpm.optionalInt
+            let path = sourceData.path.string
+            let duration: TimeInterval
+            
+            if let durationValue = timeInterval(from: sourceData.duration.string) {
+                duration = durationValue
+            } else {
+                duration = .zero
+            }
+            
+            let pathIsValid = sourceData.pathIsValid.bool
+            let isArchived = sourceData.isArchived.bool
+            let lastPlayed = sourceData.lastPlayed.optionalDate
+            let numberTimesPlayed = sourceData.numberTimesPlayed.int
             let notes = sourceData.notes.optionalString
             var sourceGroup: SourceGroup?
+            
             if let sourceGroupId = sourceData.sourceGroupId.optionalInt {
                 sourceGroup = sourceGroups[sourceGroupId]
             }
@@ -178,14 +193,15 @@ struct Importer {
                 measure1Start: measure1Start,
                 isFavorite: isFavorite,
                 isExpanded: isExpanded,
-                notes: notes,
-                bpm: media.bpm,
-                duration: media.duration,
-                lastPlayed: media.lastPlayed,
-                numberTimesPlayed: media.numberTimesPlayed,
-                path: media.path ?? "",
-                pathIsValid: false,
+                bpm: bpm,
+                path: path,
                 bookmark: nil,
+                duration: duration,
+                pathIsValid: pathIsValid,
+                isArchived: isArchived,
+                lastPlayed: lastPlayed,
+                numberTimesPlayed: numberTimesPlayed,
+                notes: notes,
                 mediaCollection: mediaCollection,
                 playback: playback,
                 sourceGroup: sourceGroup)
@@ -203,7 +219,6 @@ struct Importer {
     fileprivate func importClips(modelContext: ModelContext, _ clips: [JSON], source: Source) -> [Int:Clip] {
         var result: [Int:Clip] = [:]
         for clipAggregate in clips {
-            let media = importMedia(modelContext: modelContext, clipAggregate.media)
             let playback = importPlayback(modelContext: modelContext, clipAggregate.playback)
             let clipData = clipAggregate.clip
             let id = clipData.clipId.int
@@ -217,6 +232,18 @@ struct Importer {
             let startMeasure = clipData.startMeasure.optionalInt
             let endMeasure = clipData.endMeasure.optionalInt
             let isFavorite = clipData.isFavorite.bool
+            let bpm = clipData.bpm.optionalInt
+            let duration: TimeInterval
+            
+            if let durationValue = timeInterval(from: clipData.duration.string) {
+                duration = durationValue
+            } else {
+                duration = .zero
+            }
+            
+            let lastPlayed = clipData.lastPlayed.optionalDate
+            let numberTimesPlayed = clipData.numberTimesPlayed.int
+            
             let notes = clipData.notes.optionalString
             let clip = Clip(
                 name: name,
@@ -225,10 +252,10 @@ struct Importer {
                 startMeasure: startMeasure,
                 endMeasure: endMeasure,
                 isFavorite: isFavorite,
-                bpm: media.bpm,
-                duration: media.duration,
-                lastPlayed: media.lastPlayed,
-                numberTimesPlayed: media.numberTimesPlayed,
+                bpm: bpm,
+                duration: duration,
+                lastPlayed: lastPlayed,
+                numberTimesPlayed: numberTimesPlayed,
                 notes: notes,
                 source: source,
                 playback: playback)
@@ -237,52 +264,6 @@ struct Importer {
         }
         
         return result
-    }
-    
-    fileprivate class Media {
-        var bpm: Int?
-        var duration: Double
-        var path: String?
-        var pathIsValid: Bool
-        var lastPlayed: Date?
-        var numberTimesPlayed: Int
-        var isArchived: Bool
-
-        public init(
-            bpm: Int?,
-            duration: Double = 0,
-            path: String,
-            pathIsValid: Bool = true,
-            isArchived: Bool = false,
-            lastPlayed: Date? = nil,
-            numberTimesPlayed: Int = 0
-            
-        ) {
-            self.bpm = bpm
-            self.duration = duration
-            self.path = path
-            self.pathIsValid = pathIsValid
-            self.isArchived = isArchived
-            self.lastPlayed = lastPlayed
-            self.numberTimesPlayed = numberTimesPlayed
-        }
-    }
-
-    fileprivate func importMedia(modelContext: ModelContext,_ mediaJson: JSON) -> Media {
-        let bpm = mediaJson.bpm.optionalInt
-        let path = mediaJson.path.string
-        var mediaDuration = TimeInterval.zero
-        
-        if let duration = timeInterval(from: mediaJson.duration.string) {
-            mediaDuration = duration
-        }
-        
-        let isArchived = mediaJson.isArchived.bool
-        let pathIsValid = false
-        let numberTimesPlayed = mediaJson.numberTimesPlayed.int
-        let lastPlayed = mediaJson.lastPlayed.optionalDate
-        let media = Media(bpm: bpm, duration: mediaDuration, path: path, pathIsValid: pathIsValid, isArchived: isArchived, lastPlayed: lastPlayed, numberTimesPlayed: numberTimesPlayed)
-        return media
     }
     
     fileprivate func importDuration(_ duration: String?) -> TimeInterval? {

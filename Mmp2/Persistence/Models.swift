@@ -276,15 +276,16 @@ import SwiftData
     var name_normalized: String = ""
     var sortOrder: Int
     var measure1Start: Double?
+    var isExpanded: Bool
     var isFavorite: Bool
     var bpm: Int?
+    var path: String?
+    var bookmark: Data?
     var duration: Double
+    var pathIsValid: Bool
+    var isArchived: Bool
     var lastPlayed: Date?
     var numberTimesPlayed: Int
-    var path: String?
-    var pathIsValid: Bool
-    var bookmark: Data?
-    var isExpanded: Bool
     var notes: String?
     
     @Relationship(deleteRule: .cascade, inverse: \Clip.source)
@@ -304,14 +305,15 @@ import SwiftData
         measure1Start: Double?,
         isFavorite: Bool,
         isExpanded: Bool,
-        notes: String?,
         bpm: Int?,
+        path: String,
+        bookmark: Data?,
         duration: Double,
+        pathIsValid: Bool,
+        isArchived: Bool,
         lastPlayed: Date?,
         numberTimesPlayed: Int,
-        path: String,
-        pathIsValid: Bool,
-        bookmark: Data?,
+        notes: String?,
         mediaCollection: MediaCollection,
         playback: Playback,
         sourceGroup: SourceGroup?
@@ -322,14 +324,15 @@ import SwiftData
         self.measure1Start = measure1Start
         self.isFavorite = isFavorite
         self.isExpanded = isExpanded
-        self.notes = notes
         self.bpm = bpm
+        self.path = path
+        self.bookmark = bookmark
         self.duration = duration
+        self.pathIsValid = pathIsValid
+        self.isArchived = isArchived
         self.lastPlayed = lastPlayed
         self.numberTimesPlayed = numberTimesPlayed
-        self.path = path
-        self.pathIsValid = pathIsValid
-        self.bookmark = bookmark
+        self.notes = notes
         self.mediaCollection = mediaCollection
         self.playback = playback
         self.sourceGroup = sourceGroup
