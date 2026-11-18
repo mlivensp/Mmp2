@@ -44,14 +44,9 @@ struct JSON: RandomAccessCollection {
     }
     
     var optionalDate: Date? {
-        if let stringValue = optionalString {
-            if let date = try? Date.ISO8601FormatStyle(includingFractionalSeconds: true).parse(stringValue) {
-                return date
-            }
+        if let stringValue = optionalString, let date = try? Date.ISO8601FormatStyle(includingFractionalSeconds: true).parse(stringValue) {
+            return date
         }
-//        if let stringValue = optionalString, let date = try? Date.ISO8601FormatStyle(includingFractionalSeconds: true).parse(stringValue) {
-//            return date
-//        }
         
         return nil
     }
@@ -181,7 +176,8 @@ struct Importer {
                 duration = .zero
             }
             
-            let pathIsValid = sourceData.pathIsValid.bool
+            // always import pathIsValid as false
+//            let pathIsValid = sourceData.pathIsValid.bool
             let isArchived = sourceData.isArchived.bool
             let lastPlayed = sourceData.lastPlayed.optionalDate
             let numberTimesPlayed = sourceData.numberTimesPlayed.int
@@ -202,7 +198,7 @@ struct Importer {
                 path: path,
                 bookmark: nil,
                 duration: duration,
-                pathIsValid: pathIsValid,
+                pathIsValid: false,
                 isArchived: isArchived,
                 lastPlayed: lastPlayed,
                 numberTimesPlayed: numberTimesPlayed,
