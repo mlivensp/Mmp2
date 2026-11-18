@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 
 extension Clip {
     static func makeDraft(
@@ -39,5 +40,15 @@ extension Clip {
             source: source,
             playback: draftPlayback
         )
+    }
+    
+    var name: String {
+        let parts = [
+            self.source.mediaCollection.primitiveName,
+            self.source.primitiveName,
+            self.primitiveName
+        ]
+        
+        return parts.joined(separator: nameSeparator)
     }
 }

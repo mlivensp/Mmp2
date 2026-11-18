@@ -44,9 +44,14 @@ struct JSON: RandomAccessCollection {
     }
     
     var optionalDate: Date? {
-        if let stringValue = optionalString, let date = try? Date.ISO8601FormatStyle(includingFractionalSeconds: true).parse(stringValue) {
-            return date
+        if let stringValue = optionalString {
+            if let date = try? Date.ISO8601FormatStyle(includingFractionalSeconds: true).parse(stringValue) {
+                return date
+            }
         }
+//        if let stringValue = optionalString, let date = try? Date.ISO8601FormatStyle(includingFractionalSeconds: true).parse(stringValue) {
+//            return date
+//        }
         
         return nil
     }

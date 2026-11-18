@@ -5,10 +5,12 @@
 //  Created by Michael Livenspargar on 10/30/26.
 //
 
+import SwiftData
 import SwiftUI
 
 struct PlaylistPlayerView: View {
     @Environment(AppRootManager.self) private var appRootManager
+    @Environment(\.modelContext) private var modelContext
 
     @State private var controller: PlaylistController?
 
@@ -83,7 +85,8 @@ struct PlaylistPlayerView: View {
                 }
             let controller = PlaylistController(
                 items: items,
-                repeatCount: playlist.timesToRepeat
+                repeatCount: playlist.timesToRepeat,
+                modelContext: modelContext
             )
             self.controller = controller
             controller.start { exit() }

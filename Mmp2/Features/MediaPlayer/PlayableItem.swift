@@ -6,8 +6,10 @@
 //
 
 import Foundation
+import SwiftData
 
 struct PlayableItem {
+    let reference: PlayableReference
     let url: URL
     let title: String
     let start: TimeInterval?

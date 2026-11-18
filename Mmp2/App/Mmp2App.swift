@@ -37,7 +37,7 @@ struct Mmp2App: App {
     
     var body: some Scene {
         WindowGroup {
-            RootView(appRootManager: appRootManager)
+            RootView(appRootManager: appRootManager, modelContext: sharedModelContainer.mainContext)
                 .fileImporter(
                     isPresented: $appRootManager.showImportCatalog,
                     allowedContentTypes: [.json],

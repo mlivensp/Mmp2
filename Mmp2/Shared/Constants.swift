@@ -10,3 +10,5 @@ import Foundation
 let formPadding: CGFloat = 12
 let numericFieldWidth: CGFloat = 60
 let timespanFieldWidth: CGFloat = 100
+
+let nameSeparator = " • "

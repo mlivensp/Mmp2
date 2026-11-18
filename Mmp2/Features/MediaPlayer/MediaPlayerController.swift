@@ -1,5 +1,6 @@
 import Foundation
 import AVFoundation
+import SwiftData
 
 @MainActor @Observable
 final class MediaPlayerController {
@@ -9,7 +10,11 @@ final class MediaPlayerController {
     private var sequencer: StepSequencer?
     
     private var playbackTask: Task<Void, Never>?
+    private let playHistoryService: PlayHistoryService
     
+    init(modelContext: ModelContext) {
+        playHistoryService = PlayHistoryService(modelContainer: modelContext.container)
+    }
     // MARK: - Loading
 
     func load(_ playableItem: PlayableItem, forPlaylist: Bool = false) throws {
@@ -74,6 +79,14 @@ final class MediaPlayerController {
     func start(continuation: @escaping () -> Void) {
         stop()
         sequencer?.reset()
+        
+        if let playableItem {
+                Task {
+                    try? await playHistoryService.recordPlay(
+                        playableReference: playableItem.reference
+                    )
+                }
+            }
         
         playbackTask = Task {
             await playVideoLoop(player, startAt: playableItem?.start)

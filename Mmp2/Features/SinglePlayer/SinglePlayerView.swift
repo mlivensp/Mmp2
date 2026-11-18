@@ -7,15 +7,20 @@
 
 import SwiftUI
 import OSLog
+import SwiftData
 
 struct SinglePlayerView: View {
     @Environment(AppRootManager.self) private var appRootManager
     
     @State private var resolvedURL: URL?
-    @State private var controller: MediaPlayerController = MediaPlayerController()
+    @State private var controller: MediaPlayerController
     @State private var source: Source?
     @State private var isAddingClip: Bool = false
     @State private var appeared = false
+    
+    init(modelContext: ModelContext) {
+        controller = MediaPlayerController(modelContext: modelContext)
+    }
     
     var body: some View {
         HSplitView {

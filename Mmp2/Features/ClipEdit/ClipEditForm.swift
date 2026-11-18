@@ -29,6 +29,8 @@ struct ClipEditForm: View {
                     }
                 }
                 
+                Text("Played \(vm.clip.numberTimesPlayed) times, last played \(String(describing: vm.clip.lastPlayed))")
+                
                 ErrorFieldContainer(
                     hasError: vm.bpmError != nil,
                     errorMessage: vm.bpmError

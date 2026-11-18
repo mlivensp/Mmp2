@@ -7,10 +7,11 @@
 
 import Foundation
 import OSLog
+import SwiftData
 
 @MainActor @Observable
 final class PlaylistController {
-    let player = MediaPlayerController()
+    let player: MediaPlayerController
     
     private let items: [PlaylistPlaybackItem]
     private let repeatCount: Int?          // total passes, >= 1
@@ -25,9 +26,10 @@ final class PlaylistController {
     private(set) var playbackState: PlaylistPlaybackState?
     private var countdownTask: Task<Void, Never>?
     
-    init(items: [PlaylistPlaybackItem], repeatCount: Int? = 1) {
+    init(items: [PlaylistPlaybackItem], repeatCount: Int? = 1, modelContext: ModelContext) {
         self.items = items
         self.repeatCount = repeatCount.map { max(1, $0) }
+        player = MediaPlayerController(modelContext: modelContext)
     }
     
     /// Calls onFinished when the last item of the last pass completes.

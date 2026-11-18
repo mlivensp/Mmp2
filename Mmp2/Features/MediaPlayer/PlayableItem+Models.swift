@@ -6,13 +6,15 @@
 //
 
 import Foundation
+import SwiftData
 
 extension PlayableItem {
     /// Caller supplies an already-resolved URL, so it owns the security-scoped access.
     init(source: Source, url: URL, playback: Playback? = nil) {
         self.init(
+            reference: .source(source.persistentModelID),
             url: url,
-            title: Self.title(source.mediaCollection.primitiveName, source.primitiveName),
+            title: source.name, //Self.title(source.mediaCollection.primitiveName, source.primitiveName),
             start: nil,
             end: nil,
             bpm: source.bpm,
@@ -21,8 +23,9 @@ extension PlayableItem {
 
     init?(clip: Clip, url: URL, playback: Playback? = nil) {
         self.init(
+            reference: .clip(clip.persistentModelID),
             url: url,
-            title: Self.title(clip.source.mediaCollection.primitiveName, clip.source.primitiveName, clip.primitiveName),
+            title: clip.name, //Self.title(clip.source.mediaCollection.primitiveName, clip.source.primitiveName, clip.primitiveName),
             start: clip.startSeconds,
             end: clip.endSeconds,
             bpm: clip.bpm,

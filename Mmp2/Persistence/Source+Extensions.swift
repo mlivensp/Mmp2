@@ -12,12 +12,6 @@ extension Source {
     var effectiveSortOrder: Int {
         (sourceGroup == nil ? sortOrder : sourceGroup?.sortOrder) ?? 0
     }
-//    
-//    static func createNew() -> Source {
-//        let media = Media.createNew()
-//        let playback = Playback.createNew()
-//        return Source(name: "", sortOrder: 0, measure1Start: nil, isFavorite: false, notes: nil, media: media, playback: playback, sourceGroup: nil)
-//    }
 }
 
 extension Source {
@@ -99,5 +93,14 @@ extension Source {
         }
         
         return url
+    }
+    
+    var name: String {
+        let parts = [
+            self.mediaCollection.primitiveName,
+            self.primitiveName
+        ]
+        
+        return parts.joined(separator: nameSeparator)
     }
 }
