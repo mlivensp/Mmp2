@@ -25,12 +25,15 @@ struct ClipSection: View {
         
         let _ = dumpClips(sortedClips)
         
-        ForEach(sortedClips) { clip in
-            ClipRow(clip: clip) { clp in
-                appRootManager.editClip(clp, of: source)
+        Group {
+            ForEach(sortedClips) { clip in
+                ClipRow(clip: clip) { clp in
+                    appRootManager.editClip(clp, of: source)
+                }
+                .onTapGesture { onClipTapped(clip) }
             }
-            .onTapGesture { onClipTapped(clip) }
         }
+        .backgroundStyle(.orange)
     }
     
     func dumpClips(_ clips: [Clip]) {

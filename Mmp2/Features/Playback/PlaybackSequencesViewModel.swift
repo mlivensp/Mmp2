@@ -5,12 +5,14 @@
 //  Created by Michael Livenspargar on 11/12/26.
 //
 
+import AppKit
 import Foundation
 import SwiftData
 
 @Observable
 final class PlaybackSequencesViewModel {
     var sequenceVMs: [PlaybackSequenceViewModel]
+    var tableRevision = 0
     
     init(sequences: [PlaybackSequence]) {
         self.sequenceVMs = sequences
@@ -24,6 +26,7 @@ final class PlaybackSequencesViewModel {
 
     func scaleRates(by factor: Double) {
         sequenceVMs.forEach { $0.scaleRate(by: factor) }
+        tableRevision += 1
     }
     
     func addSequence() -> Int {

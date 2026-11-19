@@ -109,7 +109,6 @@ extension ClipEditView {
             get { return storedNameString }
             set {
                 storedNameString = newValue
-                
                 let result = validateName(storedNameString)
                 applyNameValidationResult(result)
             }
@@ -118,8 +117,7 @@ extension ClipEditView {
         var bpmString: String {
             get { return storedBpmString }
             set {
-                storedBpmString = newValue
-                
+                storedBpmString = newValue                
                 let result = validateBpm(storedBpmString)
                 applyBpmValidationResult(result)
             }

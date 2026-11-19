@@ -25,7 +25,16 @@ struct RecentsView: View {
             let recentItems = fetchLastPlayed()
             List(selection: $selection) {
                 ForEach(recentItems) { item in
-                    HStack {
+                    HStack(spacing: 8) {
+                        if item.isFavorite {
+                            Image(systemName: "heart.fill")
+                                .foregroundStyle(.red)
+                                .frame(width: 20)
+                        } else {
+                            Color.clear
+                                .frame(width: 20, height: 1)
+                        }
+                        
                         Text(item.name)
                             .padding(.trailing, 8)
                             .frame(width: 500, alignment: .leading)
@@ -65,7 +74,7 @@ struct RecentsView: View {
                     isFavorite: $0.isFavorite
                 )
             } +
-            clips.map {
+             clips.map {
                 let reference: PlayableReference = .source($0.persistentModelID)
                 return RecentItem(
                     reference: reference,

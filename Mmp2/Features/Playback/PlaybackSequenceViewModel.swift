@@ -42,7 +42,7 @@ final class PlaybackSequenceViewModel {
         guard case .success = validateValue(storedValueString) else { return }
         preciseValue *= factor
         value = scaledPlaybackValue(preciseValue)
-        storedValueString = String(value)
+        valueString = String(value)
         validate()
     }
 

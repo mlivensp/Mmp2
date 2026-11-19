@@ -19,18 +19,29 @@ final class TimeFormatter {
         guard seconds.isFinite else { return "0:00.00" }
 
         let totalMilliseconds = Int((seconds * 1000).rounded())
+
         let hours = totalMilliseconds / 3_600_000
         let minutes = (totalMilliseconds % 3_600_000) / 60_000
         let secs = (totalMilliseconds % 60_000) / 1000
-        let tenths = (totalMilliseconds % 1000) / 10
+        let hundredths = (totalMilliseconds % 1000) / 10
 
         if hours > 0 {
-            return String(format: "%d:%02d:%02d.%d", hours, minutes, secs, tenths)
+            return String(
+                format: "%d:%02d:%02d.%02d",
+                hours,
+                minutes,
+                secs,
+                hundredths
+            )
         } else {
-            return String(format: "%d:%02d.%d", minutes, secs, tenths)
+            return String(
+                format: "%d:%02d.%02d",
+                minutes,
+                secs,
+                hundredths
+            )
         }
     }
-
     func string(from time: CMTime) -> String {
         string(from: time.seconds)
     }

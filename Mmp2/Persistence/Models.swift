@@ -104,38 +104,6 @@ import SwiftData
     }
 }
 
-//@Model public class Media {
-//    var source: Source?
-//    var clip: Clip?
-//    var bpm: Int?
-//    var duration: Double
-//    var path: String?
-//    var pathIsValid: Bool
-//    var lastPlayed: Date?
-//    var numberTimesPlayed: Int
-//    var isArchived: Bool
-//    var bookmark: Data?
-//
-//    public init(
-//        bpm: Int?,
-//        path: String,
-//        duration: Double = 0,
-//        isArchived: Bool = false,
-//        pathIsValid: Bool = true,
-//        numberTimesPlayed: Int = 0,
-//        lastPlayed: Date? = nil,
-//        
-//    ) {
-//        self.bpm = bpm
-//        self.path = path
-//        self.duration = duration
-//        self.isArchived = isArchived
-//        self.pathIsValid = pathIsValid
-//        self.numberTimesPlayed = numberTimesPlayed
-//        self.lastPlayed = lastPlayed
-//    }
-//}
-
 @Model public class MediaCollection {
     var primitiveName: String
     var name_normalized: String

@@ -12,6 +12,8 @@ struct PlaybackSequenceTableView: NSViewRepresentable {
 
     @Bindable var vm: PlaybackSequencesViewModel
     @Binding var selectedRow: Int?
+    let tableRevision: Int
+    
     
     func makeCoordinator() -> Coordinator {
         Coordinator(vm: vm, selectedRow: $selectedRow)

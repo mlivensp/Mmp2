@@ -13,36 +13,14 @@ struct PlaybackSequencesView: View {
     var isBPM: Bool
     
     var body: some View {
+        let _ = print("PlaybackSequencesView body")
         GroupBox("Sequence")
         {
             HStack(spacing: 0) {
-                //            Button("Delete") {
-                //                if let row = selectedRow {
-                //                    selectedRow = vm.delete(at: row)
-                //                        }
-                //            }
-                //            .disabled(selectedRow == nil)
-                //
-                //            Button("Move Up") {
-                //                if let row = selectedRow {
-                //                    selectedRow = vm.moveUp(row: row)
-                //                }
-                //            }
-                //            .disabled(selectedRow == nil || selectedRow == 0)
-                //
-                //            Button("Move Down") {
-                //                if let row = selectedRow {
-                //                    vm.moveDown(row: row)
-                //                }
-                //            }
-                //            .disabled(
-                //                selectedRow == nil ||
-                //                selectedRow == vm.sequences.count - 1
-                //            )
-                
                 PlaybackSequenceTableView(
                     vm: vm,
-                    selectedRow: $selectedRow
+                    selectedRow: $selectedRow,
+                    tableRevision: vm.tableRevision
                 )
                 Divider()
                 toolbar

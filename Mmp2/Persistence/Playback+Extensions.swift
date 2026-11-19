@@ -24,22 +24,33 @@ extension Playback {
         switch newMode {
         case .constant:
             deleteIfNeeded(&playbackProgression)
+            deletePlaybackSequence(context: context)
 
             if playbackConstant == nil {
                 let new = PlaybackConstant.makeDraft()
                 playbackConstant = new
             }
+            
 
         case .progression:
             deleteIfNeeded(&playbackConstant)
+            deletePlaybackSequence(context: context)
 
             if playbackProgression == nil {
                 let new = PlaybackProgression.makeDraft()
                 playbackProgression = new
             }
         case .sequence:
-            let _ = 2
-            // TODO: sequence
+            deleteIfNeeded(&playbackConstant)
+            deleteIfNeeded(&playbackProgression)
+        }
+    }
+    
+    private func deletePlaybackSequence(context: ModelContext) {
+        if let playbackSequences {
+            for playbackSequence in playbackSequences {
+                context.delete(playbackSequence)
+            }
         }
     }
 }

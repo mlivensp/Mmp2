@@ -33,6 +33,7 @@ struct SourceSection: View {
                     onClipTapped: onClipTapped,
                     appRootManager: appRootManager
                 )
+                .backgroundStyle(.pink)
             } label: {
                 SourceRow(source: source) { src in
                     appRootManager.editSource(src, in: src.mediaCollection)
