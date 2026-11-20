@@ -15,6 +15,7 @@ extension CollectionEditView {
         let mediaCollection: MediaCollection
         let context: ModelContext
         
+        internal var storedSources: [Source]
         internal var storedNameString: String
         internal var notes: String
         
@@ -26,6 +27,8 @@ extension CollectionEditView {
             
             self.storedNameString = collection.primitiveName
             self.notes = collection.notes ?? ""
+            
+            self.storedSources = mediaCollection.sources
         }
         
         var topLevelRows: [CollectionRow] {
@@ -49,7 +52,7 @@ extension CollectionEditView {
         }
 
         var sources: [Source] {
-            mediaCollection.sources.sorted(by: {
+            storedSources.sorted(by: {
                 if $0.effectiveSortOrder == $1.effectiveSortOrder {
                     return $0.sortOrder < $1.sortOrder
                 } else {
@@ -133,6 +136,31 @@ extension CollectionEditView {
             
             try context.save()
             return true
+        }
+        
+        func delete(row: CollectionRow) -> CollectionRow? {
+            guard let index = topLevelRows.firstIndex(of: row) else { return nil }
+            switch row {
+            case .group(_):
+                return row
+            case .groupedSource(let source):
+                removeSource(source)
+            case .ungroupedSource(let source):
+                removeSource(source)
+            }
+            
+            if storedSources.isEmpty {
+                return nil
+            }
+            
+            let newIndex = min(index, topLevelRows.count - 1)
+            return topLevelRows[newIndex]
+        }
+        
+        private func removeSource(_ source: Source) {
+            if let index = storedSources.firstIndex(of: source) {
+                storedSources.remove(at: index)
+            }
         }
         
         // MARK: Source list ordering

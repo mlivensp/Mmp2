@@ -138,7 +138,7 @@ struct SourceEditForm: View {
             }
             .scrollContentBackground(.hidden)   // optional, but recommended
             .fileImporter(isPresented: $presentSourcePicker,
-                          allowedContentTypes: [.audio, .video]) { result in
+                          allowedContentTypes: [.audio, .video, .movie]) { result in
                 switch result {
                 case .success(let url):
                     // 1. Start accessing so we can create the bookmark
