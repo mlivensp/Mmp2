@@ -126,7 +126,7 @@ private extension CollectionEditSourceListView {
                 
                 onEdit(newSource)
             } label: {
-                Label("Add", systemImage: "plus")
+                Image(systemName: "plus")
             }
 
             Button {
@@ -137,7 +137,7 @@ private extension CollectionEditSourceListView {
                 self.selectedRow = vm.delete(row: row)
 
             } label: {
-                Label("Delete", systemImage: "trash")
+                Image(systemName: "trash")
             }
             .disabled(selectedRow == nil)
 

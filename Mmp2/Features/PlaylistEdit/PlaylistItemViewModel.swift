@@ -31,7 +31,7 @@ struct PlaylistItemViewModel: Identifiable {
         return nameParts.joined(separator: " • ")
     }
     
-    var sequence: Int {
+    var playOrder: Int {
         playlistItem.playOrder
     }
 }

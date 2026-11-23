@@ -183,7 +183,7 @@ import SwiftData
     var timesToRepeat: Int?
     var notes: String?
     
-    @Relationship(deleteRule: .cascade, inverse: \PlaylistItem.playlist) var playlistItems: [PlaylistItem] = []
+    @Relationship(deleteRule: .cascade) var playlistItems: [PlaylistItem] = []
     @Relationship(deleteRule: .cascade, inverse: \PlaylistGroupItem.playlist) var groups: [PlaylistGroupItem] = []
 
     public init(name: String, shuffle: Bool, defaultSecondsToDelay: Int, duration: TimeInterval, timesToRepeat: Int?, notes: String?) {
@@ -227,15 +227,13 @@ import SwiftData
     @Relationship var source: Source?
     @Relationship var clip: Clip?
     @Relationship(deleteRule: .cascade) var playback: Playback?
-    @Relationship var playlist: Playlist?
 
-    init(playOrder: Int, secondsToDelayOverride: Int? = nil, source: Source? = nil, clip: Clip? = nil, playback: Playback? = nil, playlist: Playlist? = nil) {
+    init(playOrder: Int, secondsToDelayOverride: Int?, source: Source?, clip: Clip?, playback: Playback?) {
         self.playOrder = playOrder
         self.secondsToDelayOverride = secondsToDelayOverride
         self.source = source
         self.clip = clip
         self.playback = playback
-        self.playlist = playlist
     }
 }
 

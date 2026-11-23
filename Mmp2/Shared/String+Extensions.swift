@@ -9,6 +9,10 @@ import Foundation
 
 extension String {
     public var normalizedForSearch: String {
+//        let transformed = applyingTransform(
+//            StringTransform("Any-Latin; Latin-ASCII; Lower; [^[:Letter:][:Number:]] Remove"),
+//            reverse: false
+//        )
         let transformed = applyingTransform(StringTransform("Any-Latin; Latin-ASCII; Lower; [:^Letter:] Remove"), reverse: false)
         return transformed as String? ?? ""
     }

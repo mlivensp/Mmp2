@@ -11,15 +11,17 @@ struct ContentView: View {
     @Environment(AppRootManager.self) var appRootManager
     
     var body: some View {
-        switch appRootManager.selectedCategory {
-        case .collections:
-            CollectionsView()
-        case .playlists:
-            PlaylistsView()
-        case .favorites:
-            Text("Favorites")
-        case .recents:
-            Text("Recents")
+        ZStack {
+            switch appRootManager.selectedCategory {
+            case .collections:
+                CollectionsView()
+            case .playlists:
+                PlaylistsView()
+            case .favorites:
+                Text("Favorites")
+            case .recents:
+                Text("Recents")
+            }
         }
     }
 }

@@ -26,174 +26,145 @@ struct PlaylistEditForm: View {
     
     var body: some View {
         VStack {
-            GeometryReader { proxy in
-                HStack {
-                    Form {
-                        ErrorFieldContainer(
-                            hasError: vm.nameError != nil,
-                            errorMessage: vm.nameError
-                        ) {
-                            HStack {
-                                Text("Name")
-                                TextField("", text: $vm.name)
-                            }
-                        }
-                        
-                        Toggle(isOn: $vm.shuffle) {
-                            Text("Shuffle")
-                        }
-                        
-                        ErrorFieldContainer(
-                            hasError: vm.defaultDelayError != nil,
-                            errorMessage: vm.defaultDelayError
-                        ) {
-                            HStack {
-                                Text("Default Delay (seconds)")
-                                TextField("", text: $vm.defaultDelayString)
-                            }
-                        }
-                        
-                        ErrorFieldContainer(
-                            hasError: vm.timesToRepeatError != nil,
-                            errorMessage: vm.timesToRepeatError
-                        ) {
-                            HStack {
-                                Text("Times To Repeat")
-                                TextField("", text: $vm.timesToRepeatString)
-                            }
-                        }
-                        Spacer()
-                    }
-                    .frame(width: proxy.size.width / 2)
-                    
-                    VStack {
+            HStack {
+                Form {
+                    ErrorFieldContainer(
+                        hasError: vm.nameError != nil,
+                        errorMessage: vm.nameError
+                    ) {
                         HStack {
-                            Text("In Groups")
-                                .font(.headline)
-                            
-                            Spacer()
-                            
-                            Button {
-                                showingAddGroupSheet = true
-                            } label: {
-                                Label("", systemImage: "plus")
+                            Text("Name")
+                            TextField("", text: $vm.name)
+                        }
+                    }
+                    
+                    Toggle(isOn: $vm.shuffle) {
+                        Text("Shuffle")
+                    }
+                    
+                    ErrorFieldContainer(
+                        hasError: vm.defaultDelayError != nil,
+                        errorMessage: vm.defaultDelayError
+                    ) {
+                        HStack {
+                            Text("Default Delay (seconds)")
+                            TextField("", text: $vm.defaultDelayString)
+                        }
+                    }
+                    
+                    ErrorFieldContainer(
+                        hasError: vm.timesToRepeatError != nil,
+                        errorMessage: vm.timesToRepeatError
+                    ) {
+                        HStack {
+                            Text("Times To Repeat")
+                            TextField("", text: $vm.timesToRepeatString)
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                
+                VStack {
+                    HStack {
+                        Text("In Groups")
+                            .font(.headline)
+                        
+                        Spacer()
+                        
+                        Button {
+                            showingAddGroupSheet = true
+                        } label: {
+                            Label("", systemImage: "plus")
+                        }
+                        .buttonStyle(.automatic)
+                        .sheet(isPresented: $showingAddGroupSheet) {
+                            PlaylistGroupPickerSheet(
+                                playlist: vm.playlist,
+                                context: vm.context
+                            )
+                        }
+                        
+                        Button {
+                            showingDeleteMembershipConfirmation = true
+                        } label: {
+                            Label("", systemImage: "trash")
+                        }
+                        .buttonStyle(.automatic)
+                        .disabled(selectedPlaylistGroupItem == nil)
+                        .alert(
+                            "Remove Group Membership",
+                            isPresented: $showingDeleteMembershipConfirmation
+                        ) {
+                            Button("Delete", role: .destructive) {
+                                if let selectedPlaylistGroupItem {
+                                    vm.removeGroupMembership(selectedPlaylistGroupItem)
+                                    self.selectedPlaylistGroupItem = nil
+                                }
                             }
-                            .buttonStyle(.automatic)
-                            .sheet(isPresented: $showingAddGroupSheet) {
-                                PlaylistGroupPickerSheet(
-                                    playlist: vm.playlist,
-                                    context: vm.context
+                            
+                            Button("Cancel", role: .cancel) {
+                            }
+                        } message: {
+                            if let selectedPlaylistGroupItem {
+                                Text(
+                                    "Remove this playlist from '\(selectedPlaylistGroupItem.playlistGroup.primitiveName)'?"
                                 )
                             }
-                            
-                            Button {
-                                showingDeleteMembershipConfirmation = true
-                            } label: {
-                                Label("", systemImage: "trash")
-                            }
-                            .buttonStyle(.automatic)
-                            .disabled(selectedPlaylistGroupItem == nil)
-                            .alert(
-                                "Remove Group Membership",
-                                isPresented: $showingDeleteMembershipConfirmation
-                            ) {
-                                Button("Delete", role: .destructive) {
-                                    if let selectedPlaylistGroupItem {
-                                        vm.removeGroupMembership(selectedPlaylistGroupItem)
-                                        self.selectedPlaylistGroupItem = nil
-                                    }
-                                }
-
-                                Button("Cancel", role: .cancel) {
-                                }
-                            } message: {
-                                if let selectedPlaylistGroupItem {
-                                    Text(
-                                        "Remove this playlist from '\(selectedPlaylistGroupItem.playlistGroup.primitiveName)'?"
-                                    )
-                                }
-                            }                       }
-                        
-                        Divider()
-                        
-                        ScrollView {
-                            ForEach(vm.groupItems) { groupItem in
-                                Text(groupItem.playlistGroup.primitiveName)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(4)
-                                    .background(
-                                        selectedPlaylistGroupItem?.id == groupItem.id
-                                        ? Color.accentColor.opacity(0.2)
-                                        : Color.clear
-                                    )
-                                    .onTapGesture {
-                                        selectedPlaylistGroupItem = groupItem
-                                    }
-                            }
                         }
-                        
-                        Divider()
                     }
-                    .frame(width: proxy.size.width / 2)
+                    
+                    Divider()
+                    
+                    ScrollView {
+                        ForEach(vm.groupItems) { groupItem in
+                            Text(groupItem.playlistGroup.primitiveName)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(4)
+                                .background(
+                                    selectedPlaylistGroupItem?.id == groupItem.id
+                                    ? Color.accentColor.opacity(0.2)
+                                    : Color.clear
+                                )
+                                .onTapGesture {
+                                    selectedPlaylistGroupItem = groupItem
+                                }
+                        }
+                    }
                 }
+                .frame(maxWidth: .infinity)
             }
-            .padding([.leading, .trailing], formPadding)
+            .fixedSize(horizontal: false, vertical: true)
             
-            HStack {
-                Text("Media To Play")
-                    .font(.headline)
-                    .frame(minWidth: 50, alignment: .leading)
-                
-                Spacer()
+            Text("Media To Play")
+                .font(.headline)
+                .frame(minWidth: 50, alignment: .leading)
 
-                Button {
-                    if let selectedPlaylistItem {
-                        vm.moveItemUp(selectedPlaylistItem)
-                    }
-                } label: {
-                    Image(systemName: "arrow.up")
-                }
-                .buttonStyle(.bordered)
-                
-                Button {
-                    if let selectedPlaylistItem {
-                        vm.moveItemDown(selectedPlaylistItem)
-                    }
-                } label: {
-                    Image(systemName: "arrow.down")
-                }
-                .buttonStyle(.bordered)
-                
-                Button {
-                    showingAddItemSheet = true
-                } label: {
-                    Label("Select Media", systemImage: "checklist")
-                }
-                .buttonStyle(.automatic)
-                .sheet(isPresented: $showingAddItemSheet) {
-                    PlaylistItemPickerSheet(playlist: vm.playlist)
-                }
-            }
-            .padding([.leading, .trailing], formPadding)
-            
             Divider()
             
-            ScrollView {
-                ForEach(vm.playlistItems) { playlistItem in
-                    Text(playlistItem.name)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(4)
-                        .background(
-                            selectedPlaylistItem?.id == playlistItem.id
-                            ? Color.accentColor.opacity(0.2)
-                            : Color.clear
-                        )
-                        .onTapGesture {
-                            selectedPlaylistItem = playlistItem
-                        }
+            HStack(spacing: 0) {
+                ScrollView {
+                    ForEach(vm.playlistItems) { playlistItem in
+                        Text(playlistItem.name)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(4)
+                            .background(
+                                selectedPlaylistItem?.id == playlistItem.id
+                                ? Color.accentColor.opacity(0.2)
+                                : Color.clear
+                            )
+                            .onTapGesture {
+                                selectedPlaylistItem = playlistItem
+                            }
+                    }
                 }
+                .frame(maxHeight: .infinity)
+                
+                Divider()
+                
+                toolbar
+                    .frame(width: 30)
+                    .padding([.leading, .trailing], formPadding)
             }
-            //            .frame(maxWidth: .infinity, alignment: .leading)
             .padding([.leading, .trailing], formPadding)
             
             Spacer()
@@ -220,10 +191,78 @@ struct PlaylistEditForm: View {
             }
             .padding()
         }
+        .padding([.leading, .trailing], formPadding)
     }
     
     private func addPlaylistItem() {
         
+    }
+}
+
+private extension PlaylistEditForm {
+    
+    var toolbar: some View {
+        
+        VStack(spacing: 8) {
+            
+            Button {
+                showingAddItemSheet = true
+            } label: {
+                Image(systemName: "plus")
+            }
+            
+            Button {
+                guard let row = selectedPlaylistItem else {
+                    return
+                }
+                
+                // TODO: delete playlist item
+                //                self.selectedRow = vm.delete(row: row)
+                
+            } label: {
+                Image(systemName: "trash")
+            }
+            .disabled(selectedPlaylistItem == nil)
+            
+            Divider()
+            
+            Button {
+                guard let row = selectedPlaylistItem else {
+                    return
+                }
+                
+                // TODO: playlist item move up
+                //                vm.moveUp(row)
+                
+            } label: {
+                Image(systemName: "arrow.up")
+            }
+            .disabled(
+                selectedPlaylistItem == nil
+                // TODO: disable if first item
+                // || selectedPlaylistItem == vm.playlistItems.first
+            )
+            
+            Button {
+                guard let row = selectedPlaylistItem else {
+                    return
+                }
+                
+                // TODO: playlist item move down
+                //                vm.moveDown(row)
+                
+            } label: {
+                Image(systemName: "arrow.down")
+            }
+            .disabled(
+                selectedPlaylistItem == nil
+                // TODO: disable if lat item
+                //                || selectedRow == vm.topLevelRows.last
+            )
+            
+            Spacer()
+        }
+        .padding()
     }
 }
 

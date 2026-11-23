@@ -12,7 +12,7 @@ extension SourceEditView {
     @Observable
     final class ViewModel {
         var source: Source
-        var collection: MediaCollection
+        var mediaCollection: MediaCollection
         var context: ModelContext
         
         var playbackVM: PlaybackEditViewModel
@@ -34,10 +34,11 @@ extension SourceEditView {
         var bpmError: String?
         var sortOrderError: String?
         var measure1StartError: String?
+        var groupError: String?
         
         init(source: Source, collection: MediaCollection, context: ModelContext) {
             self.source = source
-            self.collection = collection
+            self.mediaCollection = collection
             self.context = context
             
             self.playbackVM = PlaybackEditViewModel(playback: source.playback, bpm: source.bpm, context: context)
@@ -86,7 +87,12 @@ extension SourceEditView {
         }
         
         var sourceGroups: [SourceGroup] {
-            collection.sourceGroups.sorted(by: { $0.sortOrder < $1.sortOrder })
+            mediaCollection.sourceGroups.sorted(by: { $0.sortOrder < $1.sortOrder })
+        }
+        
+        var sourceGroupText: String {
+            get { sourceGroup?.primitiveName ?? "" }
+            set { }
         }
         
         // MARK: Editable fields
@@ -143,7 +149,7 @@ extension SourceEditView {
                 if storedSourceGroupString.isEmpty {
                     storedSourceGroup = nil
                 } else {
-                    if let sourceGroup = findExistingSourceGroup(name: storedSourceGroupString, collection: collection, context: context) {
+                    if let sourceGroup = findExistingSourceGroup(name: storedSourceGroupString, collection: mediaCollection, context: context) {
                         self.sourceGroup = sourceGroup
                     } else {
                         self.sourceGroup = nil
@@ -174,7 +180,7 @@ extension SourceEditView {
                 return .failure("Name is required.")
             }
             
-            return validateNameUniqueness(nameValue, source: source, existingSources: collection.sources)
+            return validateNameUniqueness(nameValue, source: source, existingSources: mediaCollection.sources)
         }
         
         fileprivate func validateNameUniqueness(_ nameValue: String, source: Source, existingSources: [Source]) -> ValidationResult<String> {
@@ -310,7 +316,7 @@ extension SourceEditView {
             do {
                 if source.isNew {
                     context.insert(source)            // media and playback come with it (cascade relationships)
-                    source.mediaCollection = collection
+                    source.mediaCollection = mediaCollection
                 }
                 
                 // Playback is now in the context, so submodels attach to a real parent.
@@ -332,11 +338,11 @@ extension SourceEditView {
         }
         
         private func findOrCreateSourceGroup(name: String) -> SourceGroup {
-            if let existing = findExistingSourceGroup(name: name, collection: collection, context: context) {
+            if let existing = findExistingSourceGroup(name: name, collection: mediaCollection, context: context) {
                 return existing
             }
-            let next = (collection.sourceGroups.map(\.sortOrder).max() ?? 0) + 1
-            let group = SourceGroup(name: name, sortOrder: next, isExpanded: false, mediaCollection: collection)
+            let next = (mediaCollection.sourceGroups.map(\.sortOrder).max() ?? 0) + 1
+            let group = SourceGroup(name: name, sortOrder: next, isExpanded: false, mediaCollection: mediaCollection)
             context.insert(group)
             return group
         }

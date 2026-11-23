@@ -30,7 +30,7 @@ extension PlaylistGroupPickerSheet {
         func loadGroups() {
             let descriptor = FetchDescriptor<PlaylistGroup>(
                 sortBy: [
-                    SortDescriptor(\.primitiveName)
+                    SortDescriptor(\.name_normalized)
                 ]
             )
 

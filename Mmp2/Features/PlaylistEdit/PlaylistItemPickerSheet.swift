@@ -212,13 +212,7 @@ struct PlaylistItemPickerSheet: View {
                 if sourceIdsToAdd.contains(
                     source.persistentModelID
                 ) {
-
-                    let item = PlaylistItem(
-                        playOrder: playOrder,
-                        source: source,
-                        playlist: playlist
-                    )
-
+                    let item = PlaylistItem.makeDraft(playOrder: playOrder, source: source)
                     modelContext.insert(item)
 
                     playOrder += 1
@@ -229,13 +223,7 @@ struct PlaylistItemPickerSheet: View {
                     if clipIdsToAdd.contains(
                         clip.persistentModelID
                     ) {
-
-                        let item = PlaylistItem(
-                            playOrder: playOrder,
-                            clip: clip,
-                            playlist: playlist
-                        )
-
+                        let item = PlaylistItem.makeDraft(playOrder: playOrder, clip: clip)
                         modelContext.insert(item)
 
                         playOrder += 1

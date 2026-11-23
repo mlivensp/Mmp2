@@ -14,9 +14,9 @@ struct SourceEditForm: View {
     @Environment(\.dismiss) private var dismiss
     
     @State private var vm: SourceEditView.ViewModel
-    
     @State private var presentSourcePicker = false
-    
+    @State private var showingAddGroupSheet = false
+
     init(source: Source, collection: MediaCollection, context: ModelContext) {
         _vm = State(initialValue: SourceEditView.ViewModel(source: source, collection: collection, context: context))
     }
@@ -85,24 +85,43 @@ struct SourceEditForm: View {
                 Toggle(isOn: $vm.isFavorite) {
                     Text("Favorite")
                 }
-
-                HStack {
-                    Text("Group")
-                    Picker("", selection: $vm.sourceGroup) {
-                        Text("None").tag(nil as SourceGroup?)
-                        
-                        ForEach(vm.sourceGroups) { sourceGroup in
-                            Text(sourceGroup.primitiveName)
-                                .tag(sourceGroup)
+                
+                ErrorFieldContainer(
+                    hasError: vm.groupError != nil,
+                    errorMessage: vm.groupError
+                ) {
+                    HStack {
+                        Text("Group")
+                        TextField("", text: $vm.sourceGroupText)
+                            .disabled(true)
+                        Button {
+                            showingAddGroupSheet = true
+                        } label: {
+                            Image(systemName: "plus")
                         }
                     }
-                    .pickerStyle(.menu)   // This makes it behave like a dropdown
+                    .sheet(isPresented: $showingAddGroupSheet) {
+                        SourceGroupPickerSheet(sourceVM: vm, context: vm.context)
+                    }
                 }
-                
-                HStack {
-                    Text("Or New Group")
-                    TextField("", text: $vm.sourceGroupString)
-                }
+
+//                HStack {
+//                    Text("Group")
+//                    Picker("", selection: $vm.sourceGroup) {
+//                        Text("None").tag(nil as SourceGroup?)
+//                        
+//                        ForEach(vm.sourceGroups) { sourceGroup in
+//                            Text(sourceGroup.primitiveName)
+//                                .tag(sourceGroup)
+//                        }
+//                    }
+//                    .pickerStyle(.menu)   // This makes it behave like a dropdown
+//                }
+//                
+//                HStack {
+//                    Text("Or New Group")
+//                    TextField("", text: $vm.sourceGroupString)
+//                }
                 
                 HStack {
                     Text("Notes")

@@ -31,7 +31,7 @@ struct CollectionsView: View {
                     let mediaCollection = MediaCollection.makeDraft();
                     appRootManager.editCollection(mediaCollection)
                 } label: {
-                    Label("", systemImage: "plus")
+                    Image(systemName: "plus")
                 }
                 .padding(.trailing, 4)
             }
@@ -42,6 +42,7 @@ struct CollectionsView: View {
                 ForEach(mediaCollections) { mediaCollection in
                     NavigationLink(value: mediaCollection) {
                         Text(mediaCollection.primitiveName)
+                            .backgroundStyle(.green)
                             .contextMenu {
                                 Button {
                                     appRootManager.editCollection(mediaCollection)
@@ -57,27 +58,6 @@ struct CollectionsView: View {
 #if os(macOS)
         .navigationSplitViewColumnWidth(min: 180, ideal: 200)
 #endif
-        .toolbar {
-#if os(iOS)
-            ToolbarItem(placement: .navigationBarTrailing) {
-                EditButton()
-            }
-#endif
-            
-            ToolbarItem {
-                Button(action: addItem) {
-                    Label("Add Item", systemImage: "plus")
-                }
-            }
-            
-        }
-    }
-    
-    private func addItem() {
-        //        withAnimation {
-        //            let newItem = CatalogCollection(timestamp: Date())
-        //            modelContext.insert(newItem)
-        //        }
     }
     
     private func deleteItems(offsets: IndexSet) {

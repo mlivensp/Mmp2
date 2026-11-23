@@ -35,7 +35,7 @@ struct SinglePlayerView: View {
                         Button(action: {
                             isAddingClip.toggle()
                         }, label: {
-                            Label("", systemImage: isAddingClip ? "minus" : "plus")
+                            Image(systemName: isAddingClip ? "minus" : "plus")
                         })
                         .backgroundStyle(.clear)
                     }
@@ -102,9 +102,7 @@ struct SinglePlayerView: View {
                 Button {
                     exit()
                 } label: {
-                    HStack {
-                        Image(systemName: "chevron.left")
-                    }
+                    Image(systemName: "chevron.left")
                 }
             }
         }
