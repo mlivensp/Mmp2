@@ -18,6 +18,8 @@ extension CollectionEditView {
         internal var storedSources: [Source]
         internal var storedNameString: String
         internal var notes: String
+        private var pendingSource: Source?
+        private var pendingSourceRevision: UUID?
         
         internal var nameError: String?
         
@@ -59,6 +61,27 @@ extension CollectionEditView {
                     return $0.sortOrder < $1.sortOrder
                 }
             } )
+        }
+
+        func sources(in group: SourceGroup) -> [Source] {
+            sources.filter { $0.sourceGroup == group }
+                .sorted { $0.sortOrder < $1.sortOrder }
+        }
+
+        func beginAddingSource(_ source: Source, revision: UUID) {
+            pendingSource = source
+            pendingSourceRevision = revision
+        }
+
+        func finishAddingSource(revision: UUID) {
+            guard let source = pendingSource, let previousRevision = pendingSourceRevision else {
+                return
+            }
+            if revision != previousRevision && !storedSources.contains(source) {
+                storedSources.append(source)
+            }
+            pendingSource = nil
+            pendingSourceRevision = nil
         }
         
         var nameString: String {

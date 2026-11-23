@@ -55,9 +55,7 @@ struct CollectionEditSourceListView: View {
                                         }
                                         
                                         ForEach(
-                                            group.sources.sorted {
-                                                $0.sortOrder < $1.sortOrder
-                                            }
+                                            vm.sources(in: group)
                                         ) { source in
                                             HStack {
                                                 Text(source.primitiveName)
