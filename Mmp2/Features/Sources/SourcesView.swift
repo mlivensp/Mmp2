@@ -22,6 +22,7 @@ struct SourcesView: View {
             onSourceTapped: { appRootManager.play(source: $0) },
             onClipTapped:   { appRootManager.play(clip: $0) }
         )
+        .id(appRootManager.sourcesListRevision)
         .overlay {
             if collection == nil {
                 ContentUnavailableView("No Collection Selected", systemImage: "folder")

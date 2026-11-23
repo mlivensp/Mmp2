@@ -5,6 +5,7 @@
 //  Created by Michael Livenspargar on 10/5/26.
 //
 
+import Foundation
 import SwiftData
 import SwiftUI
 internal import UniformTypeIdentifiers
@@ -144,6 +145,7 @@ struct SourceEditForm: View {
                         Button("Done") {
                             do {
                                 if try vm.save() {
+                                    appRootManager.sourcesListRevision = UUID()
                                     dismiss()
                                 }
                             } catch {

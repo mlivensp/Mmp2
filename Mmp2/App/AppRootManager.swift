@@ -33,6 +33,7 @@ final class AppRootManager {
     var selectedSource: Source?
     var selectedClip: Clip?
     var selectedPlaylist: Playlist?
+    var sourcesListRevision = UUID()
     
     var editingClip: Clip?
     
