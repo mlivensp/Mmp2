@@ -14,23 +14,26 @@ struct SourcesList: View {
     let onSourceTapped: (Source) -> Void
     let onClipTapped: (Clip) -> Void
     
-    private var topLevelItems: [TopLevelSourceItem] {
+    static func topLevelItems(for collection: MediaCollection?) -> [TopLevelSourceItem] {
         guard let collection else { return [] }
         
         var items: [TopLevelSourceItem] = []
+        let sources = collection.sources
         
         // 1. Groups
-        let groups = collection.sourceGroups.map {
+        let groups = collection.sourceGroups.map { group in
             TopLevelSourceGroup(
-                sourceGroup: $0,
-                sources: topLevelSources($0.sources)
-                    .sorted(by: { $0.sortOrder < $1.sortOrder })
+                sourceGroup: group,
+                sources: sources
+                    .filter { $0.sourceGroup == group }
+                    .map { TopLevelSource(source: $0) }
+                    .sorted { $0.sortOrder < $1.sortOrder }
             )
         }
         items += groups.map { .group($0) }
         
         // 2. Ungrouped sources
-        let ungrouped = collection.sources
+        let ungrouped = sources
             .filter { $0.sourceGroup == nil }
             .map { TopLevelSource(source: $0) }
         
@@ -39,14 +42,9 @@ struct SourcesList: View {
         return items.sorted { $0.sortOrder < $1.sortOrder }
     }
     
-    private func topLevelSources(_ sources: [Source]) -> [TopLevelSource] {
-        sources.map { TopLevelSource(source: $0) }
-            .sorted(by: { $0.sortOrder  < $1.sortOrder })
-    }
-    
     var body: some View {
         List {
-            ForEach(topLevelItems) { item in
+            ForEach(Self.topLevelItems(for: collection)) { item in
                 switch item {
                 case .group(let wrapper):
                     GroupSection(

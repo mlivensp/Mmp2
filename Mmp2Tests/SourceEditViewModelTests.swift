@@ -26,6 +26,65 @@ struct SourceEditViewModelTests {
         return ModelContext(container)
     }
 
+    @MainActor
+    @Suite("Collection source list")
+    struct CollectionSourceListTests {
+        @Test("saved group changes are reflected in the source list")
+        func groupChangesAppearInSourceList() throws {
+            let context = try TestModelContext().context
+            let collection = MediaCollection(name: "Collection")
+            let firstGroup = SourceGroup(name: "First", sortOrder: 1, mediaCollection: collection)
+            let secondGroup = SourceGroup(name: "Second", sortOrder: 2, mediaCollection: collection)
+            let source = Source.makeDraft(name: "Source", sortOrder: 2, mediaCollection: collection)
+            let otherSource = Source.makeDraft(name: "Other", sortOrder: 1, mediaCollection: collection, sourceGroup: firstGroup)
+            context.insert(collection)
+            context.insert(firstGroup)
+            context.insert(secondGroup)
+            context.insert(source)
+            context.insert(otherSource)
+            try context.save()
+
+            func groupSources(_ group: SourceGroup, in items: [TopLevelSourceItem]) -> [Source] {
+                items.compactMap {
+                    if case .group(let wrapper) = $0, wrapper.sourceGroup == group {
+                        return wrapper.sources.map(\.source)
+                    }
+                    return nil
+                }.first ?? []
+            }
+
+            func ungroupedSources(in items: [TopLevelSourceItem]) -> [Source] {
+                items.compactMap {
+                    if case .source(let wrapper) = $0 { return wrapper.source }
+                    return nil
+                }
+            }
+
+            let initial = SourcesList.topLevelItems(for: collection)
+            #expect(ungroupedSources(in: initial) == [source])
+            #expect(groupSources(firstGroup, in: initial) == [otherSource])
+
+            let vm = SourceEditView.ViewModel(source: source, collection: collection, context: context)
+            vm.sourceGroup = firstGroup
+            try vm.save()
+            let grouped = SourcesList.topLevelItems(for: collection)
+            #expect(ungroupedSources(in: grouped).isEmpty)
+            #expect(groupSources(firstGroup, in: grouped) == [otherSource, source])
+
+            vm.sourceGroup = secondGroup
+            try vm.save()
+            let moved = SourcesList.topLevelItems(for: collection)
+            #expect(groupSources(firstGroup, in: moved) == [otherSource])
+            #expect(groupSources(secondGroup, in: moved) == [source])
+
+            vm.sourceGroup = nil
+            try vm.save()
+            let ungrouped = SourcesList.topLevelItems(for: collection)
+            #expect(groupSources(secondGroup, in: ungrouped).isEmpty)
+            #expect(ungroupedSources(in: ungrouped) == [source])
+        }
+    }
+
     private func makeFixture(
         name: String = "Source A",
         sortOrder: Int = 1,
