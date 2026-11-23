@@ -66,9 +66,12 @@ extension SourceGroupPickerSheet {
                 return
             }
 
+            let maxGroupSortOrder = sourceVM.mediaCollection.sourceGroups.map { $0.sortOrder }.max() ?? 1
+            let maxSourceSortOrder = sourceVM.mediaCollection.sources.map { $0.sortOrder }.max() ?? 1
+            let maxSortOrder = max(maxGroupSortOrder, maxSourceSortOrder)
             let group = SourceGroup(
                 name: name,
-                sortOrder: 0,
+                sortOrder: maxSortOrder + 1,
                 mediaCollection: sourceVM.mediaCollection
             )
 
