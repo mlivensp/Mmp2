@@ -78,7 +78,13 @@ extension SourceEditView {
         
         var mediaPath: String {
             get { source.path ?? "" }
-            set { source.path = newValue }
+            set {
+                source.path = newValue
+                
+                if name.isEmpty {
+                    name = SourceNameBuilder.createSourceName(from: newValue)
+                }
+            }
         }
         
         var bookmarkData: Data? {
