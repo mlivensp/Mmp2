@@ -41,6 +41,7 @@ struct CollectionEditForm: View {
             CollectionEditSourceListView(
                 vm: vm
             ) { source in
+                vm.beginAddingSource(source, revision: appRootManager.sourcesListRevision)
                 appRootManager.editSource(
                     source,
                     in: vm.mediaCollection
@@ -71,6 +72,12 @@ struct CollectionEditForm: View {
                 .buttonStyle(.borderedProminent)
             }
             .padding()
+        }
+        .onAppear {
+            vm.finishAddingSource(revision: appRootManager.sourcesListRevision)
+        }
+        .onChange(of: appRootManager.sourcesListRevision) {
+            vm.finishAddingSource(revision: appRootManager.sourcesListRevision)
         }
     }
 }

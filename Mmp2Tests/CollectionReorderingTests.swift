@@ -6,8 +6,68 @@
 //
 
 @testable import Mmp2
+import Foundation
 import Testing
 import SwiftData
+
+@MainActor
+@Suite("Collection editor source additions")
+struct CollectionEditorSourceAdditionTests {
+    @Test("saved new sources appear in the collection editor", arguments: [false, true])
+    func savedNewSourceAppears(grouped: Bool) throws {
+        let context = try TestModelContext().context
+        let collection = MediaCollection(name: "Collection")
+        let group = SourceGroup(name: "Group", sortOrder: 1, mediaCollection: collection)
+        let existing = Source.makeDraft(name: "Existing", sortOrder: 1, mediaCollection: collection)
+        context.insert(collection)
+        context.insert(group)
+        context.insert(existing)
+        try context.save()
+
+        let vm = CollectionEditView.ViewModel(collection: collection, context: context)
+        _ = vm.delete(row: .ungroupedSource(existing))
+        vm.nameString = "Edited collection"
+        let source = Source.makeDraft(name: "New source", sortOrder: 2, mediaCollection: collection)
+        let revision = UUID()
+        vm.beginAddingSource(source, revision: revision)
+        let sourceVM = SourceEditView.ViewModel(source: source, collection: collection, context: context)
+        if grouped {
+            sourceVM.sourceGroup = group
+        }
+        #expect(try sourceVM.save())
+
+        let savedRevision = UUID()
+        vm.finishAddingSource(revision: savedRevision)
+        vm.finishAddingSource(revision: savedRevision)
+
+        #expect(vm.nameString == "Edited collection")
+        #expect(vm.sources == [source])
+        if grouped {
+            #expect(vm.topLevelRows == [.group(group)])
+            #expect(vm.sources(in: group) == [source])
+        } else {
+            #expect(vm.topLevelRows == [.ungroupedSource(source)])
+        }
+    }
+
+    @Test("cancelled new sources do not appear in the collection editor")
+    func cancelledNewSourceDoesNotAppear() throws {
+        let context = try TestModelContext().context
+        let collection = MediaCollection(name: "Collection")
+        context.insert(collection)
+        try context.save()
+        let vm = CollectionEditView.ViewModel(collection: collection, context: context)
+        let source = Source.makeDraft(name: "Cancelled", mediaCollection: collection)
+        let revision = UUID()
+        vm.beginAddingSource(source, revision: revision)
+
+        vm.finishAddingSource(revision: revision)
+        vm.finishAddingSource(revision: UUID())
+
+        #expect(vm.sources.isEmpty)
+        #expect(vm.topLevelRows.isEmpty)
+    }
+}
 
 @MainActor
 @Suite("Collection Reordering")
