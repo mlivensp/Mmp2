@@ -17,18 +17,26 @@ struct SourcesView: View {
     }
 
     var body: some View {
-        SourcesList(
-            collection: collection,        // make this parameter optional in SourcesList
-            onSourceTapped: { appRootManager.play(source: $0) },
-            onClipTapped:   { appRootManager.play(clip: $0) }
-        )
-        .id(appRootManager.sourcesListRevision)
-        .overlay {
-            if collection == nil {
-                ContentUnavailableView("No Collection Selected", systemImage: "folder")
+        VStack {
+            Text(collection?.primitiveName ?? "")
+                .font(.largeTitle)
+                .fontWeight(.semibold)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, formPadding)
+            SourcesList(
+                collection: collection,        // make this parameter optional in SourcesList
+                onSourceTapped: { appRootManager.play(source: $0) },
+                onClipTapped:   { appRootManager.play(clip: $0) }
+            )
+            .id(appRootManager.sourcesListRevision)
+            .overlay {
+                if collection == nil {
+                    ContentUnavailableView("No Collection Selected", systemImage: "folder")
+                }
             }
         }
-    }}
+    }
+}
 
 #Preview {
     SourcesView()
