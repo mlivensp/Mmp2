@@ -36,12 +36,12 @@
             landmarkType = "24">
             <Locations>
                <Location
-                  uuid = "00FCF6BD-39B2-42CB-90B8-B1ACC9DD29B5 - c95b28826031952a"
+                  uuid = "00FCF6BD-39B2-42CB-90B8-B1ACC9DD29B5 - 62c77bf2afba1e14"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "Mmp2.SourceSection.body.getter : some"
-                  moduleName = "Mmp2.debug.dylib"
+                  symbolName = "Mmp.SourceSection.body.getter : some"
+                  moduleName = "Mmp.debug.dylib"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Volumes/X9%20Pro/Projects/Mmp2/Mmp2/Features/Sources/SourceSection.swift"
                   startingColumnNumber = "9223372036854775807"
@@ -50,12 +50,12 @@
                   endingLineNumber = "23">
                </Location>
                <Location
-                  uuid = "00FCF6BD-39B2-42CB-90B8-B1ACC9DD29B5 - 3e0a813d708ba457"
+                  uuid = "00FCF6BD-39B2-42CB-90B8-B1ACC9DD29B5 - c372c638915e3453"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "closure #2 () -&gt; () in Mmp2.SourceSection.body.getter : some"
-                  moduleName = "Mmp2.debug.dylib"
+                  symbolName = "closure #2 () -&gt; () in Mmp.SourceSection.body.getter : some"
+                  moduleName = "Mmp.debug.dylib"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Volumes/X9%20Pro/Projects/Mmp2/Mmp2/Features/Sources/SourceSection.swift"
                   startingColumnNumber = "9223372036854775807"

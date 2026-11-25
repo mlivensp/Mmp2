@@ -12,11 +12,21 @@ struct PlaylistsView: View {
 
     var body: some View {
         VStack {
-            Text("Playlists")
-                .font(.largeTitle)
-                .fontWeight(.semibold)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading, formPadding)
+            HStack {
+                Text("Playlists")
+                    .font(.largeTitle)
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, formPadding)
+                Spacer()
+                Button {
+                    let playlist = Playlist.makeDraft();
+                    appRootManager.editPlaylist(playlist)
+                } label: {
+                    Image(systemName: "plus")
+                }
+                .padding(.trailing, 4)
+            }
             
             PlaylistsList(onPlaylistTapped: { appRootManager.play(playlist: $0) })
         }

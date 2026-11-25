@@ -85,7 +85,7 @@ struct PlaylistPlayerView: View {
                 }
             let controller = PlaylistController(
                 items: items,
-                repeatCount: playlist.timesToRepeat,
+                repeatCount: playlist.timesToPlay,
                 modelContext: modelContext
             )
             self.controller = controller

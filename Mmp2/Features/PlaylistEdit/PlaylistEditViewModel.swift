@@ -36,9 +36,9 @@ extension PlaylistEditView {
             self.shuffle = playlist.shuffle
             self.defaultDelay = playlist.defaultSecondsToDelay
             self.storedDefaultDelayString = String(playlist.defaultSecondsToDelay)
-            self.timesToRepeat = playlist.timesToRepeat
+            self.timesToRepeat = playlist.timesToPlay
             
-            if let timesToRepeat = playlist.timesToRepeat {
+            if let timesToRepeat = playlist.timesToPlay {
                 self.storedTimesToRepeatString = String(timesToRepeat)
             } else {
                 self.storedTimesToRepeatString = ""
@@ -204,7 +204,7 @@ extension PlaylistEditView {
             playlist.name_normalized = name.normalizedForSearch
             playlist.shuffle = shuffle
             playlist.defaultSecondsToDelay = defaultDelay
-            playlist.timesToRepeat = timesToRepeat
+            playlist.timesToPlay = timesToRepeat
             playlist.notes = notes.isEmpty ? nil : notes
             
             try context.save()

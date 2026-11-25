@@ -384,7 +384,7 @@ struct Importer {
             let durationString = playlistJson.duration.string
             let duration = (try? TimeFormatter.shared.seconds(from: durationString)) ?? 0
             
-            let timesToRepeat = playlistJson.repeat.optionalInt
+            let timesToPlay = playlistJson.repeat.optionalInt
             let notes = playlistJson.notes.optionalString
             
             let playlist = Playlist(
@@ -392,7 +392,7 @@ struct Importer {
                 shuffle: shuffle,
                 defaultSecondsToDelay: defaultSecondsToDelay,
                 duration: duration,
-                timesToRepeat: timesToRepeat,
+                timesToPlay: timesToPlay,
                 notes: notes)
             modelContext.insert(playlist)
             

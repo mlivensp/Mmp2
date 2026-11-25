@@ -180,19 +180,19 @@ import SwiftData
     var shuffle: Bool
     var defaultSecondsToDelay: Int
     var duration: TimeInterval
-    var timesToRepeat: Int?
+    var timesToPlay: Int?
     var notes: String?
     
     @Relationship(deleteRule: .cascade) var playlistItems: [PlaylistItem] = []
     @Relationship(deleteRule: .cascade, inverse: \PlaylistGroupItem.playlist) var groups: [PlaylistGroupItem] = []
 
-    public init(name: String, shuffle: Bool, defaultSecondsToDelay: Int, duration: TimeInterval, timesToRepeat: Int?, notes: String?) {
+    public init(name: String, shuffle: Bool, defaultSecondsToDelay: Int, duration: TimeInterval, timesToPlay: Int?, notes: String?) {
         self.primitiveName = name
         self.name_normalized = name.normalizedForSearch
         self.shuffle = shuffle
         self.defaultSecondsToDelay = defaultSecondsToDelay
         self.duration = duration
-        self.timesToRepeat = timesToRepeat
+        self.timesToPlay = timesToPlay
         self.notes = notes
     }
 }

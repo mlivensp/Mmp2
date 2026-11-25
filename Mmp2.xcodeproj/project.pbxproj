@@ -24,7 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		DD54A7CE3057467600281B19 /* Mmp2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mmp2.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DD54A7CE3057467600281B19 /* Mmp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Mmp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD54A7DD3057467700281B19 /* Mmp2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Mmp2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD54A7E73057467700281B19 /* Mmp2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Mmp2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -93,7 +93,7 @@
 		DD54A7CF3057467600281B19 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DD54A7CE3057467600281B19 /* Mmp2.app */,
+				DD54A7CE3057467600281B19 /* Mmp.app */,
 				DD54A7DD3057467700281B19 /* Mmp2Tests.xctest */,
 				DD54A7E73057467700281B19 /* Mmp2UITests.xctest */,
 			);
@@ -122,7 +122,7 @@
 			packageProductDependencies = (
 			);
 			productName = Mmp2;
-			productReference = DD54A7CE3057467600281B19 /* Mmp2.app */;
+			productReference = DD54A7CE3057467600281B19 /* Mmp.app */;
 			productType = "com.apple.product-type.application";
 		};
 		DD54A7DC3057467700281B19 /* Mmp2Tests */ = {
@@ -436,8 +436,8 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = bitpicker.com.Mmp2;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = bitpicker.com.Mmp;
+				PRODUCT_NAME = Mmp;
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -494,8 +494,8 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = bitpicker.com.Mmp2;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = bitpicker.com.Mmp;
+				PRODUCT_NAME = Mmp;
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;

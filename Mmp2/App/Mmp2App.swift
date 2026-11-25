@@ -99,6 +99,7 @@ struct Mmp2App: App {
         .commands {
             MyCommands(appRootManager: appRootManager)
         }
+        .windowStyle(.hiddenTitleBar)
     }
     
     private func locateSources(using folderURL: URL) throws {
