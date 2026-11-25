@@ -11,7 +11,15 @@ struct PlaylistsView: View {
     @Environment(AppRootManager.self) private var appRootManager
 
     var body: some View {
-        PlaylistsList(onPlaylistTapped: { appRootManager.play(playlist: $0) })
+        VStack {
+            Text("Playlists")
+                .font(.largeTitle)
+                .fontWeight(.semibold)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, formPadding)
+            
+            PlaylistsList(onPlaylistTapped: { appRootManager.play(playlist: $0) })
+        }
     }
 }
 

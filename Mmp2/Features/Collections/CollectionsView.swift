@@ -17,15 +17,21 @@ struct CollectionsView: View {
     @State private var isPresentingFileImporter: Bool = false
     @State private var isImporting: Bool = false
     @State private var isLocatingSource: Bool = false
+    @State private var isDeletingCollection: Bool = false
     
     var body: some View {
         let selection = Binding<MediaCollection?>(
             get: { appRootManager.selectedMediaCollection },
             set: { appRootManager.selectCollection($0) }
         )
-
+        
         VStack {
             HStack {
+                Text("Collections")
+                    .font(.largeTitle)
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, formPadding)
                 Spacer()
                 Button {
                     let mediaCollection = MediaCollection.makeDraft();
@@ -49,10 +55,35 @@ struct CollectionsView: View {
                                 } label: {
                                     Label("Edit Collection", systemImage: "pencil")
                                 }
+                                Button {
+                                    appRootManager.selectedMediaCollection = mediaCollection
+                                    isDeletingCollection = true
+                                } label: {
+                                    Label("Delete Collection", systemImage: "trash")
+                                }
                             }
                     }
                 }
                 .onDelete(perform: deleteItems)
+                .alert(
+                    "Delete Collection",
+                    isPresented: $isDeletingCollection) {
+                        Button("Delete", role: .destructive) {
+                            if let mediaCollection = selection.wrappedValue {
+                                modelContext.delete(mediaCollection)
+                                appRootManager.selectedMediaCollection = nil
+                            }
+                        }
+                        
+                        Button("Cancel", role: .cancel) {
+                        }
+                    } message: {
+                        if let mediaCollection = selection.wrappedValue {
+                            Text(
+                                "Delete \(mediaCollection.primitiveName)? This cannot be undone."
+                            )
+                        }
+                    }
             }
         }
 #if os(macOS)

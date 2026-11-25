@@ -9,6 +9,6 @@ import Foundation
 import SwiftData
 
 enum PlayableReference {
-    case source(PersistentIdentifier)
-    case clip(PersistentIdentifier)
+    case source(Source)
+    case clip(Clip)
 }

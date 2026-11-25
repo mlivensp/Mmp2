@@ -23,6 +23,7 @@ struct SourcesView: View {
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.leading, formPadding)
+            
             SourcesList(
                 collection: collection,        // make this parameter optional in SourcesList
                 onSourceTapped: { appRootManager.play(source: $0) },

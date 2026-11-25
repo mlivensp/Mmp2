@@ -12,7 +12,7 @@ extension PlayableItem {
     /// Caller supplies an already-resolved URL, so it owns the security-scoped access.
     init(source: Source, url: URL, playback: Playback? = nil) {
         self.init(
-            reference: .source(source.persistentModelID),
+            reference: .source(source),
             url: url,
             title: source.name, //Self.title(source.mediaCollection.primitiveName, source.primitiveName),
             start: nil,
@@ -23,7 +23,7 @@ extension PlayableItem {
 
     init?(clip: Clip, url: URL, playback: Playback? = nil) {
         self.init(
-            reference: .clip(clip.persistentModelID),
+            reference: .clip(clip),
             url: url,
             title: clip.name, //Self.title(clip.source.mediaCollection.primitiveName, clip.source.primitiveName, clip.primitiveName),
             start: clip.startSeconds,

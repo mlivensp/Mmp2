@@ -17,10 +17,10 @@ struct RecentItem: Identifiable {
     
     init(reference: PlayableReference, name: String, lastPlayed: Date, isFavorite: Bool) {
         switch reference {
-        case .source(let id):
-            self.id = id
-        case .clip(let id):
-            self.id = id
+        case .source(let source):
+            self.id = source.id
+        case .clip(let clip):
+            self.id = clip.id
         }
         
         self.reference = reference

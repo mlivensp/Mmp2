@@ -42,6 +42,14 @@ struct RecentsView: View {
                         Text(item.lastPlayed, format: .dateTime)
                     }
                     .tag(item.id)
+                    .onTapGesture {
+                        switch item.reference {
+                        case .source(let source):
+                            appRootManager.play(source: source)
+                        case .clip(let clip):
+                            appRootManager.play(clip: clip)
+                        }
+                    }
                 }
             }
         }
@@ -66,7 +74,7 @@ struct RecentsView: View {
             let clips = try modelContext.fetch(clipFetchDescriptor)
             let recents: [RecentItem] =
             (sources.map {
-                let reference: PlayableReference = .source($0.persistentModelID)
+                let reference: PlayableReference = .source($0)
                 return RecentItem(
                     reference: reference,
                     name: $0.name,
@@ -75,7 +83,7 @@ struct RecentsView: View {
                 )
             } +
              clips.map {
-                let reference: PlayableReference = .source($0.persistentModelID)
+                let reference: PlayableReference = .clip($0)
                 return RecentItem(
                     reference: reference,
                     name: $0.name,

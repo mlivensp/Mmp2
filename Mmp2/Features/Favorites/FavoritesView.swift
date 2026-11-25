@@ -33,6 +33,14 @@ struct FavoritesView: View {
                         Text(item.lastPlayed, format: .dateTime)
                     }
                     .tag(item.id)
+                    .onTapGesture {
+                        switch item.reference {
+                        case .source(let source):
+                            appRootManager.play(source: source)
+                        case .clip(let clip):
+                            appRootManager.play(clip: clip)
+                        }
+                    }
                 }
             }
         }
@@ -57,7 +65,7 @@ struct FavoritesView: View {
             let clips = try modelContext.fetch(clipFetchDescriptor)
             let recents: [RecentItem] =
             (sources.map {
-                let reference: PlayableReference = .source($0.persistentModelID)
+                let reference: PlayableReference = .source($0)
                 return RecentItem(
                     reference: reference,
                     name: $0.name,
@@ -65,7 +73,7 @@ struct FavoritesView: View {
                     isFavorite: $0.isFavorite)
             } +
             clips.map {
-                let reference: PlayableReference = .source($0.persistentModelID)
+                let reference: PlayableReference = .clip($0)
                 return RecentItem(
                     reference: reference,
                     name: $0.name,

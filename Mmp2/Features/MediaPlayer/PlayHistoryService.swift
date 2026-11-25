@@ -16,19 +16,11 @@ actor PlayHistoryService {
 
         switch playableReference {
 
-        case .source(let id):
-            guard let source = self[id, as: Source.self] else {
-                return
-            }
-
+        case .source(let source):
             source.lastPlayed = .now
             source.numberTimesPlayed += 1
 
-        case .clip(let id):
-            guard let clip = self[id, as: Clip.self] else {
-                return
-            }
-
+        case .clip(let clip):
             clip.lastPlayed = .now
             clip.numberTimesPlayed += 1
         }
