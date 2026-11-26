@@ -10,13 +10,13 @@ import SwiftUI
 
 struct PlaylistItemPickerSheet: View {
     let playlist: Playlist
-
+    
     @Environment(\.modelContext)
     private var modelContext
     
     @Environment(\.dismiss)
     private var dismiss
-
+    
     @Query(sort: \MediaCollection.name_normalized)
     private var mediaCollections: [MediaCollection]
     
@@ -46,32 +46,33 @@ struct PlaylistItemPickerSheet: View {
                                         expandedCollectionIds.remove(wrapper.id)
                                     }
                                 }
-                            )                ) {
-                                
-                                PlaylistCollectionSection(
-                                    mediaCollection: wrapper.collection,
-                                    selectedSourceIds: $selectedSourceIds,
-                                    selectedClipIds: $selectedClipIds
-                                )
-                                
-                            } label: {
-                                
-                                Text(wrapper.collection.primitiveName)
-                                    .font(.headline)
-                            }
+                            )
+                        ) {
+                            
+                            PlaylistCollectionSection(
+                                mediaCollection: wrapper.collection,
+                                selectedSourceIds: $selectedSourceIds,
+                                selectedClipIds: $selectedClipIds
+                            )
+                            
+                        } label: {
+                            
+                            Text(wrapper.collection.primitiveName)
+                                .font(.headline)
+                        }
                     }
                 }
             }
             
             Divider()
-
+            
             HStack {
                 Spacer()
-
+                
                 Button("Cancel") {
                     dismiss()
                 }
-
+                
                 Button("Done") {
                     applySelections()
                     dismiss()
@@ -88,7 +89,7 @@ struct PlaylistItemPickerSheet: View {
         )
         .onAppear {
             loadSelections()
-
+            
             collections = mediaCollections.map {
                 TopLevelCollection(collection: $0)
             }
@@ -101,7 +102,7 @@ struct PlaylistItemPickerSheet: View {
                 $0.source?.persistentModelID
             }
         )
-
+        
         selectedClipIds = Set(
             playlist.playlistItems.compactMap {
                 $0.clip?.persistentModelID
@@ -111,7 +112,7 @@ struct PlaylistItemPickerSheet: View {
     
     func toggle(source: Source) {
         let id = source.persistentModelID
-
+        
         if selectedSourceIds.contains(id) {
             selectedSourceIds.remove(id)
         } else {
@@ -121,7 +122,7 @@ struct PlaylistItemPickerSheet: View {
     
     func toggle(clip: Clip) {
         let id = clip.persistentModelID
-
+        
         if selectedClipIds.contains(id) {
             selectedClipIds.remove(id)
         } else {
@@ -135,35 +136,35 @@ struct PlaylistItemPickerSheet: View {
                 $0.source?.persistentModelID
             }
         )
-
+        
         let existingClipIds = Set(
             playlist.playlistItems.compactMap {
                 $0.clip?.persistentModelID
             }
         )
-
+        
         let sourceIdsToAdd =
-            selectedSourceIds.subtracting(existingSourceIds)
-
+        selectedSourceIds.subtracting(existingSourceIds)
+        
         let clipIdsToAdd =
-            selectedClipIds.subtracting(existingClipIds)
-
+        selectedClipIds.subtracting(existingClipIds)
+        
         let sourceIdsToRemove =
-            existingSourceIds.subtracting(selectedSourceIds)
-
+        existingSourceIds.subtracting(selectedSourceIds)
+        
         let clipIdsToRemove =
-            existingClipIds.subtracting(selectedClipIds)
-
+        existingClipIds.subtracting(selectedClipIds)
+        
         removeItems(
             sourceIdsToRemove: sourceIdsToRemove,
             clipIdsToRemove: clipIdsToRemove
         )
-
+        
         addItems(
             sourceIdsToAdd: sourceIdsToAdd,
             clipIdsToAdd: clipIdsToAdd
         )
-
+        
         try? modelContext.save()
     }
     
@@ -172,23 +173,23 @@ struct PlaylistItemPickerSheet: View {
         clipIdsToRemove: Set<PersistentIdentifier>
     ) {
         let playlistItemsToRemove =
-            playlist.playlistItems.filter { item in
-
-                if let source = item.source {
-                    return sourceIdsToRemove.contains(
-                        source.persistentModelID
-                    )
-                }
-
-                if let clip = item.clip {
-                    return clipIdsToRemove.contains(
-                        clip.persistentModelID
-                    )
-                }
-
-                return false
+        playlist.playlistItems.filter { item in
+            
+            if let source = item.source {
+                return sourceIdsToRemove.contains(
+                    source.persistentModelID
+                )
             }
-
+            
+            if let clip = item.clip {
+                return clipIdsToRemove.contains(
+                    clip.persistentModelID
+                )
+            }
+            
+            return false
+        }
+        
         playlistItemsToRemove.forEach {
             modelContext.delete($0)
         }
@@ -203,34 +204,49 @@ struct PlaylistItemPickerSheet: View {
         clipIdsToAdd: Set<PersistentIdentifier>
     ) {
         var playOrder =
-            (playlist.playlistItems.map(\.playOrder).max() ?? -1) + 1
-
-        for collection in mediaCollections {
-
-            for source in collection.sources {
-
-                if sourceIdsToAdd.contains(
-                    source.persistentModelID
-                ) {
-                    let item = PlaylistItem.makeDraft(playOrder: playOrder, source: source)
-                    modelContext.insert(item)
-
-                    playOrder += 1
-                }
-
-                for clip in source.clips {
-
-                    if clipIdsToAdd.contains(
-                        clip.persistentModelID
-                    ) {
-                        let item = PlaylistItem.makeDraft(playOrder: playOrder, clip: clip)
-                        modelContext.insert(item)
-
-                        playOrder += 1
-                    }
-                }
+        (playlist.playlistItems.map(\.playOrder).max() ?? -1) + 1
+        
+        for sourceId in sourceIdsToAdd {
+            if let source = modelContext.model(for: sourceId) as? Source {
+                let item = PlaylistItem.makeDraft(playOrder: playOrder, source: source)
+                playlist.playlistItems.append(item)
+                playOrder += 1
             }
         }
+        
+        for clipId in clipIdsToAdd {
+            if let clip = modelContext.model(for: clipId) as? Clip {
+                let item = PlaylistItem.makeDraft(playOrder: playOrder, clip: clip)
+                playlist.playlistItems.append(item)
+                playOrder += 1
+            }
+        }
+//        for collection in mediaCollections {
+//            
+//            for source in collection.sources {
+//                
+//                if sourceIdsToAdd.contains(
+//                    source.persistentModelID
+//                ) {
+//                    let item = PlaylistItem.makeDraft(playOrder: playOrder, source: source)
+//                    modelContext.insert(item)
+//                    
+//                    playOrder += 1
+//                }
+//                
+//                for clip in source.clips {
+//                    
+//                    if clipIdsToAdd.contains(
+//                        clip.persistentModelID
+//                    ) {
+//                        let item = PlaylistItem.makeDraft(playOrder: playOrder, clip: clip)
+//                        modelContext.insert(item)
+//                        
+//                        playOrder += 1
+//                    }
+//                }
+//            }
+//        }
     }
 }
 //#Preview {

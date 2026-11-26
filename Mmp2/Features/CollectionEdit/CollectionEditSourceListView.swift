@@ -103,7 +103,8 @@ struct CollectionEditSourceListView: View {
                 Divider()
                 
                 toolbar
-                    .frame(width: 30)
+                    .frame(width: 20)
+                    .padding([.leading, .trailing], formPadding)
             }
         }
     }

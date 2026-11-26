@@ -24,7 +24,8 @@ struct PlaybackSequencesView: View {
                 )
                 Divider()
                 toolbar
-                    .frame(maxWidth: 30)
+                    .frame(width: 20)
+                    .padding([.leading, .trailing], formPadding)
             }
             .frame(minHeight: 300)
         }
@@ -40,7 +41,7 @@ private extension PlaybackSequencesView {
             Button {
                 selectedRow = vm.addSequence()
             } label: {
-                Label("Add", systemImage: "plus")
+                Image(systemName: "plus")
             }
 
             Button {
@@ -51,7 +52,7 @@ private extension PlaybackSequencesView {
                 selectedRow = vm.delete(at: row)
 
             } label: {
-                Label("Delete", systemImage: "trash")
+                Image(systemName: "trash")
             }
             .disabled(selectedRow == nil)
 

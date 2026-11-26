@@ -26,7 +26,7 @@ struct PlaylistEditForm: View {
     
     var body: some View {
         VStack {
-            HStack {
+            HStack(alignment: .top) {
                 Form {
                     ErrorFieldContainer(
                         hasError: vm.nameError != nil,
@@ -62,7 +62,6 @@ struct PlaylistEditForm: View {
                         }
                     }
                 }
-                .frame(maxWidth: .infinity)
                 
                 VStack {
                     HStack {
@@ -133,12 +132,12 @@ struct PlaylistEditForm: View {
                 }
                 .frame(maxWidth: .infinity)
             }
-            .fixedSize(horizontal: false, vertical: true)
-            
+            .frame(maxWidth: .infinity, maxHeight: 150)
+
             Text("Media To Play")
                 .font(.headline)
                 .frame(minWidth: 50, alignment: .leading)
-
+            
             Divider()
             
             HStack(spacing: 0) {
@@ -157,18 +156,17 @@ struct PlaylistEditForm: View {
                             }
                     }
                 }
-                .frame(maxHeight: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
                 Divider()
                 
                 toolbar
-                    .frame(width: 30)
+                    .frame(width: 20)
                     .padding([.leading, .trailing], formPadding)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .padding([.leading, .trailing], formPadding)
-            
-            Spacer()
-            
+                        
             HStack {
                 Spacer()
                 
@@ -177,7 +175,7 @@ struct PlaylistEditForm: View {
                 }
                 .foregroundColor(.secondary)
                 
-                Button("Save") {
+                Button("Done") {
                     do {
                         if try vm.save() {
                             dismiss()
@@ -192,6 +190,9 @@ struct PlaylistEditForm: View {
             .padding()
         }
         .padding([.leading, .trailing], formPadding)
+        .sheet(isPresented: $showingAddItemSheet) {
+            PlaylistItemPickerSheet(playlist: vm.playlist)
+        }
     }
     
     private func addPlaylistItem() {

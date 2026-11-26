@@ -100,6 +100,7 @@ struct Mmp2App: App {
             MyCommands(appRootManager: appRootManager)
         }
         .windowStyle(.hiddenTitleBar)
+        .defaultSize(width: 500, height: 500)
     }
     
     private func locateSources(using folderURL: URL) throws {
