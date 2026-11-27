@@ -18,6 +18,7 @@ extension PlaylistEditView {
         private var defaultDelay: Int
         public var shuffle: Bool
         private var timesToRepeat: Int?
+        public var playlistItems: [PlaylistItemViewModel]
         
         private var storedNameString: String
         private var storedDefaultDelayString: String
@@ -45,6 +46,10 @@ extension PlaylistEditView {
             }
             
             self.notes = playlist.notes ?? ""
+            
+            playlistItems = playlist.playlistItems
+                .map { PlaylistItemViewModel(playlistItem: $0) }
+                .sorted { $0.sortOrder < $1.sortOrder }
         }
         
         // MARK: Editable fields
@@ -75,12 +80,6 @@ extension PlaylistEditView {
                 let result = validateTimesToRepeat(storedTimesToRepeatString)
                 applyTimesToRepeatValidationResult(result)
             }
-        }
-        
-        public var playlistItems: [PlaylistItemViewModel] {
-            playlist.playlistItems
-                .sorted { $0.playOrder < $1.playOrder }
-                .map { PlaylistItemViewModel(playlistItem: $0) }
         }
         
         public var groupItems: [PlaylistGroupItem] {
@@ -197,6 +196,31 @@ extension PlaylistEditView {
         
         // MARK: Save
         
+        fileprivate func updatePlaylistItems() {
+            // remove playlistItems that have been deleted
+            for playlistItem in playlist.playlistItems {
+                let index = playlistItems.firstIndex(where: { $0.id == playlistItem.persistentModelID })
+                
+                if index == nil {
+                    context.delete(playlistItem)
+                }
+            }
+            
+            // add playlistItems that have been added
+            for playlistItemVM in playlistItems {
+                if playlistItemVM.isNew {
+                    playlist.playlistItems.append(playlistItemVM.playlistItem)
+                }
+            }
+            
+            var sortOrder = 1
+            let sortedPlaylistItemVMs = playlistItems.sorted { $0.sortOrder < $1.sortOrder }
+            for playlistItemVM in sortedPlaylistItemVMs {
+                playlistItemVM.playlistItem.playOrder = sortOrder
+                sortOrder += 1
+            }
+        }
+        
         func save() throws -> Bool {
             guard validate() else { return false }
             
@@ -207,6 +231,8 @@ extension PlaylistEditView {
             playlist.timesToPlay = timesToRepeat
             playlist.notes = notes.isEmpty ? nil : notes
             
+            updatePlaylistItems()
+            
             try context.save()
             return true
         }
@@ -214,8 +240,8 @@ extension PlaylistEditView {
         // MARK: move playlist items
         
         func moveItemUp(_ item: PlaylistItemViewModel) {
-            
-            guard let index = playlistItems.firstIndex(where: {
+            let sortedItems = playlistItems.sorted { $0.sortOrder < $1.sortOrder }
+            guard let index = sortedItems.firstIndex(where: {
                 $0.id == item.id
             }) else {
                 return
@@ -225,32 +251,32 @@ extension PlaylistEditView {
                 return
             }
             
-            let current = playlistItems[index].playlistItem
-            let previous = playlistItems[index - 1].playlistItem
+            let current = sortedItems[index]
+            let previous = sortedItems[index - 1]
             
-            let temp = current.playOrder
-            current.playOrder = previous.playOrder
-            previous.playOrder = temp
+            let temp = current.sortOrder
+            current.sortOrder = previous.sortOrder
+            previous.sortOrder = temp
         }
         
         func moveItemDown(_ item: PlaylistItemViewModel) {
-            
-            guard let index = playlistItems.firstIndex(where: {
+            let sortedItems = playlistItems.sorted { $0.sortOrder < $1.sortOrder }
+            guard let index = sortedItems.firstIndex(where: {
                 $0.id == item.id
             }) else {
                 return
             }
             
-            guard index < playlistItems.count - 1 else {
+            guard index < sortedItems.count - 1 else {
                 return
             }
             
-            let current = playlistItems[index].playlistItem
-            let next = playlistItems[index + 1].playlistItem
+            let current = sortedItems[index]
+            let next = sortedItems[index + 1]
             
-            let temp = current.playOrder
-            current.playOrder = next.playOrder
-            next.playOrder = temp
+            let temp = current.sortOrder
+            current.sortOrder = next.sortOrder
+            next.sortOrder = temp
         }
         
         // MARK: Delete group

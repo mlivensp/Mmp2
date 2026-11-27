@@ -8,9 +8,16 @@
 import Foundation
 import SwiftData
 
-struct PlaylistItemViewModel: Identifiable {
+@Observable
+final class PlaylistItemViewModel: Identifiable {
     let playlistItem: PlaylistItem
 
+    init(playlistItem: PlaylistItem, isNew: Bool = false) {
+        self.playlistItem = playlistItem
+        self.sortOrder = playlistItem.playOrder
+        self.isNew = isNew
+    }
+    
     var id: PersistentIdentifier {
         playlistItem.persistentModelID
     }
@@ -31,7 +38,6 @@ struct PlaylistItemViewModel: Identifiable {
         return nameParts.joined(separator: " • ")
     }
     
-    var playOrder: Int {
-        playlistItem.playOrder
-    }
+    var sortOrder: Int
+    var isNew: Bool
 }

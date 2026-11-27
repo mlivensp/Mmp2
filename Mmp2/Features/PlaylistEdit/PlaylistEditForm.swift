@@ -142,7 +142,9 @@ struct PlaylistEditForm: View {
             
             HStack(spacing: 0) {
                 ScrollView {
-                    ForEach(vm.playlistItems) { playlistItem in
+                    let playlistItems = vm.playlistItems
+                        .sorted { $0.sortOrder < $1.sortOrder }
+                    ForEach(playlistItems) { playlistItem in
                         Text(playlistItem.name)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(4)
@@ -154,6 +156,8 @@ struct PlaylistEditForm: View {
                             .onTapGesture {
                                 selectedPlaylistItem = playlistItem
                             }
+                        Spacer()
+                        Text("\(playlistItem.sortOrder)")
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -191,7 +195,7 @@ struct PlaylistEditForm: View {
         }
         .padding([.leading, .trailing], formPadding)
         .sheet(isPresented: $showingAddItemSheet) {
-            PlaylistItemPickerSheet(playlist: vm.playlist)
+            PlaylistItemPickerSheet(playlistVM: vm)
         }
     }
     
@@ -217,9 +221,9 @@ private extension PlaylistEditForm {
                     return
                 }
                 
-                // TODO: delete playlist item
-                //                self.selectedRow = vm.delete(row: row)
-                
+                if let index = vm.playlistItems.firstIndex(where: { $0.id == row.id }) {
+                    vm.playlistItems.remove(at: index)
+                }
             } label: {
                 Image(systemName: "trash")
             }
@@ -232,16 +236,14 @@ private extension PlaylistEditForm {
                     return
                 }
                 
-                // TODO: playlist item move up
-                //                vm.moveUp(row)
+                vm.moveItemUp(row)
                 
             } label: {
                 Image(systemName: "arrow.up")
             }
             .disabled(
                 selectedPlaylistItem == nil
-                // TODO: disable if first item
-                // || selectedPlaylistItem == vm.playlistItems.first
+                || selectedPlaylistItem?.playlistItem == vm.playlistItems.first?.playlistItem
             )
             
             Button {
@@ -249,16 +251,14 @@ private extension PlaylistEditForm {
                     return
                 }
                 
-                // TODO: playlist item move down
-                //                vm.moveDown(row)
+                vm.moveItemDown(row)
                 
             } label: {
                 Image(systemName: "arrow.down")
             }
             .disabled(
                 selectedPlaylistItem == nil
-                // TODO: disable if lat item
-                //                || selectedRow == vm.topLevelRows.last
+                || selectedPlaylistItem?.playlistItem == vm.playlistItems.last?.playlistItem
             )
             
             Spacer()
