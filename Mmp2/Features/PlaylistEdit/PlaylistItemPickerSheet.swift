@@ -73,7 +73,11 @@ struct PlaylistItemPickerSheet: View {
                 }
                 
                 Button("Done") {
-                    applySelections()
+                    do {
+                        try applySelections()
+                    } catch {
+                        // TODO: notify user
+                    }
                     dismiss()
                 }
                 .buttonStyle(.borderedProminent)
@@ -129,7 +133,7 @@ struct PlaylistItemPickerSheet: View {
         }
     }
     
-    private func applySelections() {
+    private func applySelections() throws {
         let existingSourceIds = Set(
             playlistVM.playlistItems.compactMap {
                 $0.playlistItem.source?.persistentModelID
@@ -159,7 +163,7 @@ struct PlaylistItemPickerSheet: View {
             clipIdsToRemove: clipIdsToRemove
         )
         
-        addItems(
+        try addItems(
             sourceIdsToAdd: sourceIdsToAdd,
             clipIdsToAdd: clipIdsToAdd
         )
@@ -202,14 +206,13 @@ struct PlaylistItemPickerSheet: View {
     
     private func addItems(
         sourceIdsToAdd: Set<PersistentIdentifier>,
-        clipIdsToAdd: Set<PersistentIdentifier>
-    ) {
+        clipIdsToAdd: Set<PersistentIdentifier>) throws {
         var sortOrder = nextSortOrder
         
         for sourceId in sourceIdsToAdd {
             if let source = modelContext.model(for: sourceId) as? Source {
                 let item = PlaylistItem.makeDraft(playOrder: sortOrder, source: source)
-                let itemVM = PlaylistItemViewModel(playlistItem: item, isNew: true)
+                let itemVM = try PlaylistItemViewModel(playlistItem: item, context: modelContext, isNew: true)
                 playlistVM.playlistItems.append(itemVM)
                 sortOrder += 1
             }
@@ -218,7 +221,7 @@ struct PlaylistItemPickerSheet: View {
         for clipId in clipIdsToAdd {
             if let clip = modelContext.model(for: clipId) as? Clip {
                 let item = PlaylistItem.makeDraft(playOrder: sortOrder, clip: clip)
-                let itemVM = PlaylistItemViewModel(playlistItem: item)
+                let itemVM = try PlaylistItemViewModel(playlistItem: item, context: modelContext, isNew: true)
                 playlistVM.playlistItems.append(itemVM)
                 sortOrder += 1
             }

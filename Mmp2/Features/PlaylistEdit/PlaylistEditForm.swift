@@ -19,6 +19,8 @@ struct PlaylistEditForm: View {
     @State private var showingAddItemSheet = false
     @State private var showingAddGroupSheet = false
     @State private var showingDeleteMembershipConfirmation = false
+    @State private var showingPlaylistItemEditSheet = false
+    @State private var editingPlaylistItem: PlaylistItemViewModel?
     
     init(playlist: Playlist, context: ModelContext) {
         _vm = State(initialValue: PlaylistEditView.ViewModel(playlist: playlist, context: context))
@@ -156,8 +158,6 @@ struct PlaylistEditForm: View {
                             .onTapGesture {
                                 selectedPlaylistItem = playlistItem
                             }
-                        Spacer()
-                        Text("\(playlistItem.sortOrder)")
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -197,6 +197,9 @@ struct PlaylistEditForm: View {
         .sheet(isPresented: $showingAddItemSheet) {
             PlaylistItemPickerSheet(playlistVM: vm)
         }
+        .sheet(item: $editingPlaylistItem) { vm in
+            PlaylistItemEditView(vm: vm)
+        }
     }
     
     private func addPlaylistItem() {
@@ -205,6 +208,8 @@ struct PlaylistEditForm: View {
 }
 
 private extension PlaylistEditForm {
+    
+    //MARK: Toolbar
     
     var toolbar: some View {
         
@@ -260,6 +265,13 @@ private extension PlaylistEditForm {
                 selectedPlaylistItem == nil
                 || selectedPlaylistItem?.playlistItem == vm.playlistItems.last?.playlistItem
             )
+            
+            Button {
+                editingPlaylistItem = selectedPlaylistItem
+            } label: {
+                Image(systemName: "pencil")
+            }
+           .disabled(selectedPlaylistItem == nil)
             
             Spacer()
         }

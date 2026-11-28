@@ -48,7 +48,7 @@ extension PlaylistEditView {
             self.notes = playlist.notes ?? ""
             
             playlistItems = playlist.playlistItems
-                .map { PlaylistItemViewModel(playlistItem: $0) }
+                .map { try! PlaylistItemViewModel(playlistItem: $0, context: context) }
                 .sorted { $0.sortOrder < $1.sortOrder }
         }
         
